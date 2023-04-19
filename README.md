@@ -1,6 +1,7 @@
 # RustyLeet
 
-![RustyLeet logo](https://github.com/allaboutevemirolive/RustyLeet/.github/rustyCrab.png)
+<img src="https://github.com/allaboutevemirolive/RustyLeet/blob/main/.github/rustyCrab.png" width="300" height="300" alt="RustyLeet logo">
+
 
 Welcome to RustyLeet! 🦀👨‍💻
 
