@@ -1,6 +1,6 @@
 # RustyLeet
 
-![RustyLeet Banner Image](https://i.imgur.com/1ObY52t.png)
+![RustyLeet logo](https://github.com/allaboutevemirolive/RustyLeet/.github/rustyCrab.png)
 
 Welcome to RustyLeet! 🦀👨‍💻
 
