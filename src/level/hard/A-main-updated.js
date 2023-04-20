@@ -5,9 +5,9 @@ const fs = require('fs');
     const browser = await chromium.launch();
     const page = await browser.newPage();
 
-    const text_file = 'LeetCode-Hard-Page-2.txt'
+    const text_file = 'LeetCode-Hard-Page-4.txt'
 
-    const target_link = 'https://leetcode.com/problemset/all/?difficulty=HARD&page=2';
+    const target_link = 'https://leetcode.com/problemset/all/?difficulty=HARD&page=4';
 
     const target_language_class = '.language-rust, .language-python, .language-java, .language-cpp';
 
@@ -19,7 +19,7 @@ const fs = require('fs');
 
         await page.goto(target_link);
 
-        await page.waitForTimeout(5000);
+        await page.waitForTimeout(6000);
 
         console.log('match: ' + match);
 
@@ -50,7 +50,7 @@ const fs = require('fs');
 
             await page.waitForTimeout(3000);
 
-            const searchInput = await page.$('input[type="text"][placeholder="Search"]');
+            const searchInput = await page.$('input[type="text"][placeholder="Search..."]');
 
             await searchInput.fill('rust');
 
@@ -65,7 +65,7 @@ const fs = require('fs');
         }
 
         try {
-            const button_sort = await page.$('#headlessui-menu-button-\\:Rqaa9j9l5t6\\:');
+            const button_sort = await page.$('#headlessui-menu-button-\\:Rmaa9j9l5t6\\:');
 
             await button_sort.click();
 
