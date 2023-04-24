@@ -1,0 +1,49 @@
+// https://leetcode.com/problems/process-restricted-friend-requests/solutions/2942191/rust-solution/
+impl Solution {
+    fn find(x: usize, p:&mut Vec<usize>) -> usize {
+        return if p[x] == x {
+            x
+        } else {
+            p[x] = Self::find(p[x], p);
+            p[x]
+        }
+    }
+
+    pub fn friend_requests(n: i32, restrictions: Vec<Vec<i32>>, requests: Vec<Vec<i32>>) -> Vec<bool> {
+        let mut p = vec![0; (n + 1) as usize];
+        for i  in 1..=n {
+            p[i as usize] = i as usize;
+        }
+        let mut ans = vec![false; requests.len()];
+        for i in 0..requests.len() {
+            let (a, b) = (requests[i][0] as usize, requests[i][1] as usize);
+            // 如果已经是朋友
+            let pa = Self::find(a, &mut p);
+            let pb = Self::find(b, &mut p);
+            if pa == pb {
+                ans[i] = true;
+            } else {
+                // pc 作为备份，如果失败则回退
+                let pc = p.clone();
+                // flag 表示是否可行
+                let mut flag = true;
+                p[pa] = pb;
+                for j in 0..restrictions.len() {
+                    let (x, y) = (restrictions[j][0] as usize, restrictions[j][1] as usize);
+                    let px = Self::find(x, &mut p);
+                    let py = Self::find(y, &mut p);
+                    if px == py {
+                        flag = false;
+                        break;
+                    }
+                }
+                if flag {
+                    ans[i] = true;
+                } else {
+                    p = pc;
+                }
+            }
+        }
+        ans
+    }
+}

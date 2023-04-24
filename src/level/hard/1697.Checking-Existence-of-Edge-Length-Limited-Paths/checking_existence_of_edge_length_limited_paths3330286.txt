@@ -1,0 +1,114 @@
+// https://leetcode.com/problems/checking-existence-of-edge-length-limited-paths/solutions/3330286/rust-union-find-sorting/
+impl Solution {
+    pub fn distance_limited_paths_exist(n: i32, edge_list: Vec<Vec<i32>>, queries: Vec<Vec<i32>>) -> Vec<bool> {
+        distance_limited_paths_exist(n, edge_list, queries)
+    }
+}
+
+
+use std::cmp::Ordering;
+
+const IDX_NODE_A: usize = 0;
+const IDX_NODE_B: usize = 1;
+const IDX_COST_LIMIT: usize = 2;
+const IDX_COST: usize = 2;
+
+pub fn distance_limited_paths_exist(
+    n: i32,
+    mut edge_list: Vec<Vec<i32>>,
+    queries: Vec<Vec<i32>>,
+) -> Vec<bool> {
+    assert!(n >= 0);
+
+    // sort the edges by ascending cost
+    edge_list.sort_unstable_by_key(|x| x[IDX_COST]);
+
+    // sort the queries by ascending cost, but preserve the original indexes
+    // because we need them to provide the answers in the correct order
+    let mut queries = queries.into_iter().enumerate().collect::<Vec<_>>();
+    queries.sort_unstable_by_key(|x| x.1[IDX_COST_LIMIT]);
+
+    let mut answer = vec![false; queries.len()];
+    let mut uf = UnionFind::new(n as usize);
+    let mut edges = edge_list.into_iter().peekable();
+
+    for (query_idx, query) in queries {
+        let node_a = query[IDX_NODE_A] as usize;
+        let node_b = query[IDX_NODE_B] as usize;
+        let limit = query[IDX_COST_LIMIT];
+
+        // union() all nodes that are connected with edges
+        // whose cost is lower than the current limit
+        while let Some(edge) = edges.peek() {
+            if edge[IDX_COST] >= limit {
+                break;
+            }
+
+            uf.union(edge[IDX_NODE_A] as usize, edge[IDX_NODE_B] as usize);
+            edges.next();
+        }
+
+        // If the two nodes have the same roots, then there exists a path
+        // whose elements' cost is lower than the limit, because we have
+        // not union()-ed any edges with cost >= limit, because both the
+        // edges and the queries are sorted
+        if uf.find(node_a) == uf.find(node_b) {
+            answer[query_idx] = true;
+        }
+    }
+
+    answer
+}
+
+pub struct UnionFind {
+    parents: Vec<usize>,
+    ranks: Vec<usize>,
+}
+
+impl UnionFind {
+    pub fn new(size: usize) -> Self {
+        Self {
+            ranks: vec![0; size],
+            parents: (0..size).collect(),
+        }
+    }
+
+    pub fn find(&mut self, key: usize) -> usize {
+        if self.parents[key] == key {
+            return key;
+        }
+
+        let parent = self.find(self.parents[key]);
+        self.parents[key] = parent;
+        parent
+    }
+
+    pub fn union(&mut self, a: usize, b: usize) -> usize {
+        let x = self.find(a);
+        let y = self.find(b);
+
+        // A and B are already in the same set -> nothing to do
+        if x == y {
+            return x;
+        }
+
+        let xr = self.ranks[x];
+        let yr = self.ranks[y];
+
+        match xr.cmp(&yr) {
+            Ordering::Less => {
+                self.parents[x] = y;
+                y
+            }
+            Ordering::Greater => {
+                self.parents[y] = x;
+                x
+            }
+            Ordering::Equal => {
+                self.parents[x] = y;
+                self.ranks[y] += 1;
+                y
+            }
+        }
+    }
+}

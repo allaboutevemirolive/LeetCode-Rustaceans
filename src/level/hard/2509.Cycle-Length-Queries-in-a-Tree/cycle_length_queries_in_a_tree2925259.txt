@@ -1,0 +1,19 @@
+// https://leetcode.com/problems/cycle-length-queries-in-a-tree/solutions/2925259/rust-concise-solution-lowest-common-ancestor/
+impl Solution {
+    pub fn cycle_length_queries(n: i32, queries: Vec<Vec<i32>>) -> Vec<i32> {
+        let mut ret = vec![];
+
+        for q in queries {
+            let mut count = 0;
+            let (mut a, mut b) = (q[0], q[1]);
+            while a != b {
+                if a > b { a >>= 1; }
+                else     { b >>= 1; }
+                count += 1;
+            }
+            ret.push(count + 1);
+        }
+
+        ret
+    }
+}

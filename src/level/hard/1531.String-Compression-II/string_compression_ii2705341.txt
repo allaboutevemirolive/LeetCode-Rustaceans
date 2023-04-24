@@ -1,0 +1,44 @@
+// https://leetcode.com/problems/string-compression-ii/solutions/2705341/rust-solution/
+fn len_block(cnt: usize) -> i32 {
+    assert_ne!(cnt, 0);
+    assert!(cnt <= 100);
+    match cnt {
+        1 => 1,
+        2..=9 => 2,
+        10..=99 => 3,
+        100 => 4,
+        _ => unreachable!(),
+    }
+}
+
+impl Solution {
+    pub fn get_length_of_optimal_compression(s: String, k: i32) -> i32 {
+        let a = s.into_bytes();
+        let k = k as usize + 1;
+        let mut d = vec![vec![0; k]];
+        for (i, ai) in a.iter().enumerate() {
+            d.push(
+                (0..k)
+                    .map(|j| {
+                        a[0..=i]
+                            .iter()
+                            .zip(&d)
+                            .rev()
+                            .scan((j, 0), |(rest, group_ai), (c, row)| {
+                                if ai == c {
+                                    *group_ai += 1;
+                                } else {
+                                    *rest = (*rest).checked_sub(1)?;
+                                }
+                                Some(row[*rest] + len_block(*group_ai))
+                            })
+                            .chain(j.checked_sub(1).map(|j| d[i][j]))
+                            .min()
+                            .unwrap()
+                    })
+                    .collect(),
+            );
+        }
+        d.pop().unwrap().into_iter().min().unwrap()
+    }
+}

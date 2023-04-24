@@ -1,0 +1,133 @@
+// https://leetcode.com/problems/best-position-for-a-service-centre/solutions/736790/rust-translated/
+// Weiszfeld's algorithm
+// https://leetcode.com/problems/best-position-for-a-service-centre/discuss/731599/Weiszfeld's-algorithm
+impl Solution {
+    pub fn get_min_dist_sum(positions: Vec<Vec<i32>>) -> f64 {
+        fn sum_of_dist(positions: &Vec<Vec<i32>>, x: f64, y: f64) -> f64 {
+            let mut d = 0.0;
+            for p in positions {
+                d += ((x - p[0] as f64) * (x - p[0] as f64)
+                    + (y - p[1] as f64) * (y - p[1] as f64))
+                    .sqrt();
+            }
+            d
+        }
+
+        fn sum_of_bottom(positions: &Vec<Vec<i32>>, x: f64, y: f64) -> f64 {
+            let mut d = 0.0;
+            for p in positions {
+                let t = ((x - p[0] as f64) * (x - p[0] as f64)
+                    + (y - p[1] as f64) * (y - p[1] as f64))
+                    .sqrt();
+                if t < std::f64::EPSILON * 10.0 {
+                    continue;
+                }
+                d += 1.0 / t;
+            }
+            d
+        }
+
+        fn upper(positions: &Vec<Vec<i32>>, x: f64, y: f64) -> (f64, f64) {
+            let mut xx = 0.0;
+            let mut yy = 0.0;
+
+            for p in positions {
+                let t = ((x - p[0] as f64) * (x - p[0] as f64)
+                    + (y - p[1] as f64) * (y - p[1] as f64))
+                    .sqrt();
+                if t < std::f64::EPSILON * 10.0 {
+                    continue;
+                }
+                xx += p[0] as f64 / t;
+                yy += p[1] as f64 / t;
+            }
+            (xx, yy)
+        }
+
+        fn weis(positions: &Vec<Vec<i32>>, x: f64, y: f64) -> (f64, f64) {
+            let (xx, yy) = upper(&positions, x, y);
+            let bottom = sum_of_bottom(&positions, x, y);
+            return if bottom < std::f64::EPSILON * 10.0 {
+                (x, y)
+            } else {
+                (xx / bottom, yy / bottom)
+            };
+        }
+
+        let n = positions.len();
+        if n == 1 {
+            return 0.0;
+        }
+        let mut ans = 0.0;
+
+        let (mut x, mut y) = (0.0, 0.0);
+        for p in &positions {
+            x += p[0] as f64;
+            y += p[1] as f64;
+        }
+        x /= n as f64;
+        y /= n as f64;
+
+        let mut pre = std::f64::MIN;
+        while (ans - pre).abs() > 1.0e-7 {
+            pre = ans;
+            let t = weis(&positions, x, y);
+            x = t.0;
+            y = t.1;
+            ans = sum_of_dist(&positions, x, y)
+        }
+        ans
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_get_min_dist_sum() {
+        assert_eq!(
+            Solution::get_min_dist_sum(vec![vec![0, 1], vec![1, 0], vec![1, 2], vec![2, 1]]),
+            4.0
+        )
+    }
+
+    #[test]
+    fn test_get_min_dist_sum_02() {
+        assert_eq!(Solution::get_min_dist_sum(vec![vec![1, 1]]), 0.0)
+    }
+
+    #[test]
+    fn test_get_min_dist_sum_03() {
+        assert!((Solution::get_min_dist_sum(vec![vec![1, 1], vec![3, 3]]) - 2.82843).abs() < 1.0e-5)
+    }
+
+    #[test]
+    fn test_get_min_dist_sum_04() {
+        assert!(
+            (Solution::get_min_dist_sum(vec![vec![1, 1], vec![0, 0], vec![2, 0]]) - 2.73205).abs()
+                < 1.0e-5
+        )
+    }
+
+    #[test]
+    fn test_get_min_dist_sum_05() {
+        let v = vec![
+            vec![0, 1],
+            vec![3, 2],
+            vec![4, 5],
+            vec![7, 6],
+            vec![8, 9],
+            vec![11, 1],
+            vec![2, 12],
+        ];
+        // let (x, y) = (4.3460852395, 4.9813795505);
+        // let mut ans = 0.0;
+        // for p in &v {
+        //     ans += ((x - p[0] as f64) * (x - p[0] as f64) + (y - p[1] as f64) * (y - p[1] as f64))
+        //         .sqrt();
+        // }
+        // println!("{}", ans);
+        assert!((Solution::get_min_dist_sum(v) - 32.94036).abs() < 1.0e-5)
+    }
+}

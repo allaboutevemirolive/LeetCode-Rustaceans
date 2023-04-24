@@ -1,0 +1,50 @@
+// https://leetcode.com/problems/minimum-obstacle-removal-to-reach-corner/solutions/2088110/76-ms-8-1mb-probably-fastest-solution-in-rust/
+use std::collections::VecDeque;
+impl Solution {
+    pub fn minimum_obstacles(grid: Vec<Vec<i32>>) -> i32 {
+        let mut result = 0;
+        let n_row = grid.len();
+        let n_col = grid.first().unwrap().len();
+        let mut deque = VecDeque::from([(0, 0, 0)]);
+        let mut grid = grid;
+
+        while let Some((cost, i, j)) = deque.pop_front() {
+            if i + 1 == n_row && j + 1 == n_col {
+                result = cost;
+                break;
+            }
+
+            let mut f = |i: usize, j: usize| unsafe {
+                let r_brick = grid.get_unchecked_mut(i).get_unchecked_mut(j);
+                match *r_brick {
+                    0 => {
+                        deque.push_front((cost, i, j));
+                        *r_brick = -1;
+                    }
+                    1 => {
+                        deque.push_back((cost + 1, i, j));
+                        *r_brick = -1;
+                    }
+                    _ => {}
+                }
+            };
+
+            if i > 0 {
+                f(i - 1, j);
+            }
+
+            if i + 1 < n_row {
+                f(i + 1, j);
+            }
+
+            if j > 0 {
+                f(i, j - 1);
+            }
+
+            if j + 1 < n_col {
+                f(i, j + 1);
+            }
+        }
+        result
+    }
+}

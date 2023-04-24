@@ -1,0 +1,21 @@
+// https://leetcode.com/problems/minimize-deviation-in-array/solutions/1782794/rust-solution/
+use std::collections::BTreeSet;
+
+impl Solution {
+    pub fn minimum_deviation(nums: Vec<i32>) -> i32 {
+        let mut s: BTreeSet<_> = nums
+            .into_iter()
+            .map(|x| if x % 2 == 1 { x * 2 } else { x })
+            .collect();
+        std::iter::from_fn(|| {
+            let max = *s.iter().last().unwrap();
+            (max % 2 == 0).then(|| {
+                s.remove(&max);
+                s.insert(max / 2);
+                s.iter().last().unwrap() - s.iter().next().unwrap()
+            })
+        })
+        .min()
+        .unwrap()
+    }
+}

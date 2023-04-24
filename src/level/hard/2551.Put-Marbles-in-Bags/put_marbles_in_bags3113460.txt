@@ -1,0 +1,15 @@
+// https://leetcode.com/problems/put-marbles-in-bags/solutions/3113460/rust-sort/
+impl Solution {
+    pub fn put_marbles(weights: Vec<i32>, k: i32) -> i64 {
+        let mut data = vec![];
+        let n = weights.len();
+
+        for i in 0 .. n - 1 { data.push(weights[i] as i64 + weights[i + 1] as i64); } 
+        data.sort();
+
+        let mut ret = 0;
+        for i in 0 .. k as usize - 1 { ret += data[n - 2 - i] - data[i]; }
+
+        ret 
+    }
+}

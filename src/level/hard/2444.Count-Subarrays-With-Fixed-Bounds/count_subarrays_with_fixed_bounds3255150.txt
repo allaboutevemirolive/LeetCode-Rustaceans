@@ -1,0 +1,32 @@
+// https://leetcode.com/problems/count-subarrays-with-fixed-bounds/solutions/3255150/rust-very-simple-solution/
+impl Solution {
+    pub fn count_subarrays(nums: Vec<i32>, min_k: i32, max_k: i32) -> i64 {
+        let mut ret = 0;
+
+        let mut start_at = 0; // Leftmost pos without offending items (< min or > max)
+        let mut last_min_at = None;
+        let mut last_max_at = None;
+
+        for (ix, num) in nums.into_iter().enumerate() {
+            if num < min_k || num > max_k {
+                start_at = ix + 1;
+                last_min_at = None;
+                last_max_at = None;
+                continue;
+            }
+
+            if num == min_k {
+                last_min_at = Some(ix);
+            }
+            if num == max_k {
+                last_max_at = Some(ix);
+            }
+
+            if let (Some(last_min_at), Some(last_max_at)) = (last_min_at, last_max_at) {
+                ret += last_min_at.min(last_max_at) as u64 - start_at as u64 + 1;
+            }
+        }
+
+        ret as i64
+    }
+}

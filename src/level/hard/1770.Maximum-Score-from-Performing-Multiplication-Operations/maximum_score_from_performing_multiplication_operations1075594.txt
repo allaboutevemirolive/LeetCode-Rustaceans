@@ -1,0 +1,28 @@
+// https://leetcode.com/problems/maximum-score-from-performing-multiplication-operations/solutions/1075594/python-help-me-understand-what-went-wrong-here/
+use std::collections::HashMap;
+
+impl Solution {
+    pub fn maximum_score(nums: Vec<i32>, multipliers: Vec<i32>) -> i32 {
+        let mut seen: HashMap<(usize, usize, usize), i32> = HashMap::new();
+        return Self::dp(0, nums.len() - 1, 0, &nums, &multipliers, &mut seen);
+    }
+    
+    fn dp(l: usize, r: usize, i: usize, n: &Vec<i32>, m: &Vec<i32>, s: &mut HashMap<(usize, usize, usize), i32>) -> i32 {
+        if i == m.len() {
+            return 0;
+        }
+                
+        if s.contains_key(&(l, r, i)) {
+            let val = *s.get(&(l, r, i)).unwrap();
+            return val;
+        }
+        
+        let left = n[l] * m[i] + Self::dp(l + 1, r, i + 1, n, m, s);
+        let right = n[r] * m[i] + Self::dp(l, r - 1, i + 1, n, m, s);
+        
+        let res = left.max(right);
+        s.insert((l, r, i), res);
+        
+        res
+    }
+}

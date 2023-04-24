@@ -1,0 +1,76 @@
+// https://leetcode.com/problems/paint-house-iii/solutions/2253906/rust-backtracking-with-memoization-with-comments/
+#[derive(Clone, Copy)]
+enum Cost {
+    Infeasible,
+    Feasible(i32),
+}
+
+use Cost::{Feasible, Infeasible};
+
+impl Solution {
+    fn backtrack(houses: &mut [i32], cost: &[Vec<i32>], m: usize, n: i32, target: usize, i: usize, prev_color: i32, neighborhoods: usize, memo: &mut [[[Option<Cost>; 21]; 100]; 100]) -> Cost {
+        // Base cases if we have reached the end of the "street"
+        // If we have reached the target number of neighborhoods,
+        // the additional cost is 0. If not, we signal that this
+        // branch is not feasible by returning None instead of a
+        // magic value.
+        if i == m {
+            if neighborhoods == target {
+                return Feasible(0);
+            } else {
+                return Infeasible;
+            }
+        }
+
+        // Prune the search by signalling that this branch is
+        // dead by returning None if we already exceed the number
+        // of target neighborhoods.
+        if neighborhoods > target {
+            return Infeasible;
+        }
+
+        // Return memoized result if available to avoid redoing
+        // work.
+        if let Some(c) = memo[i][neighborhoods][prev_color as usize] {
+            return c;
+        }
+
+        // min_cost is the cost of this sub-branch.
+        let mut min_cost = Infeasible;
+        if houses[i] == 0 {
+            // Unpainted house - loop through colors to to find the sub-branch with minimum cost.
+            for j in 0..n {
+                houses[i] = j + 1;
+                // If this house has a different color than the previous, we have an additional neighborhood
+                let new_neighborhoods = if j + 1 == prev_color { neighborhoods } else { neighborhoods + 1};
+                // curr_cost is the cost of painting this house in the selected color
+                let curr_cost = cost[i][j as usize];
+                // Minimize the cost, making use of Option instead of magic values to account for infeasible
+                // sub-branches.
+                match (min_cost, Self::backtrack(houses, cost, m, n, target, i + 1, j+1, new_neighborhoods, memo)) {
+                    (Infeasible, Feasible(cost)) => min_cost = Feasible(curr_cost + cost),
+                    (Feasible(old_cost), Feasible(new_cost)) => min_cost = Feasible(old_cost.min(curr_cost + new_cost)),
+                    _ => (),
+                }
+
+            }
+            // Backtrack the search by making the house unpainted again
+            houses[i] = 0;
+        } else {
+            // House is already painted - we just recurse down the sub-branch without adding any cost
+            let new_neighborhoods = if houses[i] == prev_color { neighborhoods } else { neighborhoods + 1};
+            min_cost = Self::backtrack(houses, cost, m, n, target, i + 1, houses[i], new_neighborhoods, memo);
+        }
+
+        // Record the cost of the sub-branch in the memoization table.
+        memo[i][neighborhoods][prev_color as usize] = Some(min_cost);
+        min_cost
+    } 
+
+    pub fn min_cost(mut houses: Vec<i32>, cost: Vec<Vec<i32>>, m: i32, n: i32, target: i32) -> i32 {
+        match Self::backtrack(&mut houses, &cost, m as usize, n, target as usize, 0, 0, 0, &mut [[[None; 21]; 100]; 100]) {
+            Infeasible => -1,
+            Feasible(c) => c,
+        }
+    }
+}

@@ -1,0 +1,29 @@
+// https://leetcode.com/problems/longest-cycle-in-a-graph/solutions/3347623/simple-and-typical-dfs-beats-100-rust/
+impl Solution {
+    pub fn longest_cycle(edges: Vec<i32>) -> i32 {
+        let mut visited = vec![false; edges.len()];
+        let mut ans = -1;
+
+        for i in 0..edges.len() {
+            if edges[i] != -1 && !visited[i] {
+                let mut seq = Vec::new();
+                ans = ans.max(dfs(&edges, &mut visited, &mut seq, i));
+            }
+        }
+
+        ans
+    }
+}
+
+fn dfs(edges: &Vec<i32>, visited: &mut Vec<bool>, seq: &mut Vec<usize>, i: usize) -> i32 {
+    if edges[i] == -1 { return -1 };
+    if visited[i] { 
+        return if let Some(start) = seq.iter().position(|x| x == &i) {
+            (seq.len() - start) as i32
+        } else { -1 };
+    };
+
+    seq.push(i);
+    visited[i] = true;
+    dfs(edges, visited, seq, edges[i] as usize)
+}

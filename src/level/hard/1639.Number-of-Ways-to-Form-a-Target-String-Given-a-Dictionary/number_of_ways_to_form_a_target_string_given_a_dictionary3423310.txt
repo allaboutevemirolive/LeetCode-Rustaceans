@@ -1,0 +1,23 @@
+// https://leetcode.com/problems/number-of-ways-to-form-a-target-string-given-a-dictionary/solutions/3423310/rust-solution/
+impl Solution {
+    pub fn num_ways(words: Vec<String>, target: String) -> i32 {
+        const MOD: usize = 1_000_000_007;
+
+        let mut col_to_cnt = vec![[0; 26]; words[0].len()];
+        for word in words {
+            for (row, c) in col_to_cnt.iter_mut().zip(word.bytes()) {
+                row[(c - b'a') as usize] += 1;
+            }
+        }
+
+        let mut dp = vec![0; target.len()];
+        dp.push(1);
+        for cnt in col_to_cnt.into_iter().rev() {
+            for (i, ti) in target.bytes().enumerate() {
+                dp[i] += dp[i + 1] * cnt[(ti - b'a') as usize];
+                dp[i] %= MOD;
+            }
+        }
+        dp[0] as _
+    }
+}

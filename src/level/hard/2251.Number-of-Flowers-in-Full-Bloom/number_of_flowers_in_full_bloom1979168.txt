@@ -1,0 +1,31 @@
+// https://leetcode.com/problems/number-of-flowers-in-full-bloom/solutions/1979168/rust-sweep-line-sort-o-n-log-n/
+impl Solution {
+    pub fn full_bloom_flowers(flowers: Vec<Vec<i32>>, persons: Vec<i32>) -> Vec<i32> {
+        let mut arr: Vec<(i32, usize)> = vec![];
+        for f in flowers {
+            let start = f[0];
+            let end = f[1];
+            arr.push((start, 0 as usize));
+            arr.push((end, usize::MAX));
+        }
+        for (i, p) in persons.iter().enumerate() {
+            arr.push((*p, i+1));
+        }
+        arr.sort();
+        // println!("arr {arr:?}");
+        
+        let n = persons.len();
+        let mut res = vec![0; n];
+        let mut cnt = 0;
+        for (t, i) in arr {
+            if i == 0 {
+                cnt += 1;
+            } else if i == usize::MAX {
+                cnt -= 1;
+            } else {
+                res[i-1] = cnt
+            }
+        }
+        res
+    }
+}

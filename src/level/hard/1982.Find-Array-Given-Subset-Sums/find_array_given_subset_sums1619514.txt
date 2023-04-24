@@ -1,0 +1,79 @@
+// https://leetcode.com/problems/find-array-given-subset-sums/solutions/1619514/ugly-rust-solution-beats-100-100-ruby-bonus/
+use std::collections::BTreeMap;
+
+impl Solution {
+    pub fn recover_array(n: i32, sums: Vec<i32>) -> Vec<i32> {
+        let n = n as usize;
+        let mut cur: Vec<i32> = Vec::with_capacity(n);
+        let mut rem: BTreeMap<i32, usize> = Default::default();
+        let mut with_zero: BTreeMap<i32, usize> = Default::default();
+
+        for &x in &sums {
+            *rem.entry(x).or_insert(0) += 1;
+        }
+        let mut one: BTreeMap<i32, usize> = Default::default();
+        one.insert(0, 1);
+        let mut to_check = vec![];
+        while rem != one {
+            let mut k: i32;
+            if let Some(kk) = to_check.pop() {
+                k = kk;
+            } else {
+                let (&(mut kk), &(mut cnt)) = rem.iter().next().unwrap();
+                if cnt > 1 {
+                    to_check.push(0);
+                } else {
+                    let mut it = rem.iter();
+                    it.next();
+                    let k2 = *it.next().unwrap().0 - kk;
+                    to_check.push(k2);
+                    to_check.push(-k2);
+                }
+                continue;
+            }
+            if !rem.contains_key(&k) {
+                continue;
+            }
+
+            let mut a = rem.clone();
+            let mut ok = true;
+            with_zero.clear();
+
+            while !a.is_empty() {
+                let (&t, &cnt) = (if k <= 0 {
+                    a.iter().next()
+                } else {
+                    a.iter().rev().next()
+                })
+                .unwrap();
+
+                if cnt == 1 {
+                    a.remove(&t);
+                } else {
+                    a.insert(t, cnt - 1);
+                }
+
+                match a.get(&(t - k)) {
+                    None | Some(0) => {
+                        ok = false;
+                        break;
+                    }
+                    Some(1) => {
+                        a.remove(&(t - k));
+                    }
+                    Some(i) => {
+                        a.insert(t - k, i - 1);
+                    }
+                }
+
+                *with_zero.entry(t - k).or_insert(0) += 1;
+            }
+
+            if ok && with_zero.contains_key(&0) {
+                cur.push(k);
+                std::mem::swap(&mut rem, &mut with_zero);
+            }
+        }
+        cur
+    }
+}

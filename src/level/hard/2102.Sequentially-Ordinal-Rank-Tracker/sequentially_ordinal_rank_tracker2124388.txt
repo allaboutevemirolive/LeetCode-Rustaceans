@@ -1,0 +1,87 @@
+// https://leetcode.com/problems/sequentially-ordinal-rank-tracker/solutions/2124388/rust-two-binaryheap-solution/
+use std::{
+    cmp::Ordering,
+    collections::BinaryHeap,
+};
+
+
+#[derive(Eq, PartialEq, Debug)]
+struct MinNode {
+    name: String,
+    score: i32,
+}
+
+impl Ord for MinNode {
+    fn cmp(&self, other: &Self) -> Ordering {
+        other
+            .score
+            .cmp(&self.score)
+            .then(self.name.cmp(&other.name))
+    }
+}
+
+impl PartialOrd for MinNode {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        Some(self.cmp(other))
+    }
+}
+
+#[derive(Eq, PartialEq, Debug)]
+struct MaxNode {
+    name: String,
+    score: i32,
+}
+
+impl Ord for MaxNode {
+    fn cmp(&self, other: &Self) -> Ordering {
+        self
+            .score
+            .cmp(&other.score)
+            .then(other.name.cmp(&self.name))
+    }
+}
+
+impl PartialOrd for MaxNode {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        Some(self.cmp(other))
+    }
+}
+
+
+#[derive(Debug)]
+struct SORTracker {
+    top: BinaryHeap<MinNode>,
+    bot: BinaryHeap<MaxNode>,
+    idx: usize,
+}
+
+impl SORTracker {
+    fn new() -> Self {
+        SORTracker {
+            top: BinaryHeap::new(),
+            bot: BinaryHeap::new(),
+            idx: 0,
+        }
+    }
+
+    fn add(&mut self, name: String, score: i32) {
+        self.top.push(MinNode { name, score });
+        while self.top.len() > self.idx {
+            let curr = self.top.pop().unwrap();
+            self.bot.push(MaxNode {
+                name: curr.name,
+                score: curr.score,
+            })
+        }
+    }
+
+    fn get(&mut self) -> String {
+        let curr = self.bot.pop().unwrap();
+        self.idx += 1;
+        self.top.push(MinNode {
+            name: curr.name.clone(),
+            score: curr.score,
+        });
+        curr.name
+    }
+}

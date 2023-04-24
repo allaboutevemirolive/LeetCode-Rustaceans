@@ -1,0 +1,61 @@
+// https://leetcode.com/problems/minimum-time-to-visit-a-cell-in-a-grid/solutions/3234807/rust-heap/
+use std::collections::{BinaryHeap, HashSet};
+use std::cmp::Ordering;
+
+#[derive(Eq, PartialEq)]
+struct TupleWithIndex {
+    t: i32,
+    i: usize,
+    j: usize,
+}
+
+impl Ord for TupleWithIndex {
+    fn cmp(&self, other: &Self) -> Ordering {
+        other.t.cmp(&self.t)
+    }
+}
+
+impl PartialOrd for TupleWithIndex {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        Some(self.cmp(other))
+    }
+}
+
+impl Solution {
+    pub fn minimum_time(grid: Vec<Vec<i32>>) -> i32 {
+        let m = grid.len();
+        let n = grid[0].len();
+        let mut seen = HashSet::new();
+        let mut h = BinaryHeap::new();
+        h.push(TupleWithIndex { t: 0, i: 0, j: 0 });
+        while let Some(TupleWithIndex { t, i, j }) = h.pop() {
+            if i == m - 1 && j == n - 1 {
+                return t;
+            }
+            for (di, dj) in [(0, 1), (1, 0), (0, -1), (-1, 0)].iter() {
+                let mut t2 = t + 1;
+                let i2 = i as i32 + di;
+                let j2 = j as i32 + dj;
+                if i2 >= 0 && i2 < m as i32 && j2 >= 0 && j2 < n as i32 {
+                    let key = (i2, j2);
+                    if seen.contains(&key) {
+                        continue;
+                    }
+                    seen.insert(key);
+                    let i2 = i2 as usize;
+                    let j2 = j2 as usize;
+                    if t2 < grid[i2][j2] {
+                        if t2 == 1 {
+                            continue;
+                        }
+                        let dt = grid[i2][j2] - t2;
+                        t2 += dt + dt % 2;
+                    }
+
+                    h.push(TupleWithIndex { t: t2, i: i2, j: j2 });
+                }
+            }
+        }
+        -1
+    }
+}

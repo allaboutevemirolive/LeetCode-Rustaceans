@@ -1,0 +1,56 @@
+// https://leetcode.com/problems/second-minimum-time-to-reach-destination/solutions/1526220/rust-c-bfs-o-e-solution-and-explanation/
+use std::collections::VecDeque;
+impl Solution {
+    pub fn second_minimum(n: i32, edges: Vec<Vec<i32>>, time: i32, change: i32) -> i32 {
+        let mut adj: Vec<Vec<usize>> = vec![vec![]; (n + 1) as usize];
+
+        for e in edges {
+            let v1 = e[0] as usize;
+            let v2 = e[1] as usize;
+            adj[v1].push(v2);
+            adj[v2].push(v1);
+        }
+
+        let dist2start = Solution::bfs(&adj, 1);
+        let dist2end = Solution::bfs(&adj, adj.len() - 1);
+        let min = dist2start.last().unwrap();
+        let min2 = if Solution::check_dist(&dist2start, &dist2end, min + 1) {
+            min + 1
+        } else {
+            min + 2
+        };
+
+        (0..min2).into_iter().fold(0, |sum, _| {
+            if sum / change % 2 == 1 {
+                (sum / change + 1) * change + time
+            } else {
+                sum + time
+            }
+        })
+    }
+
+    fn check_dist(dist2start: &[usize], dist2end: &[usize], target: usize) -> bool {
+        dist2start[1..]
+            .iter()
+            .zip(dist2end[1..].iter())
+            .any(|(d1, d2)| d1 + d2 == target)
+    }
+
+    fn bfs(adj: &[Vec<usize>], start: usize) -> Vec<usize> {
+        let mut q: VecDeque<usize> = VecDeque::new();
+        q.push_back(start);
+        let mut dist2start = vec![usize::MAX; adj.len()];
+        dist2start[start] = 0;
+        while !q.is_empty() {
+            let v = q.pop_front().unwrap();
+            for &a in &adj[v] {
+                if dist2start[a] == usize::MAX {
+                    dist2start[a] = dist2start[v] + 1;
+                    q.push_back(a);
+                }
+            }
+        }
+
+        dist2start
+    }
+}

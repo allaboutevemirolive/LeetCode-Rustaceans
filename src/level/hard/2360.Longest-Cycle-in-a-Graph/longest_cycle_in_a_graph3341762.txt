@@ -1,0 +1,23 @@
+// https://leetcode.com/problems/longest-cycle-in-a-graph/solutions/3341762/rust-very-simple-15ms-beats-100/
+impl Solution {
+    pub fn longest_cycle(edges: Vec<i32>) -> i32 {
+        let     n       = edges.len();
+        let mut visited = vec![0; n];
+        let mut longest = 0;
+
+        let mut i = 1;  // Step counter.
+
+        for mut v in 0..n {
+            let j = i;
+            while edges[v] != -1 && visited[v] == 0 {
+                visited[v] = i;
+                v = edges[v] as usize;  // Follow.
+                i += 1;
+            }
+            if edges[v] != -1 && visited[v] >= j {
+                longest = longest.max(i - visited[v]);
+            }
+        }
+        if longest < 2 { -1 } else { longest as i32 }
+    }    
+}

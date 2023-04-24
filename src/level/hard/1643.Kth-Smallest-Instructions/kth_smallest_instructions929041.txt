@@ -1,0 +1,43 @@
+// https://leetcode.com/problems/kth-smallest-instructions/solutions/929041/rust-dp-o-v-h-2/
+use std::cmp;
+impl Solution {
+    pub fn kth_smallest_path(destination: Vec<i32>, k: i32) -> String {
+        let h = destination[1];
+        let v = destination[0];
+        
+        let mut dp: Vec<Vec<i32>> = vec![];
+        for i in 0..=v {
+            dp.push(vec![-1; (h+v) as usize]);
+        }
+        for i in 1..=v {
+            dp[i as usize][(i-1) as usize] = 0;
+            for j in i..v+h {
+                dp[i as usize][j as usize] = 1;
+                for k in 0..i {
+                    dp[i as usize][j as usize] += dp[(i-k) as usize][(j-k-1) as usize];   
+                }
+            }
+        }
+        
+        let mut real_k = k - 1;
+        let mut highest = v+h-1;
+        let mut answer = String::new();
+        for i in 0..v {
+            let p = v - i;
+            while dp[p as usize][highest as usize] > real_k {
+                answer.push('H');
+                highest -= 1;
+                
+            }
+            answer.push('V');
+            real_k -= dp[p as usize][highest as usize];
+            highest -= 1;
+        }
+        for _ in 0..=highest {
+            answer.push('H');
+        }
+
+       answer
+        
+    }
+}

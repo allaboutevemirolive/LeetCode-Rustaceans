@@ -1,0 +1,48 @@
+// https://leetcode.com/problems/closest-subsequence-sum/solutions/2589859/rust-meet-in-middle-binary-search/
+impl Solution {
+    pub fn min_abs_difference(nums: Vec<i32>, goal: i32) -> i32 {
+        let n = nums.len();
+        let m1 = n / 2;
+        let m2 = n - m1;
+        let (sz1, sz2) = (1 << m1, 1 << m2);
+        
+        let (mut v1, mut v2) = (vec![0; sz1], vec![0; sz2]);
+        
+        for i in 0..sz1 {
+            for k in 0..m1 {
+                if i & (1 << k) > 0 { v1[i] += nums[k] as i64; }
+            }
+        }
+        
+        for i in 0..sz2 {
+            for k in 0..m2 {
+                if i & (1 << k) > 0 { v2[i] += nums[m1 + k] as i64; }
+            }
+        }
+        
+        v2.sort();
+        
+        let mut ret = i64::MAX;
+        for a in v1 {
+            let i = Self::binary_search(&v2, goal as i64 - a);
+            ret = ret.min(i64::abs(goal as i64 - a - v2[i]));
+            if i + 1 < v2.len() { ret = ret.min(i64::abs(goal as i64 - a - v2[i + 1])); }
+        }
+        
+        ret as i32
+    }
+    
+    fn binary_search(v2: &Vec<i64>, val: i64) -> usize {
+        if val >= v2[v2.len() - 1] { return v2.len() - 1 }
+                
+        let (mut left, mut right) = (0, v2.len() - 1);
+        
+        while left < right {
+            let mid = right - (right - left) / 2;
+            if v2[mid] <= val { left = mid; }
+            else              { right = mid - 1; }
+        }
+        
+        left
+    }
+}

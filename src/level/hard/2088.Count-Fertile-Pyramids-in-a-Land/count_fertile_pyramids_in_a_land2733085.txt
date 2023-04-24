@@ -1,0 +1,157 @@
+// https://leetcode.com/problems/count-fertile-pyramids-in-a-land/solutions/2733085/rust-bit-of-an-odd-solution-that-builds-valid-ranges-for-each-row/
+struct IndRange {
+    left: i16,
+    right: i16,
+}
+
+impl IndRange {
+    fn new(left: i16, right: i16) -> Self {
+        Self {
+            left: left,
+            right: right,
+        }
+    }
+
+    // Is the other range inside this range (inclusive on both ends)
+    fn contains(&self, other: IndRange) -> bool {
+        if self.left > other.left {
+            return false
+        }
+        if self.right < other.right {
+            return false
+        }
+        return true
+    }
+
+    fn is_zero(&self) -> bool {
+        return self.left == -1;
+    }
+}
+
+impl Clone for IndRange {
+    fn clone(&self) -> Self {
+        Self {
+            left: self.left,
+            right: self.right,
+        }
+    }
+}
+
+impl Solution {
+
+    fn ranges_for_row(rvec: &Vec<i32>) -> Vec<IndRange> {
+        let mut smallvec: Vec<IndRange> = Vec::new();
+        let mut low: i16 = 0;
+        let mut high: i16 = 0;
+        let mut last_was_0 = true;
+        let len = rvec.len();
+        for i in 0..=len {
+            let val_m = rvec.get(i);
+            let val;
+            if let Some(v) = val_m {
+                val = *v;
+            } else {
+                val = 0;
+            }
+            if val == 0 {
+                if last_was_0 {
+                    continue;
+                }
+                smallvec.push(IndRange::new(low, high));
+                last_was_0 = true;
+                continue;
+            }
+            if last_was_0 {
+                low = i as i16;
+                last_was_0 = false;
+            }
+            high = i as i16;
+        }
+        return smallvec
+    }
+
+    fn unroll_small_ranges_vec(rvec: Vec<IndRange>, len: usize) -> Vec<IndRange> {
+        let mut vec: Vec<IndRange> = vec![IndRange::new(-1, -1); len];
+
+        for rng in rvec {
+            let left = rng.left;
+            let right = rng.right;
+            for i in left..=right {
+                vec[i as usize] = rng.clone();
+            }
+        }
+        return vec
+    }
+
+    fn init_ranges(grid: &Vec<Vec<i32>>, ranges: &mut Vec<Vec<IndRange>>) {
+        for r in grid {
+            let svec = Self::ranges_for_row(r);
+            let rng_row = Self::unroll_small_ranges_vec(svec, r.len());
+            ranges.push(rng_row);
+        }
+    }
+
+    fn signed_get<T>(grid: &Vec<T>, ind: i16) -> Option<&T> {
+        if ind < 0 {
+            return None
+        }
+        grid.get(ind as usize)
+    }
+
+
+    fn pyramids_at(ranges: &Vec<Vec<IndRange>>, row: i16, col: i16) -> i32 {
+        let mut num_pyramids = 0;
+        let mut h: i16 = 1;
+        if ranges[row as usize][col as usize].is_zero() {
+            return 0;
+        }
+        loop {
+            let meta_row = row + h;
+            let rvec_m = Self::signed_get(ranges, meta_row);
+            let rvec;
+            match rvec_m {
+                Some(rvec_i) => rvec = rvec_i,
+                None => break,
+            }
+            let range = IndRange::new(col - h, col + h);
+            if !rvec[col as usize].contains(range) {
+                break;
+            }
+            num_pyramids += 1;
+            h += 1;
+        }
+        h = 1;
+        loop {
+            let meta_row = row - h;
+            let rvec_m = Self::signed_get(ranges, meta_row);
+            let rvec;
+            match rvec_m {
+                Some(rvec_i) => rvec = rvec_i,
+                None => break,
+            }
+            let range = IndRange::new(col - h, col + h);
+            if !rvec[col as usize].contains(range) {
+                break;
+            }
+            num_pyramids += 1;
+            h += 1;
+        }
+        return num_pyramids;
+    }
+
+
+
+    pub fn count_pyramids(grid: Vec<Vec<i32>>) -> i32 {
+        let mut ranges: Vec<Vec<IndRange>> = Vec::new();
+        Self::init_ranges(&grid, &mut ranges); 
+        let rlen = grid.len();
+        let mut num_pyramids = 0;
+        for r in 0..rlen {
+            let clen = grid[r].len();
+            for c in 0..clen {
+                num_pyramids += Self::pyramids_at(&ranges, r as i16, c as i16);
+            }
+        }
+        return num_pyramids
+    }
+}

@@ -1,0 +1,43 @@
+// https://leetcode.com/problems/create-components-with-same-value/solutions/2707126/rust-dfs-solution/
+impl Solution {
+    pub fn component_value(nums: Vec<i32>, edges: Vec<Vec<i32>>) -> i32 {
+        let n = nums.len();
+        let mut graph = vec![vec![]; n];
+
+        for e in edges {
+            let (u, v) = (e[0] as usize, e[1] as usize);
+            graph[u].push(v);
+            graph[v].push(u);
+        }
+
+        let sum: i32 = nums.iter().sum();
+
+        for a in 1..sum as usize {
+            let a = a as i32;
+            if sum % a != 0 { continue }
+            
+            let mut flag = vec![0; n];
+            flag[0] = 1;
+            let mut rem = 0;
+            if Self::check(&graph, &mut flag, 0, a, &mut rem, &nums) { return sum / a - 1 }
+        }
+
+        0
+    }
+
+    fn check(graph: &Vec<Vec<usize>>, flag: &mut Vec<i32>, u: usize, amt: i32, rem: &mut i32, nums: &Vec<i32>) -> bool {
+        *rem = nums[u];
+        for v in &graph[u] {
+            if flag[*v] == 1 { continue }
+
+            flag[*v] = 1;
+            let mut t = 0;
+            if Self::check(graph, flag, *v, amt, &mut t, nums) == false { return false }
+            *rem += t;
+        }
+        if *rem > amt { return false }
+        if *rem == amt { *rem = 0; }
+        
+        true
+    }
+}

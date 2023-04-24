@@ -1,0 +1,22 @@
+// https://leetcode.com/problems/number-of-visible-people-in-a-queue/solutions/2879902/simple-rust-solution-with-time-complexity-o-n/
+impl Solution {
+    pub fn can_see_persons_count(heights: Vec<i32>) -> Vec<i32> {
+        let n = heights.len();
+
+        let mut res = vec![0; n];
+        // A stack used to record the indices of elements to be 
+        // processed
+        let mut stack: Vec<usize> = Vec::new();
+
+        for (idx, x) in heights.iter().enumerate(){
+            while !stack.is_empty() && heights[stack[stack.len() - 1]] < *x{
+                res[stack.pop().unwrap()] += 1;
+            }
+            if !stack.is_empty(){
+                res[stack[stack.len() - 1]] += 1;
+            }
+            stack.push(idx);
+        }
+        res
+    }
+}

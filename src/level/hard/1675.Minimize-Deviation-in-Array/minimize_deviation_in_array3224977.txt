@@ -1,0 +1,25 @@
+// https://leetcode.com/problems/minimize-deviation-in-array/solutions/3224977/rust-collect-binaryheap/
+use std::collections::BinaryHeap;
+
+impl Solution {
+    pub fn minimum_deviation(nums: Vec<i32>) -> i32 {
+        let mut min_num = i32::MAX;
+        let mut deviation = i32::MAX;
+        let mut pq = nums.into_iter().map(|num| {
+            let even = if num & 1 == 1 { num << 1 } else { num };
+            min_num = min_num.min(even);
+            even
+        }).collect::<BinaryHeap<_>>();
+
+        while let Some(top) = pq.pop() {
+            deviation = deviation.min(top - min_num);
+            if top & 1 == 1 {
+                break;
+            }
+            min_num = min_num.min(top >> 1);
+            pq.push(top >> 1);
+        }
+
+        deviation
+    }
+}

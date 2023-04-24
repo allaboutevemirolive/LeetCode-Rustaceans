@@ -1,0 +1,43 @@
+// https://leetcode.com/problems/number-of-good-paths/solutions/3055531/rust-dsu-path-compression-beats-100/
+use std::cmp::Ordering;
+use std::cmp::Ordering;
+
+impl Solution {
+    pub fn number_of_good_paths(vals: Vec<i32>, edges: Vec<Vec<i32>>) -> i32 {
+        let mut edges = edges;
+        edges.sort_by(|a, b| {
+            i32::max(vals[a[0] as usize], vals[a[1] as usize])
+                .cmp(&i32::max(vals[b[0] as usize], vals[b[1] as usize]))
+        });
+        let n = vals.len();
+        let mut node_cnt = vec![1; n];
+        let mut parent = (0..n).collect();
+        fn root(node: usize, parent: &mut Vec<usize>) -> usize {
+            if node == parent[node] {
+                return node;
+            }
+            parent[node] = root(parent[node], parent);
+            parent[node]
+        }
+        edges.iter().fold(n as i32, |ret, edge|{
+            let p = root(edge[0] as usize, &mut parent);
+            let q = root(edge[1] as usize, &mut parent);
+            ret + match vals[p].cmp(&vals[q]) {
+                Ordering::Equal => {
+                    parent[p] = q;
+                    let cnt = node_cnt[p] * node_cnt[q];
+                    node_cnt[q] += node_cnt[p];
+                    cnt
+                }
+                Ordering::Greater => {
+                    parent[q] = p;
+                    0
+                }
+                Ordering::Less => {
+                    parent[p] = q;
+                    0
+                }
+            }
+        })
+    }
+}

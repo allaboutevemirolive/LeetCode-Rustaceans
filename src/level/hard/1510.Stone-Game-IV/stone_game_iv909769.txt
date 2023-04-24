@@ -1,0 +1,12 @@
+// https://leetcode.com/problems/stone-game-iv/solutions/909769/idiomatic-rust-7-lines-o-n-1-5/
+impl Solution {
+    pub fn winner_square_game(n: i32) -> bool {
+        let mut dp = vec![false; n as usize + 1];
+        for i in 1..=(n as usize) {
+            dp[i] = (1..=i).map(|i| i * i)
+                .take_while(|&j| j <= i)
+                .any(|j| !dp[i - j]);
+        }
+        *dp.last().unwrap()
+    }
+}

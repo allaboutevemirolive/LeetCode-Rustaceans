@@ -1,0 +1,36 @@
+// https://leetcode.com/problems/longest-cycle-in-a-graph/solutions/3344461/rust-dfs-simple-solution/
+use std::collections::{HashMap, HashSet};
+
+impl Solution {
+    pub fn longest_cycle(edges: Vec<i32>) -> i32 {
+        let mut visited: HashSet<i32> = HashSet::new();
+        let mut longest_cycle = -1;
+//looping through all nodes
+        for i in 0..edges.len() as i32{
+//if node was already visited we continue
+            if !visited.contains(&i){
+//current map saves when we encountered each current node
+                let mut current_map: HashMap<i32,i32> = HashMap::new();
+                let mut counter = 0;
+                let mut current: i32 = i;
+//main DFS loop
+                loop {
+                    counter+=1;
+//if we find a cycle we calculate the new longest_cycle and break
+                    if let Some(v) = current_map.get(&current){
+                        longest_cycle = longest_cycle.max(counter-*v);
+                        break;
+                    }
+//if we already visited this cycle, or there is no cycle ie. ==-1 we break
+                    if visited.contains(&current) || edges[current as usize]==-1{
+                        break;
+                    }
+                    visited.insert(current);
+                    current_map.insert(current,counter);
+                    current=edges[current as usize];
+                }
+            }
+        }
+        longest_cycle
+    }
+}

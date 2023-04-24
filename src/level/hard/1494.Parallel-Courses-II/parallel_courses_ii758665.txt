@@ -1,0 +1,80 @@
+// https://leetcode.com/problems/parallel-courses-ii/solutions/758665/rust-translated/
+// https://leetcode.com/problems/parallel-courses-ii/discuss/709009/C%2B%2B20msDPState-CompressionBit-Manipulation-MagicBitwise-Subset-Iteration
+impl Solution {
+    pub fn min_number_of_semesters(n: i32, dependencies: Vec<Vec<i32>>, k: i32) -> i32 {
+        let mut n_states = (1 << n) as usize;
+        let mut dp = vec![std::i32::MAX / 2; n_states as usize];
+        let mut pre = vec![0; n as usize];
+        for dep in dependencies {
+            pre[(dep[1] - 1) as usize] = pre[(dep[1] - 1) as usize] | (1 << (dep[0] - 1));
+        }
+        dp[0] = 0;
+        let mut idx = vec![0; n as usize];
+        for i in 0..n_states {
+            let mut candidates = 0; // Courses that are ready and not taken yet, bit representation
+            let mut n_candidates = 0; // Number of these candidate courses.
+
+            for j in 0..n as usize {
+                if (i >> j) & 1 != 0 {
+                    continue;
+                }
+                if i & pre[j] == pre[j] {
+                    idx[n_candidates] = j;
+                    n_candidates += 1;
+                    candidates |= 1 << j;
+                }
+            }
+            if n_candidates <= k as usize {
+                // Take all of these courses in one semester.
+                dp[i | candidates] = std::cmp::min(dp[i | candidates], dp[i] + 1);
+            } else {
+                // Enumerate subsets of size k, Gosper's Hack.
+                let mut s = (1 << k) - 1;
+                while s < (1 << n_candidates) {
+                    // Map bit-pattern "subsets of candidates" to bit-pattern "subsets of all courses"
+                    let mut subset_k = 0;
+                    for j in 0..n_candidates {
+                        if (s >> j) & 1 != 0 {
+                            subset_k |= (1 << idx[j]);
+                        }
+                    }
+                    dp[i | subset_k] = std::cmp::min(dp[i | subset_k], dp[i] + 1);
+                    let x = s & -s; // WARNING: bit manipulation magic.
+                    let y = s + x; // WARNING: bit manipulation magic.
+                    s = (((s & !y) / x) >> 1) | y; // WARNING: bit manipulation magic.
+                }
+            }
+        }
+        dp[n_states - 1]
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_min_number_of_semesters() {
+        assert_eq!(
+            3,
+            Solution::min_number_of_semesters(4, vec![vec![2, 1], vec![3, 1], vec![1, 4]], 2)
+        )
+    }
+
+    #[test]
+    fn test_min_number_of_semesters_02() {
+        assert_eq!(
+            4,
+            Solution::min_number_of_semesters(
+                5,
+                vec![vec![2, 1], vec![3, 1], vec![4, 1], vec![1, 5]],
+                2
+            )
+        )
+    }
+
+    #[test]
+    fn test_min_number_of_semesters_03() {
+        assert_eq!(6, Solution::min_number_of_semesters(11, vec![], 2))
+    }
+}

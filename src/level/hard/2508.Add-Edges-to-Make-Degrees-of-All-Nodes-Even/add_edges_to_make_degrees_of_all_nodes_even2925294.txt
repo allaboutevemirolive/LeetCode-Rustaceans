@@ -1,0 +1,44 @@
+// https://leetcode.com/problems/add-edges-to-make-degrees-of-all-nodes-even/solutions/2925294/c-rust-solution-easy-to-read/
+//C++
+class Solution {
+public:
+    bool isPossible(int n, vector<vector<int>>& edges) {
+        set<pair<int, int>> s;
+        vector<int> degree(n + 1, 0);
+        
+        for (auto &e: edges) {
+            degree[e[0]] += 1;
+            degree[e[1]] += 1;
+            int x = min(e[0], e[1]), y  = max(e[0], e[1]);
+            s.insert({x, y});
+        }
+        
+        vector<int> data;
+        for (int u = 1; u <= n; ++u) {
+            if (degree[u] % 2 != 0) data.push_back(u);
+        }
+        if (data.size() == 0) return true;
+        
+        if (data.size() == 4) {
+            sort(data.begin(), data.end());
+            
+            if (s.find({data[0], data[1]}) == s.end() && s.find({data[2], data[3]}) == s.end()) return true;
+            if (s.find({data[0], data[2]}) == s.end() && s.find({data[1], data[3]}) == s.end()) return true;
+            if (s.find({data[0], data[3]}) == s.end() && s.find({data[1], data[2]}) == s.end()) return true;
+            return false;
+        }
+        
+        if (data.size() == 2) {
+            sort(data.begin(), data.end());
+            if (s.find({data[0], data[1]}) == s.end()) return true;
+            for (int u = 1; u <= n; ++u) {
+                if (u == data[0] || u == data[1]) continue;
+                int x = min(u, data[0]), y  = max(u, data[0]);
+                int i = min(u, data[1]), j  = max(u, data[1]);
+                if (s.find({x, y}) == s.end() && s.find({i, j}) == s.end()) return true;
+            }
+        }
+        
+        return false;
+    }
+};

@@ -1,0 +1,60 @@
+// https://leetcode.com/problems/check-if-string-is-transformable-with-substring-sort-operations/solutions/844678/rust-translated-4ms-100/
+impl Solution {
+    pub fn is_transformable(s: String, t: String) -> bool {
+        let mut idx = vec![vec![]; 10];
+        let mut pos = vec![0; 10];
+        for i in 0..s.len() {
+            idx[(s.as_bytes()[i] - b'0') as usize].push(i as i32);
+        }
+        for i in 0..t.len() {
+            let d = (t.as_bytes()[i] - b'0') as usize;
+            if pos[d] >= idx[d].len() {
+                return false;
+            }
+            for j in 0..d {
+                if pos[j] < idx[j].len() && idx[j][pos[j]] < idx[d][pos[d]] {
+                    return false;
+                }
+            }
+            pos[d] += 1;
+        }
+        return true;
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_is_transformable() {
+        assert_eq!(
+            Solution::is_transformable("84532".to_string(), "34852".to_string()),
+            true
+        );
+    }
+
+    #[test]
+    fn test_is_transformable_02() {
+        assert_eq!(
+            Solution::is_transformable("34521".to_string(), "23415".to_string()),
+            true
+        );
+    }
+
+    #[test]
+    fn test_is_transformable_03() {
+        assert_eq!(
+            Solution::is_transformable("12345".to_string(), "12435".to_string()),
+            false
+        );
+    }
+
+    #[test]
+    fn test_is_transformable_04() {
+        assert_eq!(
+            Solution::is_transformable("1".to_string(), "2".to_string()),
+            false
+        );
+    }
+}

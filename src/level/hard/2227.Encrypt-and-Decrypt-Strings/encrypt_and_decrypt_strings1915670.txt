@@ -1,0 +1,82 @@
+// https://leetcode.com/problems/encrypt-and-decrypt-strings/solutions/1915670/rust-hashmap-hashset-search-from-dic-word-o-n/
+use std::collections::{HashMap, HashSet};
+struct Encrypter {
+    ci: HashMap<char, usize>,
+    vi: HashMap<String, HashSet<usize>>,
+    values: Vec<String>,
+    dic: Vec<String>,
+}
+
+
+/** 
+ * `&self` means the method takes an immutable reference.
+ * If you need a mutable reference, change it to `&mut self` instead.
+ */
+impl Encrypter {
+
+    fn new(keys: Vec<char>, values: Vec<String>, dictionary: Vec<String>) -> Self {
+        let mut ci = HashMap::new();
+        let mut vi = HashMap::new();
+        for (i, &c) in keys.iter().enumerate() {
+            ci.insert(c, i);
+        }
+        for (i, v) in values.iter().enumerate() {
+            let list = vi.entry(v.to_string()).or_insert(HashSet::new());
+            list.insert(i);
+        }
+        
+        // println!("ci {:?}\n vi {:#?}\n", ci, vi);
+        
+        Encrypter {
+            ci,
+            vi,
+            values,
+            dic: dictionary,
+        }
+        
+    }
+    
+    fn encrypt(&self, word1: String) -> String {
+        let mut ans = "".to_owned();
+        for c in word1.chars() {
+            let i = self.ci[&c];
+            let v = &self.values[i][..];
+            ans.push_str(v);
+        }
+        ans
+    }
+    
+    fn decrypt(&self, word2: String) -> i32 {
+        let mut cnt = 0;
+        let mut conn:Vec<&HashSet<usize>> = vec![];
+        let n = word2.len()/2;
+        for i in 0..n {
+            let sub = &word2[i*2..i*2+2];
+            // println!("sub {}", sub);
+            if !self.vi.contains_key(sub) {
+                return 0;
+            }
+            let ids = &self.vi[sub];
+            conn.push(ids);
+        }
+        // println!("conn {:?}", conn);
+        'dic_loop: for word in self.dic.iter() {
+            if word.len() != n {
+                continue
+            }
+            for (i, c) in word.chars().enumerate() {
+                if !self.ci.contains_key(&c) {
+                    continue 'dic_loop;
+                }
+                let ids = &conn[i];
+                let id = self.ci[&c];
+                if !ids.contains(&id) {
+                    continue 'dic_loop;
+                }
+            }
+            cnt += 1;
+        }
+        
+        cnt
+    }
+}

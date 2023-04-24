@@ -1,0 +1,86 @@
+// https://leetcode.com/problems/maximum-number-of-visible-points/solutions/879722/rust-translated-88ms-100/
+impl Solution {
+    pub fn visible_points(points: Vec<Vec<i32>>, angle: i32, location: Vec<i32>) -> i32 {
+        const SCALE: i64 = 1_000_000_000_000;
+        let mut angles = Vec::<i64>::new();
+        let mut same = 0;
+        for p in &points {
+            let dx = p[0] - location[0];
+            let dy = p[1] - location[1];
+            if dx == 0 && dy == 0 {
+                same += 1;
+                continue;
+            } else {
+                angles.push(
+                    (f64::atan2(dy as f64, dx as f64) * 180.0 / std::f64::consts::PI * SCALE as f64)
+                        as i64,
+                );
+            }
+        }
+
+        angles.sort();
+        let mut ans = 0;
+        let mut j = 0;
+        let size = angles.len();
+        for i in 0..size * 2 {
+            let adjust_i = if i >= size { 360 * SCALE } else { 0 };
+            while angles[i % size] - angles[j % size] + adjust_i
+                - if j >= size { 360 * SCALE } else { 0 }
+                > angle as i64 * SCALE
+            {
+                j += 1;
+            }
+            ans = std::cmp::max(ans, i - j + 1);
+        }
+        (ans + same) as i32
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_visible_points() {
+        assert_eq!(
+            Solution::visible_points(vec![vec![2, 1], vec![2, 2], vec![3, 3]], 90, vec![1, 1]),
+            3
+        );
+    }
+
+    #[test]
+    fn test_visible_points_02() {
+        assert_eq!(
+            Solution::visible_points(
+                vec![vec![2, 1], vec![2, 2], vec![3, 4], vec![1, 1]],
+                90,
+                vec![1, 1]
+            ),
+            4
+        );
+    }
+
+    #[test]
+    fn test_visible_points_03() {
+        assert_eq!(
+            Solution::visible_points(vec![vec![1, 0], vec![2, 1]], 13, vec![1, 1]),
+            1
+        );
+    }
+
+    #[test]
+    fn test_visible_points_04() {
+        assert_eq!(
+            Solution::visible_points(vec![vec![0, 0], vec![0, 2]], 90, vec![1, 1]),
+            2
+        );
+    }
+
+    #[test]
+    fn test_visible_points_05() {
+        assert_eq!(
+            Solution::visible_points(vec![vec![2, 1], vec![2, 2], vec![3, 3]], 90, vec![1, 1]),
+            3
+        );
+    }
+}

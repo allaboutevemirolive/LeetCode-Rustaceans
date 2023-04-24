@@ -1,0 +1,122 @@
+// https://leetcode.com/problems/groups-of-strings/solutions/1863606/rust-union-find-bitmask-sort-o-26n/
+use std::collections::HashMap;
+
+// struct Solution;
+
+impl Solution {
+    pub fn group_strings(mut words: Vec<String>) -> Vec<i32> {
+        // Sort words by length as we want to visit longer words first
+        words.sort_unstable_by_key(|word| word.len());
+        let mut remove_one = HashMap::new();
+        let mut uf = UnionFind::new(words.len());
+
+        for (i, word) in words.iter().enumerate().rev() {
+            let mut cs = CharSet::new(word);
+
+            // The word can be obtained from another word by deleting one letter
+            if let Some(&j) = remove_one.get(&cs.v) {
+                uf.union(i, j);
+            }
+
+            for c in (0..26).map(|i| (i + b'a') as char) {
+                if cs.remove(c) {
+                    if let Some(&j) = remove_one.get(&cs.v) {
+                        // The word can be obtained from another word by replacing one letter
+                        uf.union(i, j);
+                    } else {
+                        remove_one.insert(cs.v, i);
+                    }
+
+                    cs.insert(c);
+                }
+            }
+        }
+
+        let max_size = (0..words.len()).map(|i| uf.size(i)).max().unwrap();
+        vec![uf.count() as i32, max_size as i32]
+    }
+}
+
+struct CharSet {
+    v: i32,
+}
+
+impl CharSet {
+    fn new(s: &str) -> Self {
+        let v = s.bytes().fold(0, |acc, b| acc | 1 << b - b'a');
+        Self { v }
+    }
+
+    fn insert(&mut self, c: char) -> bool {
+        let mask = 1 << c as u8 - b'a';
+        let absent = self.v & mask == 0;
+        self.v |= mask;
+        absent
+    }
+
+    fn remove(&mut self, c: char) -> bool {
+        let mask = 1 << c as u8 - b'a';
+        let present = self.v & mask != 0;
+        self.v &= !mask;
+        present
+    }
+}
+
+pub struct UnionFind {
+    parents: Vec<usize>,
+    sizes: Vec<usize>,
+    comp_count: usize,
+}
+
+impl UnionFind {
+    pub fn new(size: usize) -> Self {
+        Self {
+            parents: (0..size).collect(),
+            sizes: vec![1; size],
+            comp_count: size,
+        }
+    }
+
+    pub fn find(&mut self, x: usize) -> usize {
+        let mut x = x;
+        let Self { parents, .. } = self;
+        while parents[x] != x {
+            // Path splitting
+            let parent = parents[x];
+            parents[x] = parents[parent];
+            x = parent;
+        }
+        x
+    }
+
+    pub fn union(&mut self, x: usize, y: usize) -> bool {
+        let mut root1 = self.find(x);
+        let mut root2 = self.find(y);
+        if root1 == root2 {
+            return false;
+        }
+
+        // Union by size
+        let Self {
+            parents,
+            sizes,
+            comp_count,
+        } = self;
+        if sizes[root1] > sizes[root2] {
+            std::mem::swap(&mut root1, &mut root2);
+        }
+        parents[root1] = root2;
+        sizes[root2] += sizes[root1];
+        *comp_count -= 1;
+        true
+    }
+
+    pub fn size(&mut self, x: usize) -> usize {
+        let root = self.find(x);
+        self.sizes[root]
+    }
+
+    pub fn count(&self) -> usize {
+        self.comp_count
+    }
+}

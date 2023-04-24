@@ -1,0 +1,11 @@
+// https://leetcode.com/problems/earliest-possible-day-of-full-bloom/solutions/2754237/rust-greedy/
+impl Solution {
+    pub fn earliest_full_bloom(plant_time: Vec<i32>, grow_time: Vec<i32>) -> i32 {
+        let mut plants = grow_time.iter().zip(plant_time.iter()).collect::<Vec<_>>();
+        plants.sort_unstable();
+        let (acc,till_bloom) = plants.iter().rev().fold((0,0),|(acc,till_bloom),(&g,&p)| {
+            (acc + p, g.max(till_bloom - p))
+        });
+        acc + till_bloom
+    }
+}

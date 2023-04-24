@@ -1,0 +1,31 @@
+// https://leetcode.com/problems/minimize-deviation-in-array/solutions/1784306/rust-24ms-3-6mb-100-100/
+use std::collections::BinaryHeap;
+impl Solution {
+    pub fn minimum_deviation(nums: Vec<i32>) -> i32 {
+        let mut nums = nums;
+        let (mut nums, mut deviation,  mut min) = (nums, i32::MAX, i32::MAX);
+        let mut heap: BinaryHeap<i32> =
+            BinaryHeap::with_capacity(nums.len());
+        
+        // 1. Make all odd values even by *2  
+        // 2. Find min of all values
+        // 3. Loop Through the values until the even is max
+        // 4. Otherwise difference is the result 
+        nums.into_iter()
+            .for_each(|mut x| { 
+                if x % 2 !=0 { x *= 2 } min = i32::min(min, x); 
+                heap.push(x);
+            }
+        );
+        let mut diff = i32::MAX;
+        while *heap.peek().unwrap() % 2 == 0 {
+            if let Some(max) = heap.pop() { 
+                diff = i32::min(diff, max - min);
+                if max % 2 !=0 { break;}
+                min = i32::min(max/2, min);
+                heap.push(max/ 2);
+            }
+        }
+        i32::min(diff, *heap.peek().unwrap() - min)
+    }
+}

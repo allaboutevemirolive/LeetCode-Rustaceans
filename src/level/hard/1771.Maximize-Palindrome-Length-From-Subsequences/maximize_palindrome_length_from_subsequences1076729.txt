@@ -1,0 +1,80 @@
+// https://leetcode.com/problems/maximize-palindrome-length-from-subsequences/solutions/1076729/rust-top-down-dp/
+struct Solution;
+
+#[allow(dead_code)]
+impl Solution {
+    pub fn longest_palindrome(word1: String, word2: String) -> i32 {
+        let n = word1.len() + word2.len();
+        let mut dp = vec![vec![-1; n]; n];
+        let combo = word1.clone() + &word2;
+        Self::longest_palindrome_subseq(&combo, 0, n - 1, &mut dp);
+        let mut res = 0;
+        for i in 0..word1.len() {
+            for j in (0..word2.len()).rev() {
+			    // Ensure we are using at least one char from each word.
+                if word1.as_bytes()[i] == word2.as_bytes()[j] {
+                    res = std::cmp::max(res, dp[i][word1.len() + j]);
+                }
+            }
+        }
+        res
+    }
+    // From LeetCode 516. Longest Palindromic Subsequence. This is the top down DP solution.
+    pub fn longest_palindrome_subseq(
+        w: &str,
+        i: usize,
+        j: usize,
+        mut dp: &mut Vec<Vec<i32>>,
+    ) -> i32 {
+        if dp[i][j] != -1 {
+            return dp[i][j];
+        }
+        if i > j {
+            return 0;
+        }
+        if i == j {
+            return 1;
+        }
+        if w.as_bytes()[i] == w.as_bytes()[j] {
+            dp[i][j] = Self::longest_palindrome_subseq(w, i + 1, j - 1, &mut dp) + 2;
+        } else {
+            dp[i][j] = std::cmp::max(
+                Self::longest_palindrome_subseq(w, i + 1, j, &mut dp),
+                Self::longest_palindrome_subseq(w, i, j - 1, &mut dp),
+            )
+        }
+        dp[i][j]
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_longest_palindrome() {
+        assert_eq!(
+            5,
+            Solution::longest_palindrome(String::from("cacb"), String::from("cbba"))
+        );
+        assert_eq!(
+            3,
+            Solution::longest_palindrome(String::from("ab"), String::from("ab"))
+        );
+        assert_eq!(
+            0,
+            Solution::longest_palindrome(String::from("aa"), String::from("bb"))
+        );
+    }
+
+    #[test]
+    fn test_longest_subseq() {
+        let word = String::from("bbbab");
+        let n = word.len();
+        let mut dp = vec![vec![-1; n]; n];
+        assert_eq!(
+            4,
+            Solution::longest_palindrome_subseq(&word, 0, n - 1, &mut dp)
+        );
+    }
+}

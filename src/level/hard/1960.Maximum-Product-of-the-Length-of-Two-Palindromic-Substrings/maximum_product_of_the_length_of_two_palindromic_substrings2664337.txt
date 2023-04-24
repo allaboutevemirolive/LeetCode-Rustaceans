@@ -1,0 +1,74 @@
+// https://leetcode.com/problems/maximum-product-of-the-length-of-two-palindromic-substrings/solutions/2664337/rust-solution-using-manacher-algorithm/
+use std::collections::VecDeque;
+
+impl Solution {
+    pub fn max_product(s: String) -> i64 {
+        let data = Self::manacher_odd(&s);
+        //for d in v { println!["{}", d]; } 
+        
+        let n = data.len();
+        let mut q = VecDeque::<(i32, i32)>::new();
+        let mut right= vec![1; n];
+
+        for i in (0..n).rev() {
+            while let Some(a) = q.front() {
+                if a.0 - a.1 <= i as i32 { break }
+                q.pop_front();
+            }
+            
+            if let Some(a) = q.front() {
+                right[i] += (a.0 - i as i32) * 2;
+            }
+
+            q.push_back((i as i32, data[i] - 1));
+        }
+
+        while q.is_empty() == false { q.pop_front(); } 
+        let (mut ret, mut mx_left) = (1, 1);
+        for i in 0..n - 1 {
+            let mut temp = 1;
+
+            while let Some(a) = q.front() {
+                if a.0 + a.1 >= i as i32 { break }
+                q.pop_front();
+            }
+
+            if let Some(a) = q.front() {
+                temp += (i as i32 - a.0) as i64 * 2;
+            }
+
+            q.push_back((i as i32, data[i] - 1));
+
+            mx_left = mx_left.max(temp);
+            ret = ret.max(mx_left * right[i + 1] as i64);
+        }
+
+        ret
+    }
+
+    // Adapted from:   https://cp-algorithms.com/string/manacher.html
+    fn manacher_odd(s: &String) -> Vec<i32> {
+        let n = s.len();
+        let s = String::from("$") + s + &String::from("^");
+        let s = s.chars().collect::<Vec<char>>();
+        let mut p = vec![0; n + 2];
+        
+        let (mut l, mut r) = (1, 1);
+
+        for i in 1..=n {
+            p[i] = i32::max(0, i32::min(r - i as i32, p[(l + (r - i as i32)) as usize]));
+            while (s[i - p[i] as usize] == s[i + p[i] as usize]) {
+                p[i] += 1;
+            }
+
+            if i as i32 + p[i] > r {
+                l = i as i32 - p[i];
+                r = i as i32 + p[i];
+            }
+        }
+
+         p.pop();
+         p.remove(0);         
+         p
+    }
+}

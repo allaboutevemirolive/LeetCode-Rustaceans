@@ -1,0 +1,52 @@
+// https://leetcode.com/problems/stone-game-iv/solutions/740275/rust-8ms-100/
+impl Solution {
+    pub fn winner_square_game(n: i32) -> bool {
+        let mut dp = vec![false; n as usize + 1];
+        let mut sqr = vec![1];
+        for i in 1..=n {
+            if i == sqr[0] {
+                dp[i as usize] = true;
+                continue;
+            }
+            if i > sqr[0] {
+                sqr.insert(0, sqr[0] + 2 * sqr.len() as i32 + 1)
+            }
+            for j in 1..sqr.len() {
+                if dp[(i - sqr[j]) as usize] == false {
+                    dp[i as usize] = true;
+                    break;
+                }
+            }
+        }
+        dp[n as usize]
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    #[test]
+    fn test_winner_square_game() {
+        assert!(Solution::winner_square_game(1))
+    }
+
+    #[test]
+    fn test_winner_square_game_02() {
+        assert!(!Solution::winner_square_game(2))
+    }
+
+    #[test]
+    fn test_winner_square_game_03() {
+        assert!(Solution::winner_square_game(4))
+    }
+
+    #[test]
+    fn test_winner_square_game_04() {
+        assert!(!Solution::winner_square_game(7))
+    }
+
+    #[test]
+    fn test_winner_square_game_05() {
+        assert!(!Solution::winner_square_game(17))
+    }
+}

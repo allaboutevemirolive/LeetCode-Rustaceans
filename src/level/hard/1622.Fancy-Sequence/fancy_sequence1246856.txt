@@ -1,0 +1,37 @@
+// https://leetcode.com/problems/fancy-sequence/solutions/1246856/rust-o-n-2-still-better-than-100-100/
+const MOD: u64 = 1_000_000_007;
+
+struct Fancy {
+  a: Vec<u64>
+}
+
+/** 
+ * `&self` means the method takes an immutable reference.
+ * If you need a mutable reference, change it to `&mut self` instead.
+ */
+impl Fancy {
+
+    fn new() -> Self {
+        Self { a: Vec::new() }
+    }
+    
+    fn append(&mut self, val: i32) {
+        self.a.push(val as u64);
+    }
+    
+    fn add_all(&mut self, inc: i32) {
+       for x in self.a.iter_mut() { 
+           *x = (*x + inc as u64) % MOD; 
+        } 
+    }
+    
+    fn mult_all(&mut self, m: i32) {
+       for x in self.a.iter_mut() { 
+           *x = (*x * m as u64) % MOD; 
+        }         
+    }
+    
+    fn get_index(&self, idx: i32) -> i32 {
+        self.a.get(idx as usize).map_or(-1, |&x| x as i32)
+    }
+}

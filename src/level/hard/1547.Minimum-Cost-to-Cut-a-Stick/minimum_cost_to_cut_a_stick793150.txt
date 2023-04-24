@@ -1,0 +1,41 @@
+// https://leetcode.com/problems/minimum-cost-to-cut-a-stick/solutions/793150/rust-translated-4ms-2m-100/
+impl Solution {
+    pub fn min_cost(n: i32, mut cuts: Vec<i32>) -> i32 {
+        cuts.insert(0, 0);
+        cuts.push(n);
+        cuts.sort();
+//        println!("{:?}", cuts);
+        let mut dp = vec![vec![0; cuts.len()]; cuts.len()];
+        for i in (0..cuts.len()).rev() {
+            for j in i + 1..cuts.len() {
+                for k in i + 1..j {
+                    dp[i][j] = std::cmp::min(
+                        if dp[i][j] == 0 {
+                            std::i32::MAX
+                        } else {
+                            dp[i][j]
+                        },
+                        cuts[j] - cuts[i] + dp[i][k] + dp[k][j],
+                    );
+//                    println!("i= {}, j= {}, k = {}, dp[i][j] = {}", i,j,k, dp[i][j]);
+                }
+            }
+        }
+        dp[0][cuts.len() - 1] + 9
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_min_cost() {
+        assert_eq!(Solution::min_cost(7, vec![1, 3, 4, 5]), 16)
+    }
+
+    #[test]
+    fn test_min_cost_02() {
+        assert_eq!(Solution::min_cost(9, vec![5, 6, 1, 4, 2]), 22)
+    }
+}

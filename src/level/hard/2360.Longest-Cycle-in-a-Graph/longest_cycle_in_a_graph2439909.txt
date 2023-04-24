@@ -1,0 +1,53 @@
+// https://leetcode.com/problems/longest-cycle-in-a-graph/solutions/2439909/rust-three-solutions-cycle-detection-topological-sorting-strongly-connected-komponents/
+#[derive(Copy, Clone, Eq, PartialEq)]
+enum State {
+    Unvisited,
+    Safe,
+    Cycle,
+    Undecided(i32),
+}
+
+pub fn longest_cycle(edges: Vec<i32>) -> i32 {
+    let mut state = vec![State::Unvisited; edges.len()];
+    let mut cycle = -1;
+
+    for idx in 0..edges.len() {
+        if state[idx] == State::Unvisited {
+            leads_to_cycle(&edges, &mut state, &mut cycle, idx, 0);
+        }
+    }
+
+    cycle
+}
+
+fn leads_to_cycle(
+    edges: &[i32],
+    state: &mut [State],
+    cycle: &mut i32,
+    current: usize,
+    depth: i32,
+) -> bool {
+    if edges[current] < 0 {
+        state[current] = State::Safe;
+        return false;
+    }
+
+    match state[current] {
+        State::Unvisited => { /*do nothing - process the case below*/ }
+        State::Safe => return false,
+        State::Cycle => return true,
+        State::Undecided(d) => {
+            *cycle = (*cycle).max(depth - d);
+            return true;
+        }
+    }
+
+    state[current] = State::Undecided(depth);
+    if leads_to_cycle(edges, state, cycle, edges[current] as usize, depth + 1) {
+        state[current] = State::Cycle;
+        return true;
+    }
+
+    state[current] = State::Safe;
+    false
+}

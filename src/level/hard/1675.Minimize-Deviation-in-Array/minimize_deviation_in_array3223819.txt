@@ -1,0 +1,24 @@
+// https://leetcode.com/problems/minimize-deviation-in-array/solutions/3223819/greedy-binaryheap-solution-in-rust/
+impl Solution {
+    pub fn minimum_deviation(mut nums: Vec<i32>) -> i32 {
+        let mut min_num = i32::MAX;
+        for num in nums.iter_mut() {
+            if *num & 1 == 1 {
+                *num *= 2;
+            }
+            min_num = min_num.min(*num);
+        }
+
+        let mut diff = i32::MAX;
+        let mut nums = std::collections::BinaryHeap::from(nums);
+        while let Some(num) = nums.pop() {
+            diff = diff.min(num - min_num);
+            if num & 1 == 1 || diff == 0 {
+                break;
+            }
+            nums.push(num >> 1);
+            min_num = min_num.min(num >> 1);
+        }
+        diff
+    }
+}

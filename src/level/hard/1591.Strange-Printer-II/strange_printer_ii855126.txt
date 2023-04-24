@@ -1,0 +1,98 @@
+// https://leetcode.com/problems/strange-printer-ii/solutions/855126/rust-translated-8ms-100/
+impl Solution {
+    pub fn is_printable(mut a: Vec<Vec<i32>>) -> bool {
+        use std::collections::HashSet;
+
+        fn test(a: &mut Vec<Vec<i32>>, pos: &[(i32, i32, i32, i32)], c: i32) -> bool {
+            for i in pos[c as usize].0..pos[c as usize].2 + 1 {
+                for j in pos[c as usize].1..pos[c as usize].3 + 1 {
+                    if a[i as usize][j as usize] > 0 && a[i as usize][j as usize] != c {
+                        return false;
+                    }
+                }
+            }
+            for i in pos[c as usize].0..pos[c as usize].2 + 1 {
+                for j in pos[c as usize].1..pos[c as usize].3 + 1 {
+                    a[i as usize][j as usize] = 0;
+                }
+            }
+            true
+        }
+
+        let m = a.len();
+        let n = a[0].len();
+        let mut pos = vec![(m as i32, n as i32, 0, 0); 61];
+        let mut colors = HashSet::<i32>::new();
+        for i in 0..m {
+            for j in 0..n {
+                let c = a[i][j];
+                colors.insert(c);
+                pos[c as usize].0 = std::cmp::min(pos[c as usize].0, i as i32);
+                pos[c as usize].1 = std::cmp::min(pos[c as usize].1, j as i32);
+                pos[c as usize].2 = std::cmp::max(pos[c as usize].2, i as i32);
+                pos[c as usize].3 = std::cmp::max(pos[c as usize].3, j as i32);
+            }
+        }
+
+        while !colors.is_empty() {
+            let mut c2 = HashSet::<i32>::new();
+            for &c in colors.iter() {
+                if !test(&mut a, &pos, c) {
+                    c2.insert(c);
+                }
+            }
+            if c2.len() == colors.len() {
+                return false;
+            }
+            colors = c2;
+        }
+        true
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_is_printable() {
+        assert_eq!(
+            Solution::is_printable(vec![
+                vec![1, 1, 1, 1],
+                vec![1, 2, 2, 1],
+                vec![1, 2, 2, 1],
+                vec![1, 1, 1, 1]
+            ]),
+            true
+        );
+    }
+
+    #[test]
+    fn test_is_printable_02() {
+        assert_eq!(
+            Solution::is_printable(vec![
+                vec![1, 1, 1, 1],
+                vec![1, 1, 3, 3],
+                vec![1, 1, 3, 4],
+                vec![5, 5, 1, 4]
+            ]),
+            true
+        );
+    }
+
+    #[test]
+    fn test_is_printable_03() {
+        assert_eq!(
+            Solution::is_printable(vec![vec![1, 2, 1], vec![2, 1, 2], vec![1, 2, 1]]),
+            false
+        );
+    }
+
+    #[test]
+    fn test_is_printable_04() {
+        assert_eq!(
+            Solution::is_printable(vec![vec![1, 1, 1], vec![3, 1, 3]]),
+            false
+        );
+    }
+}

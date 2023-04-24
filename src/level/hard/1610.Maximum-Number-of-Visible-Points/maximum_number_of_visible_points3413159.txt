@@ -1,0 +1,44 @@
+// https://leetcode.com/problems/maximum-number-of-visible-points/solutions/3413159/rust-sliding-window-fastest-100/
+impl Solution {
+    pub fn visible_points(points: Vec<Vec<i32>>, angle: i32, location: Vec<i32>) -> i32 {
+        let mut perma_points = 0;
+        let mut angles: Vec<f64> = Vec::new();
+        let mut angle = (angle as f64).to_radians();
+        for i in points.iter() {
+            if i[0] == location[0] && i[1] == location[1] {
+                perma_points += 1;
+            } else {
+                let x_diff = (-i[0] + location[0]) as f64;
+                let y_diff = (-i[1] + location[1]) as f64;
+                angles.push(
+                    y_diff.atan2(x_diff)
+                );
+            }
+        }
+
+        angles.sort_unstable_by(|a, b| a.partial_cmp(b).unwrap());
+        let mut r_index = 0;
+        let mut max_size = 0;
+        let mut n = angles.len();
+
+        let mut l_index = 0;
+        let mut point_angle: f64 = 0.0;
+        while l_index < n {
+            point_angle = angles[l_index];
+            while angles[r_index] <= point_angle + angle {
+                r_index = (r_index + 1) % n;
+                if r_index == l_index {
+                    return angles.len() as i32 + perma_points;
+                }
+            }
+            if r_index < l_index {
+                max_size = max_size.max(r_index + n - l_index);
+            } else {
+                max_size = max_size.max(r_index - l_index);
+            }
+            angles[l_index] += 2.0 * std::f64::consts::PI;
+            l_index += 1;
+        }
+        return max_size as i32 + perma_points;
+    }
+}

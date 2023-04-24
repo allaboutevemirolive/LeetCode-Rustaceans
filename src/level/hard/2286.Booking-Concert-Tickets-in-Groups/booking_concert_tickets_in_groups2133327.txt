@@ -1,0 +1,143 @@
+// https://leetcode.com/problems/booking-concert-tickets-in-groups/solutions/2133327/rust-segment-tree/
+use std::{
+    cell::RefCell,
+    cmp::Ordering,
+    collections::{BTreeMap, BinaryHeap, HashMap, VecDeque},
+    rc::Rc, borrow::Borrow,
+};
+
+
+#[derive(Debug)]
+struct Node {
+    // starting row index, inclusive
+    l_index: usize,
+    // ending row index, inclusive
+    r_index: usize,
+    // child node, left
+    l_node: Option<Box<Node>>,
+    // child node, right
+    r_node: Option<Box<Node>>,
+    // the total number of seat that can be allocated
+    sum: usize,
+    // the maximum amount of allocatable seat in a row
+    max: usize,
+    // the index of the first empty seat
+    index: usize,
+}
+
+impl Node {
+    fn build(l_index: usize, r_index: usize, max: usize) -> Node {
+        let (l_node, r_node, sum) = if l_index == r_index {
+            (None, None, max)
+        } else {
+            let m_index = (l_index + r_index) / 2;
+            let l_node = Box::new(Node::build(l_index, m_index, max));
+            let r_node = Box::new(Node::build(m_index + 1, r_index, max));
+
+            let sum = l_node.sum + r_node.sum;
+            (Some(l_node), Some(r_node), sum)
+        };
+
+        Node {
+            l_index,
+            r_index,
+            l_node,
+            r_node,
+            sum,
+            max,
+            index: 0,
+        }
+    }
+
+    fn merge(&mut self) {
+        if let (Some(l_node), Some(r_node)) = (self.l_node.as_ref(), self.r_node.as_ref()) {
+            self.sum = l_node.sum + r_node.sum;
+            self.max = std::cmp::max(l_node.max, r_node.max);
+        }
+    }
+
+    fn take_gather(&mut self, seats: usize, max_row: usize) -> Option<(usize, usize)> {
+        if self.max < seats || self.l_index > max_row {
+            return None;
+        }
+        let mut res = None;
+
+        match (self.l_node.as_mut(), self.r_node.as_mut()) {
+            (None, None) => {
+                self.max -= seats;
+                self.sum -= seats;
+                res = Some((self.l_index, self.index));
+                self.index += seats;
+            },
+            (Some(l_node), Some(r_node)) => {
+                if l_node.max >= seats {
+                    res = l_node.as_mut().take_gather(seats, max_row);
+                } else {
+                    res = r_node.as_mut().take_gather(seats, max_row);
+                }
+            }
+            _ => unreachable!(),
+        };
+
+        self.merge();
+
+        res
+    }
+
+    fn get_sum(&self, max_row: usize) -> usize {
+        if self.r_index <= max_row {
+            self.sum
+        } else if self.l_index > max_row {
+            0
+        } else {
+            self.l_node.as_ref().unwrap().get_sum(max_row) + self.r_node.as_ref().unwrap().get_sum(max_row)
+        }
+    }
+
+    fn take_scatter(&mut self, seats: usize) {
+        match (self.l_node.as_mut(), self.r_node.as_mut()) {
+            (None, None) => {
+                self.max -= seats;
+                self.sum -= seats;
+                self.index += seats;
+            },
+            (Some(l_node), Some(r_node)) => {
+                let l_take = std::cmp::min(l_node.sum, seats);
+                let r_take = seats - l_take;
+                l_node.take_scatter(l_take);
+                r_node.take_scatter(r_take);
+            }
+            _ => unreachable!(),
+        };
+
+        self.merge();
+    }
+}
+
+#[derive(Debug)]
+struct BookMyShow {
+    segment_tree: Node
+}
+
+impl BookMyShow {
+    fn new(n: i32, m: i32) -> Self {
+        BookMyShow { segment_tree: Node::build(0, n as usize - 1, m as usize) }
+    }
+
+    fn gather(&mut self, k: i32, max_row: i32) -> Vec<i32> {
+        match self.segment_tree.take_gather(k as usize, max_row as usize) {
+            Some((row, index)) => vec![row as i32, index as i32],
+            None => vec![],
+        }
+    }
+
+    fn scatter(&mut self, k: i32, max_row: i32) -> bool {
+        if self.segment_tree.get_sum(max_row as usize) < k as usize {
+            false
+        } else {
+            self.segment_tree.take_scatter(k as usize);
+            true
+        }
+
+    }
+}

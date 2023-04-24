@@ -1,0 +1,15 @@
+// https://leetcode.com/problems/number-of-excellent-pairs/solutions/2326308/rust-fast-and-short-solution/
+use std::collections::*;
+
+impl Solution {
+    pub fn count_excellent_pairs(nums: Vec<i32>, k: i32) -> i64 {
+        let (mut ans, s) = (0, nums.into_iter().collect::<HashSet<i32>>());
+        let cnt = s.iter().fold(HashMap::new(), |mut acc, x| {*acc.entry(x.count_ones()).or_insert(0) += 1; acc});
+        for (k1,c1) in cnt.iter() {
+            for (k2,c2) in cnt.iter() {
+                if k1+k2>=k as u32 {ans+=c1*c2;}
+            } 
+        }
+        ans
+    }
+}

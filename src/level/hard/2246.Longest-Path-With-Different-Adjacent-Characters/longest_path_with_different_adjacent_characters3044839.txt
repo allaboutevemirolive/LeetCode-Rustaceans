@@ -1,0 +1,43 @@
+// https://leetcode.com/problems/longest-path-with-different-adjacent-characters/solutions/3044839/rust-solution/
+impl Solution {
+    pub fn longest_path(parents: Vec<i32>, s: String) -> i32 {
+        let labels = s.as_bytes();
+        let mut children = vec![Vec::new(); parents.len()];
+        for (child, &parent) in parents.iter().enumerate() {
+            // Root
+            if parent < 0 {
+                continue;
+            }
+            // Prune edges between nodes with the same label
+            if labels[child as usize] == labels[parent as usize] {
+                continue;
+            }
+            children[parent as usize].push(child as usize);
+        }
+        let mut dp = vec![0; parents.len()];
+        let mut ans : i32 = 0;
+        for i in 0..parents.len() {
+            let mut length : Vec<i32> = Vec::new();
+            for &child in children[i].iter() {
+                length.push(Self::dfs(child, &mut dp, &children));
+            }
+            length.sort();
+            ans = ans.max(1 + length.iter().rev().take(2).fold(0, |acc, x| acc + x));
+        }
+        return ans;
+    }
+
+    fn dfs(curr: usize, dp: &mut Vec<i32>, children: &Vec<Vec<usize>>) -> i32 {
+        if dp[curr] != 0 {
+            return dp[curr];
+        }
+
+        let mut best : i32 = 0;
+        for &child in children[curr].iter() {
+            best = best.max(Self::dfs(child, dp, children));
+        }
+        dp[curr] = best + 1;
+
+        return best + 1;
+    }
+}

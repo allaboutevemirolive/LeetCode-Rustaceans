@@ -1,0 +1,20 @@
+// https://leetcode.com/problems/number-of-visible-people-in-a-queue/solutions/1741765/rust-stack/
+	pub fn can_see_persons_count(heights: Vec<i32>) -> Vec<i32> {
+        let mut stack = Vec::new();
+        let mut res = Vec::new();
+        
+        for idx in (0..heights.len()).rev() {
+            let mut c = 0;
+            while !stack.is_empty() && *stack.last().unwrap() < heights[idx] {
+                stack.pop();
+                c += 1;
+            }
+            if !stack.is_empty() {
+                c += 1;
+            }
+            res.push(c);
+            stack.push(heights[idx]);
+        }
+        
+        res.into_iter().rev().collect()
+    }

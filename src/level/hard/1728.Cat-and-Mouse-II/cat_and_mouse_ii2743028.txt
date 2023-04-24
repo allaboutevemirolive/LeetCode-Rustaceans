@@ -1,0 +1,301 @@
+// https://leetcode.com/problems/cat-and-mouse-ii/solutions/2743028/rust-solution-beats-100/
+use std::{
+    convert::{TryFrom, TryInto},
+    ops::{Add, Mul},
+};
+// The description says 1000 but for the size of the board, this is equivalent.
+const MAX_TURNS: usize = 75;
+const DIRECTIONS: [Vector2<i32>; 4] = [
+    Vector2 { x: -1, y: 0 },
+    Vector2 { x: 1, y: 0 },
+    Vector2 { x: 0, y: -1 },
+    Vector2 { x: 0, y: 1 },
+];
+
+#[derive(PartialEq, Eq)]
+enum Space {
+    Food,
+    Wall,
+    Empty,
+}
+struct Grid(Vec<Vec<Space>>);
+impl Grid {
+    fn get<'a, 'b>(&'a self, index: &'b Point2<usize>) -> Option<&'a Space> {
+        self.0.get(index.y).and_then(|cols| cols.get(index.x))
+    }
+}
+struct ParsedGrid {
+    grid: Grid,
+    cat: Point2<usize>,
+    mouse: Point2<usize>,
+}
+impl TryFrom<Vec<String>> for ParsedGrid {
+    type Error = ();
+    fn try_from(value: Vec<String>) -> Result<Self, Self::Error> {
+        let mut grid: Vec<Vec<Space>> = Vec::with_capacity(value.len());
+        let mut cat: Point2<usize> = Point2 { x: 0, y: 0 };
+        let mut mouse: Point2<usize> = Point2 { x: 0, y: 0 };
+        for (row_index, row) in value.into_iter().enumerate() {
+            let mut new_row = Vec::with_capacity(row.len());
+            for (col_index, col) in row.chars().enumerate() {
+                let space = match col {
+                    'C' => {
+                        cat = Point2 {
+                            x: col_index,
+                            y: row_index,
+                        };
+                        Ok(Space::Empty)
+                    }
+                    'M' => {
+                        mouse = Point2 {
+                            x: col_index,
+                            y: row_index,
+                        };
+                        Ok(Space::Empty)
+                    }
+                    '.' => Ok(Space::Empty),
+                    '#' => Ok(Space::Wall),
+                    'F' => Ok(Space::Food),
+                    _ => Err(()),
+                };
+                new_row.push(space?);
+            }
+            grid.push(new_row);
+        }
+        Ok(Self {
+            grid: Grid(grid),
+            cat,
+            mouse,
+        })
+    }
+}
+
+struct DpContainer(Vec<Vec<Vec<Vec<Vec<Option<bool>>>>>>);
+impl DpContainer {
+    fn new(width: usize, height: usize) -> Self {
+        Self(vec![
+            vec![
+                vec![vec![vec![None; height]; width]; height];
+                width
+            ];
+            MAX_TURNS + 1
+        ])
+    }
+}
+macro_rules! multi_level_optional_index {
+    ($base:expr, $fn_name:ident, $last_index:expr) => {
+        $base.$fn_name($last_index)
+    };
+    ($base:expr, $fn_name:ident, $first_index:expr, $($indices:expr),+)=> {
+        $base.$fn_name($first_index).and_then(|prev|multi_level_optional_index!(prev, $fn_name, $($indices),+))
+    };
+}
+impl DpContainer {
+    fn get<'a>(&'a self, index: &'a Turn) -> Option<&'a Option<bool>> {
+        multi_level_optional_index!(
+            self.0,
+            get,
+            index.number,
+            index.cat.x,
+            index.cat.y,
+            index.mouse.x,
+            index.mouse.y
+        )
+    }
+    fn get_mut<'a>(&'a mut self, index: &'a Turn) -> Option<&'a mut Option<bool>> {
+        multi_level_optional_index!(
+            self.0,
+            get_mut,
+            index.number,
+            index.cat.x,
+            index.cat.y,
+            index.mouse.x,
+            index.mouse.y
+        )
+    }
+}
+#[derive(Clone, PartialEq, Eq)]
+struct Point2<T> {
+    x: T,
+    y: T,
+}
+struct Vector2<T> {
+    x: T,
+    y: T,
+}
+impl<'a> Add<Vector2<i32>> for &'a Point2<usize> {
+    type Output = Option<Point2<usize>>;
+    fn add(self, other: Vector2<i32>) -> Self::Output {
+        let x = self.x as i32 + other.x;
+        let y = self.y as i32 + other.y;
+        x.try_into()
+            .and_then(|x| y.try_into().map(|y| Point2::<usize> { x, y }))
+            .ok()
+    }
+}
+impl<'a> Mul<i32> for &'a Vector2<i32> {
+    type Output = Vector2<i32>;
+    fn mul(self, rhs: i32) -> Self::Output {
+        Self::Output {
+            x: self.x * rhs,
+            y: self.y * rhs,
+        }
+    }
+}
+#[derive(Clone)]
+struct Turn {
+    number: usize,
+    cat: Point2<usize>,
+    mouse: Point2<usize>,
+}
+
+#[derive(PartialEq, Eq, Debug)]
+enum MoveResult {
+    CatWon,
+    MouseWon,
+    InvalidMove,
+}
+
+fn take_turn_for<const IS_CAT: bool>(
+    dp: &mut DpContainer,
+    grid: &Grid,
+    current_turn: &Turn,
+    mut next_turn: Turn,
+    mouse_speed: usize,
+    cat_speed: usize,
+) -> MoveResult {
+    fn get_point<const IS_CAT: bool>(turn: &Turn) -> &Point2<usize> {
+        if IS_CAT {
+            &turn.cat
+        } else {
+            &turn.mouse
+        }
+    }
+    fn get_point_mut<const IS_CAT: bool>(turn: &mut Turn) -> &mut Point2<usize> {
+        if IS_CAT {
+            &mut turn.cat
+        } else {
+            &mut turn.mouse
+        }
+    }
+    match grid.get(get_point::<IS_CAT>(current_turn)) {
+        Some(&Space::Food) => {
+            if IS_CAT {
+                return MoveResult::CatWon;
+            } else {
+                return MoveResult::MouseWon;
+            }
+        }
+        None => return MoveResult::InvalidMove,
+        _ => {}
+    }
+    let speed = if IS_CAT { cat_speed } else { mouse_speed };
+    for direction in DIRECTIONS.iter() {
+        'movement: for i in 0..=speed {
+            let current_point = get_point::<IS_CAT>(&current_turn);
+            let end_move_result = if IS_CAT {
+                MoveResult::CatWon
+            } else {
+                MoveResult::MouseWon
+            };
+            macro_rules! store_win {
+                () => {
+                    *dp.get_mut(&current_turn).unwrap() = Some(!IS_CAT);
+                    return end_move_result;
+                };
+            }
+            if let Some(new_point) = current_point + direction * i as i32 {
+                match grid.get(&new_point) {
+                    Some(&Space::Wall) => break 'movement,
+                    None => break 'movement,
+                    Some(&Space::Food) => {
+                        store_win!();
+                    }
+                    _ => {
+                        *get_point_mut::<IS_CAT>(&mut next_turn) = new_point;
+
+                        if take_turn(dp, grid, &next_turn, mouse_speed, cat_speed)
+                            == end_move_result
+                        {
+                            store_win!();
+                        }
+                    }
+                }
+            }
+        }
+    }
+    *dp.get_mut(&current_turn).unwrap() = Some(IS_CAT);
+    if IS_CAT {
+        MoveResult::MouseWon
+    } else {
+        MoveResult::CatWon
+    }
+}
+
+fn take_turn(
+    dp: &mut DpContainer,
+    grid: &Grid,
+    current_turn: &Turn,
+    mouse_speed: usize,
+    cat_speed: usize,
+) -> MoveResult {
+    if current_turn.number > MAX_TURNS || current_turn.cat == current_turn.mouse {
+        MoveResult::CatWon
+    } else {
+        match dp.get(&current_turn) {
+            None => return MoveResult::InvalidMove,
+            Some(result) => {
+                if let Some(result) = result {
+                    if *result {
+                        MoveResult::MouseWon
+                    } else {
+                        MoveResult::CatWon
+                    }
+                } else {
+                    let mut next_turn = current_turn.clone();
+                    next_turn.number += 1;
+                    if current_turn.number % 2 == 0 {
+                        take_turn_for::<false>(
+                            dp,
+                            grid,
+                            current_turn,
+                            next_turn,
+                            mouse_speed,
+                            cat_speed,
+                        )
+                    } else {
+                        take_turn_for::<true>(
+                            dp,
+                            grid,
+                            current_turn,
+                            next_turn,
+                            mouse_speed,
+                            cat_speed,
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+impl Solution {
+    pub fn can_mouse_win(grid: Vec<String>, cat_jump: i32, mouse_jump: i32) -> bool {
+        let parsed_grid: ParsedGrid = grid.try_into().unwrap();
+        let current_turn = Turn {
+            cat: parsed_grid.cat,
+            mouse: parsed_grid.mouse,
+            number: 0,
+        };
+        let mut dp: DpContainer =
+            DpContainer::new(parsed_grid.grid.0[0].len(), parsed_grid.grid.0.len());
+        let result = take_turn(
+            &mut dp,
+            &parsed_grid.grid,
+            &current_turn,
+            mouse_jump as usize,
+            cat_jump as usize,
+        ) == MoveResult::MouseWon;
+        result
+    }
+}

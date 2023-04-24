@@ -1,0 +1,40 @@
+// https://leetcode.com/problems/number-of-ways-to-separate-numbers/solutions/1885888/rust-dp-with-prefix-sum/
+pub struct Solution;
+const MOD: i64 = 1_000_000_007;
+impl Solution {
+    pub fn number_of_combinations(num: String) -> i32 {
+        let n = num.len();
+        // let s = num.chars().collect::<Vec<_>>();
+        if &num[0..1] == "0" {
+            return 0;
+        }
+        let mut dp = vec![vec![0; n + 1]; n + 1];
+        let mut s = vec![vec![0; n + 1]; n + 1];
+        for i in 0..n {
+            // dp[a][b]   last number has length b, index selecting from 0..a
+            dp[i][i + 1] = 1;
+        }
+        for i in 1..n + 1 {
+            s[0][i] = 1;
+        }
+        for i in 1..n {
+            for len in 1..=i {
+                // last index is i, last segment starting from i-len+1
+                let m = i + 1 - len;
+                if &num[m..m + 1] == "0" {
+                    continue;
+                }
+                let cur = &num[m..=i];
+                dp[i][len] = s[m - 1][len - 1];
+                if m >= len && &num[m - len..m] <= cur {
+                    dp[i][len] = (dp[i][len] + dp[m - 1][len]) % MOD;
+                }
+            }
+            for len in 1..=n {
+                s[i][len] = (s[i][len - 1] + dp[i][len]) % MOD;
+            }
+        }
+        s[n - 1][n] as _
+    }
+}
+

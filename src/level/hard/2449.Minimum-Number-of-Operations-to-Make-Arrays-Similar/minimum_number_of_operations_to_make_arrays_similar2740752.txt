@@ -1,0 +1,43 @@
+// https://leetcode.com/problems/minimum-number-of-operations-to-make-arrays-similar/solutions/2740752/rust-split-to-odds-and-evens-then-sort-o-n-log-n/
+impl Solution {
+    pub fn make_similar(mut nums: Vec<i32>, mut target: Vec<i32>) -> i64 {
+        let mut ans: i64 = 0;
+        let (mut a1, mut a2) = split(nums);
+        let (mut b1, mut b2) = split(target);
+        a1.sort();
+        a2.sort();
+        b1.sort();
+        b2.sort();
+        
+        ans += cal(a1, b1);
+        ans += cal(a2, b2);
+        
+        ans
+    }
+    
+}
+
+fn cal(arr1: Vec<i32>, arr2: Vec<i32>) -> i64 {
+    let mut ans: i64 = 0;
+    let n = arr1.len();
+    for i in 0..n {
+        let a = arr1[i];
+        let b = arr2[i];
+        if b > a {
+            ans += ((b-a)/2) as i64;
+        }
+    }
+    ans
+}
+fn split(arr: Vec<i32>) -> (Vec<i32>, Vec<i32>) {
+    let mut a1 = vec![];
+    let mut a2 = vec![];
+    for v in arr {
+        if v & 1 == 1 {
+            a1.push(v);
+            continue
+        }
+        a2.push(v);
+    }
+    (a1, a2)
+}

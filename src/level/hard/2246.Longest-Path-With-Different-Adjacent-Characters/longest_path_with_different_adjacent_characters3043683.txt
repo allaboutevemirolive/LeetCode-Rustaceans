@@ -1,0 +1,29 @@
+// https://leetcode.com/problems/longest-path-with-different-adjacent-characters/solutions/3043683/simple-rust-recursive-dfs/
+impl Solution {
+    pub fn longest_path(parent: Vec<i32>, s: String) -> i32 {
+        let tree = Solution::get_adjacency_list(parent);
+        let (_, longest_path) = Solution::dfs(&tree, &s.chars().collect(), 0);
+        longest_path
+    }
+    fn dfs(tree: &Vec<Vec<usize>>, labels: &Vec<char>, node: usize) -> (i32, i32) {
+        let mut longest_branch = 1;
+        let mut longest_path = 1;
+        
+        for child in &tree[node] {
+            let (longest_child_branch, longest_child_path) = Solution::dfs(tree, labels, *child);
+            longest_path = longest_path.max(longest_child_path);
+            if labels[*child] == labels[node] { continue }
+            longest_path = longest_path.max(longest_branch + longest_child_branch);
+            longest_branch = longest_branch.max(longest_child_branch + 1);
+        }
+
+        (longest_branch, longest_path)
+    }
+    fn get_adjacency_list(parent: Vec<i32>) -> Vec<Vec<usize>> {
+        let mut graph = vec![Vec::new(); parent.len()];
+        for i in 1..parent.len() {
+            graph[parent[i] as usize].push(i);
+        }
+        graph
+    }
+}

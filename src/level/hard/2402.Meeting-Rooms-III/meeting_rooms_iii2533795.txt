@@ -1,0 +1,34 @@
+// https://leetcode.com/problems/meeting-rooms-iii/solutions/2533795/rust-priority-queues-with-comments/
+use std::{collections::BinaryHeap, cmp::Reverse};
+
+impl Solution {
+    pub fn most_booked(n: i32, meetings: Vec<Vec<i32>>) -> i32 {
+        let n = n as usize;
+        let mut meetings = meetings.into_iter().map(|m| (m[0] as i64, m[1] as i64)).collect::<Vec<_>>();
+        meetings.sort_unstable_by_key(|m| m.0);
+        let mut free = (0..n).map(Reverse).collect::<BinaryHeap::<Reverse<usize>>>();
+        let mut occupied = BinaryHeap::<Reverse<(i64, usize)>>::new();
+        let mut bookings = vec![0; n];
+
+        let mut t = 0;
+
+        for (start_time, end_time) in meetings {
+            while let Some(Reverse((soonest_end, room))) = occupied.peek().copied() {
+                if occupied.len() == n || soonest_end <= start_time {
+                    occupied.pop();
+                    t = soonest_end;
+                    free.push(Reverse(room));
+                } else {
+                    break;
+                }
+            }
+            let new_start_time = t.max(start_time);
+            let new_end_time = new_start_time + end_time - start_time;
+            let Reverse(room) = free.pop().unwrap();
+            occupied.push(Reverse((new_end_time, room)));
+            bookings[room] += 1;
+        }
+
+        bookings.into_iter().enumerate().rev().max_by(|&(_, b1), &(_, b2)| b1.cmp(&b2)).map(|(i, _)| i).unwrap() as _
+    }
+}

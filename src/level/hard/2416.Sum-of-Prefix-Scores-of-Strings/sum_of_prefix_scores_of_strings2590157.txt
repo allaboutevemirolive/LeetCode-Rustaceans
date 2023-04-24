@@ -1,0 +1,46 @@
+// https://leetcode.com/problems/sum-of-prefix-scores-of-strings/solutions/2590157/rust-trie-solution/
+use std::collections::HashMap;
+
+struct Trie {
+    children: HashMap<char, Trie>,
+    count: i32
+}
+
+impl Trie {
+    fn new() ->Self {
+        Self { children: HashMap::new(), count: 0 }
+    }
+    
+    fn build(&mut self, words: &Vec<String>) {
+        for word in words {
+            let mut node = &mut *self;
+            for c in (*word).chars() {
+                node = node.children.entry(c).or_insert(Trie::new());
+                node.count += 1;
+            }
+        }
+    }
+    
+    fn collect(&self, words: &Vec<String>, ret: &mut Vec<i32>) {
+        for word in words {
+            let mut node = &*self;
+            let mut cnt = 0;
+            for c in (*word).chars() {
+                node = node.children.get(&c).unwrap();
+                cnt += node.count;
+            }
+            ret.push(cnt);
+        }
+    }
+}
+
+impl Solution {
+    pub fn sum_prefix_scores(words: Vec<String>) -> Vec<i32> {
+        let mut trie = Trie::new();
+        let mut ret = Vec::<i32>::new();
+        trie.build(&words);
+        trie.collect(&words, &mut ret);
+        
+        ret
+    }
+}

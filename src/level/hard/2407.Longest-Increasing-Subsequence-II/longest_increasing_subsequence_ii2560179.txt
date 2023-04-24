@@ -1,0 +1,113 @@
+// https://leetcode.com/problems/longest-increasing-subsequence-ii/solutions/2560179/rust-segment-tree/
+use std::{
+    borrow::BorrowMut,
+    cell::{Cell, RefCell, RefMut},
+    cmp::{
+        Ordering::{Equal, Greater, Less},
+        Reverse,
+    },
+    collections::{
+        hash_map::Entry::{Occupied, Vacant},
+        BTreeMap, BTreeSet, BinaryHeap, HashMap, HashSet, VecDeque,
+    },
+    iter::{Flatten, Peekable},
+    ops::{Deref, DerefMut},
+    rc::Rc,
+    vec::{self, IntoIter},
+};
+
+
+impl Solution {
+    pub fn length_of_lis(nums: Vec<i32>, k: i32) -> i32 {
+        let mut count = vec![0; 100001];
+        let mut seg_tree = SegmentTreeNode::new_from_vec(&count);
+        let mut res = 0;
+        for num in nums {
+            let prev_count = seg_tree.query_range((num - k).max(0) as usize, (num - 1).max(0) as usize);
+            seg_tree.insert(num as usize, prev_count + 1);
+            res = std::cmp::max(res, prev_count + 1);
+        }
+
+        res
+    }
+}
+
+#[derive(Debug)]
+struct SegmentTreeNode {
+    left_node: Option<Box<SegmentTreeNode>>,
+    right_node: Option<Box<SegmentTreeNode>>,
+    left_index: usize,
+    right_index: usize,
+    max_count: i32,
+}
+
+impl SegmentTreeNode {
+    fn new_from_vec(vec: &Vec<i32>) -> Self {
+        let left_index = 0;
+        let right_index = vec.len() - 1;
+        Self::new_from_slice(&vec, left_index, right_index)
+    }
+
+    fn new_from_slice(slice: &[i32], left_index: usize, right_index: usize) -> Self {
+        if left_index == right_index {
+            SegmentTreeNode {
+                left_node: None,
+                right_node: None,
+                left_index,
+                right_index,
+                max_count: 0,
+            }
+        } else {
+            let mid_index = (left_index + right_index) / 2;
+            let left_node =
+                Self::new_from_slice(&slice[0..=(mid_index - left_index)], left_index, mid_index);
+            let right_node = Self::new_from_slice(
+                &slice[(mid_index - left_index + 1)..=(right_index - left_index)],
+                mid_index + 1,
+                right_index,
+            );
+
+            SegmentTreeNode {
+                left_node: Some(Box::new(left_node)),
+                right_node: Some(Box::new(right_node)),
+                left_index,
+                right_index,
+                max_count: 0,
+            }
+        }
+    }
+
+    fn query_range(&self, left_index: usize, right_index: usize) -> i32 {
+        if right_index < self.left_index || left_index > self.right_index {
+            0
+        } else if left_index <= self.left_index && right_index >= self.right_index {
+            self.max_count
+        } else {
+            let l_max = self
+                .left_node
+                .as_ref()
+                .unwrap()
+                .query_range(left_index, right_index);
+            let r_max = self
+                .right_node
+                .as_ref()
+                .unwrap()
+                .query_range(left_index, right_index);
+            std::cmp::max(l_max, r_max)
+        }
+    }
+
+    fn insert(&mut self, index: usize, value: i32) {
+        if index < self.left_index || index > self.right_index {
+            return;
+        }
+
+        self.max_count = std::cmp::max(self.max_count, value);
+        if let Some(l_node) = self.left_node.as_mut() {
+            l_node.insert(index, value);
+        }
+        if let Some(r_node) = self.right_node.as_mut() {
+            r_node.insert(index, value);
+        }
+    }
+}

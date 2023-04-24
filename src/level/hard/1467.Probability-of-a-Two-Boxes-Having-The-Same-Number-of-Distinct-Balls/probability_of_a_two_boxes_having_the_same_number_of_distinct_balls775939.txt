@@ -1,0 +1,74 @@
+// https://leetcode.com/problems/probability-of-a-two-boxes-having-the-same-number-of-distinct-balls/solutions/775939/rust-translated/
+const EPSILON: f64 = 1.0e-5;
+
+impl Solution {
+    pub fn get_probability(balls: Vec<i32>) -> f64 {
+        let m = balls.len();
+        let n = balls.iter().fold(0, |acc, x| acc + *x) as usize / 2;
+        let mut combinations = vec![vec![0.0f64; (n + 1) as usize]; (2 * n + 1) as usize];
+        combinations[0][0] = 1.0;
+        for i in 1..(2 * n + 1) as usize {
+            combinations[i][0] = 1.0;
+            for j in 1..(n + 1) as usize {
+                combinations[i][j] = combinations[i - 1][j] + combinations[i - 1][j - 1]
+            }
+        }
+        let mut dp = vec![vec![0.0f64; n + 1]; 2 * m + 1];
+        dp[m][0] = 1.0;
+        let mut sum = 0usize;
+        for b in balls {
+            sum += b as usize;
+            let mut ndp = vec![vec![0.0f64; n + 1]; 2 * m + 1];
+            for i in 0..=b as usize {
+                for j in 0..2 * m + 1 {
+                    for k in 0..n + 1 {
+                        if dp[j][k] == 0.0 {
+                            continue;
+                        }
+                        let nk = k + i;
+                        let nr = sum - nk;
+                        if nk <= n && nr <= n {
+                            let nj = if i == 0 {
+                                j - 1
+                            } else {
+                                if i == b as usize {
+                                    j + 1
+                                } else {
+                                    j
+                                }
+                            };
+                            ndp[nj][nk] += dp[j][k] * combinations[b as usize][i];
+                        }
+                    }
+                }
+            }
+            dp = ndp;
+        }
+        dp[m][n] / combinations[2 * n][n]
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_get_probability() {
+        assert_eq!(Solution::get_probability(vec![1, 1]), 1.00000)
+    }
+
+    #[test]
+    fn test_get_probability_02() {
+        assert!((Solution::get_probability(vec![2, 1, 1]) - 0.66667).abs() < EPSILON)
+    }
+
+    #[test]
+    fn test_get_probability_03() {
+        assert_eq!(Solution::get_probability(vec![1, 2, 1, 2]), 0.6)
+    }
+
+    #[test]
+    fn test_get_probability_04() {
+        assert!((Solution::get_probability(vec![6, 6, 6, 6, 6, 6]) - 0.90327).abs() < EPSILON)
+    }
+}

@@ -1,0 +1,38 @@
+// https://leetcode.com/problems/meeting-rooms-iii/solutions/3427102/rust-2-heaps-solution/
+impl Solution {
+    pub fn most_booked(n: i32, mut meetings: Vec<Vec<i32>>) -> i32 {
+        use std::cmp::Reverse;
+        use std::collections::BinaryHeap;
+        meetings.sort();
+        let mut ready = BinaryHeap::from((0..n).map(|x| Reverse(x)).collect::<Vec<_>>());
+        let mut rooms: BinaryHeap<Reverse<(i64, i32)>> = BinaryHeap::new();
+        let mut ans = vec![0; n as usize];
+
+        for m in meetings {
+            let start = m[0] as i64;
+            let end = m[1] as i64;
+
+            while !rooms.is_empty() && rooms.peek().unwrap().0 .0 <= start {
+                ready.push(Reverse((rooms.pop().unwrap().0).1));
+            }
+
+            if !ready.is_empty() {
+                let r = ready.pop().unwrap().0;
+                rooms.push(Reverse((end, r)));
+                ans[r as usize] += 1;
+            } else {
+                let Reverse((t, r)) = rooms.pop().unwrap();
+                rooms.push(Reverse((t + end - start, r)));
+                ans[r as usize] += 1;
+            }
+        }
+
+        ans.into_iter()
+            .enumerate()
+            .map(|(i, v)| (v, Reverse(i)))
+            .max()
+            .unwrap()
+            .1
+            .0 as i32       
+    }
+}

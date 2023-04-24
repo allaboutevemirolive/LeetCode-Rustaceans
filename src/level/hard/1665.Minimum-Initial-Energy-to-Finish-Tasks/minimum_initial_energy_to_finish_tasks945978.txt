@@ -1,0 +1,13 @@
+// https://leetcode.com/problems/minimum-initial-energy-to-finish-tasks/solutions/945978/4-line-o-n-rust-solution/
+impl Solution {
+    pub fn minimum_effort(tasks: Vec<Vec<i32>>) -> i32 {
+        // sum of all the "actual" effort each task costs
+        let actuals_sum: i32 = tasks.iter().map(|pair|pair[0]).sum();
+        // minimum difference between "actual" and "minimum" effort over all tasks
+        let min_diff: i32 = tasks.iter().map(|pair|pair[1]-pair[0]).min().unwrap();
+        // largest "minimum" effort of all tasks
+        let max_min: i32 = tasks.iter().map(|pair|pair[1]).max().unwrap();
+        
+        i32::max(actuals_sum + min_diff, max_min)
+    }
+}

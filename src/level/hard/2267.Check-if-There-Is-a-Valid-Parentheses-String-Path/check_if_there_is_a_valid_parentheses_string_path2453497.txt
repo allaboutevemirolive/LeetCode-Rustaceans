@@ -1,0 +1,30 @@
+// https://leetcode.com/problems/check-if-there-is-a-valid-parentheses-string-path/solutions/2453497/rust-dynamic-programming/
+// the important step is to use the first index to trace: # of '(' - # of ')' and
+// to ignore those invalid cases where  # of '(' < # of ')'
+impl Solution {
+    pub fn has_valid_path(grid: Vec<Vec<char>>) -> bool {
+        let (m, n) = (grid.len(), grid[0].len());
+        let mut dp = vec![vec![vec![-1; m + n]; n] ; m];
+        
+        Self::solve(&grid, &mut dp, 0, 0, 0) == 1
+    }
+    
+    fn solve(grid: &Vec<Vec<char>>, dp: &mut Vec<Vec<Vec<i32>>>, i: usize, j: usize, k: usize) -> i32 {
+        let (m, n) = (grid.len(), grid[0].len());
+        if i == m || j == n { return 0 }
+        
+        let mut k = k as i32;
+        k += if grid[i][j] == '(' { 1 } else { -1 };
+        if (k < 0) { return 0 }
+        let k = k as usize;
+        
+        if i == m - 1 && j == n - 1 { 
+            return if k == 0 { 1 } else { 0 }
+        }
+        
+        if dp[i][j][k] != -1 { return dp[i][j][k] }
+        dp[i][j][k] = if Self::solve(grid, dp, i + 1, j, k) == 1 || Self::solve(grid, dp, i, j + 1, k) == 1 { 1 } else { 0 };
+        
+        dp[i][j][k]
+    }
+}

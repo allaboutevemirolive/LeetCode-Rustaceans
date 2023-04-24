@@ -1,0 +1,95 @@
+// https://leetcode.com/problems/maximum-genetic-difference-query/solutions/1891911/rust-dfs-trie/
+#[derive(Default,Debug)]
+struct Node {
+    one: Option<Box<Node>>,
+    zero: Option<Box<Node>>,
+    child_num: i32,
+}
+impl Node {
+    pub fn new() -> Self {
+        Self::default()
+    }
+    pub fn insert(&mut self, cur: i32, add: i32) {
+        let mut node = self;
+        let mut bit = 1 << 17;
+        while bit != 0 {
+            if cur & bit == 0 {
+                node = node.zero.get_or_insert_with(Box::default);
+            } else {
+                node = node.one.get_or_insert_with(Box::default);
+            }
+            node.child_num += add;
+            bit >>= 1;
+        }
+    }
+    fn get_max(&mut self, num: i32) -> i32 {
+        let mut node = self;
+        let mut bit = 1 << 17;
+        let mut res = 0;
+        while bit != 0 {
+            match num & bit {
+                0 => {
+                    if let Some(v) = node.one.as_deref_mut() {
+                        if v.child_num > 0 {
+                            node = v;
+                            res |= bit;
+                        } else {
+                            node = node.zero.as_deref_mut().unwrap();
+                        }
+                    } else {
+                        node = node.zero.as_deref_mut().unwrap();
+                    }
+                }
+                _ => {
+                    if let Some(v) = node.zero.as_deref_mut() {
+                        if v.child_num > 0 {
+                            node = v;
+                            res |= bit;
+                        } else {
+                            node = node.one.as_deref_mut().unwrap();
+                        }
+                    } else {
+                        node = node.one.as_deref_mut().unwrap();
+                    }
+                }
+            }
+            bit >>= 1;
+        }
+        res
+    }
+}
+impl Solution {
+    pub fn max_genetic_difference(parents: Vec<i32>, queries: Vec<Vec<i32>>) -> Vec<i32> {
+        let n = queries.len();
+        let number_of_node = parents.len();
+        let mut res = vec![0;n];
+        let mut query_node :Vec<Vec<(i32,usize)>>= vec![vec![];number_of_node];
+        for (i,v) in queries.iter().enumerate(){
+            let (node,val) = (v[0] as usize,v[1]);
+            query_node[node].push((val,i));
+        }
+        let mut adj = vec![vec![];number_of_node];
+        let mut root_num = 0;
+        for (i,&v) in parents.iter().enumerate(){
+            if v == -1{
+                root_num = i;
+                continue;
+            }
+            adj[v as usize].push(i);
+        }
+        let mut root = Node::new();
+        fn dfs(cur:usize,res:&mut Vec<i32>,root: &mut Node,query_node:&Vec<Vec<(i32,usize)>>,
+               adj:& Vec<Vec<usize>>){
+            root.insert(cur as i32,1);
+            for &(v,i) in query_node[cur].iter(){
+                res[i] = root.get_max(v);
+            }
+            for &nxt in adj[cur].iter(){
+                dfs(nxt,res,root,query_node,adj);
+            }
+            root.insert(cur as i32,-1);
+        }
+        dfs(root_num,&mut res,&mut root,&query_node,&adj);
+        res
+    }
+}

@@ -1,0 +1,21 @@
+// https://leetcode.com/problems/minimum-number-of-moves-to-make-palindrome/solutions/2614313/rust-simple-greedy-solution/
+use std::collections::*;
+ 
+impl Solution {
+	pub fn min_moves_to_make_palindrome(s: String) -> i32 {
+		let mut s = s.clone();
+		let mut ans = 0;
+		while s.len() > 1 {
+			let i = s.rfind(s.chars().nth(0).unwrap()).unwrap();
+			if i != 0 {
+				ans += (s.len() - 1 - i) as i32;
+				s = format!("{}{}", &s[1..i], &s[i + 1..]);
+			} else {
+				let i = s.find(s.chars().last().unwrap()).unwrap();
+				ans += i as i32;
+				s = format!("{}{}", &s[..i], &s[i + 1..(s.len() - 1)]);
+			}
+		}
+		ans
+	}
+}

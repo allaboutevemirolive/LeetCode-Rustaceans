@@ -1,0 +1,150 @@
+// https://leetcode.com/problems/maximum-number-of-non-overlapping-substrings/solutions/745435/rust/
+use std::collections::{HashMap, HashSet};
+
+#[derive(Debug, Clone)]
+struct Status {
+    ch: char,
+    left: i32,
+    right: i32,
+    len: i32,
+    expend_left: i32,
+    expend_right: i32,
+    expend_len: i32,
+}
+
+impl Status {
+    pub fn overlap(&self, other: &Status) -> bool {
+        (other.expend_left >= self.expend_left && other.expend_left <= self.expend_right)
+            || (self.expend_left >= other.expend_left && self.expend_left <= other.expend_right)
+    }
+}
+
+impl Solution {
+    pub fn max_num_of_substrings(s: String) -> Vec<String> {
+        let mut v: Vec<Status> = (0u8..26u8)
+            .into_iter()
+            .map(|ch| Status {
+                ch: char::from(ch + b'a'),
+                left: std::i32::MAX,
+                right: std::i32::MIN,
+                len: std::i32::MIN,
+                expend_left: std::i32::MAX,
+                expend_right: std::i32::MIN,
+                expend_len: std::i32::MIN,
+            })
+            .collect::<Vec<Status>>();
+        for (idx, ch) in s.bytes().enumerate() {
+            let pos = (ch - b'a') as usize;
+            if (idx as i32) < v[pos].left {
+                v[pos].left = idx as i32
+            };
+            if (idx as i32) > v[pos].right {
+                v[pos].right = idx as i32
+            }
+        }
+        for x in &mut v {
+            if x.right >= 0 {
+                x.len = x.right - x.left + 1
+            }
+            if x.len > 0 {
+                x.expend_left = x.left;
+                x.expend_right = x.right;
+                x.expend_len = x.len
+            }
+        }
+
+        for i in 0..26 {
+            if v[i].len < 0 {
+                continue;
+            }
+            let mut set = HashSet::new();
+            set.insert(v[i].ch);
+            loop {
+                let chars = &s[v[i].expend_left as usize..v[i].expend_right as usize];
+                let mut set2 = HashSet::<char>::new();
+                for ch2 in chars.as_bytes() {
+                    set2.insert(*ch2 as char);
+                }
+                if set2.is_subset(&set) {
+                    break;
+                }
+                for ch2 in set2 {
+                    if set.contains(&ch2) {
+                        continue;
+                    }
+                    let idx2 = (ch2 as u8 - b'a') as usize;
+
+                    if v[idx2].left < v[i].expend_left {
+                        v[i].expend_left = v[idx2].left
+                    }
+                    if v[idx2].right > v[i].expend_right {
+                        v[i].expend_right = v[idx2].right
+                    }
+                    v[i].expend_len = v[i].expend_right - v[i].expend_left + 1;
+                    set.insert(ch2);
+                }
+            }
+        }
+
+        let mut v2 = v
+            .into_iter()
+            .filter(|status| status.expend_len > 0)
+            .collect::<Vec<Status>>();
+        v2.sort_by(|a, b| a.expend_len.cmp(&b.expend_len));
+
+        let mut v3: Vec<Status> = vec![];
+        'outer: for status2 in &v2 {
+            for status3 in &v3 {
+                if status3.overlap(&status2) {
+                    continue 'outer;
+                }
+            }
+            v3.push(status2.clone())
+        }
+
+        let mut ans = Vec::<String>::new();
+        for status in &v3 {
+            ans.push(String::from(
+                &s[status.expend_left as usize..=status.expend_right as usize],
+            ))
+        }
+        ans
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_max_num_of_substrings() {
+        assert_eq!(
+            Solution::max_num_of_substrings(String::from("adefaddaccc")),
+            vec!["e".to_string(), "f".to_string(), "ccc".to_string()]
+        )
+    }
+
+    #[test]
+    fn test_max_num_of_substrings_02() {
+        assert_eq!(
+            Solution::max_num_of_substrings(String::from("abbaccd")),
+            vec!["d".to_string(), "bb".to_string(), "cc".to_string()]
+        )
+    }
+
+    #[test]
+    fn test_max_num_of_substrings_03() {
+        assert_eq!(
+            Solution::max_num_of_substrings(String::from("abab")),
+            vec!["abab".to_string()]
+        )
+    }
+
+    #[test]
+    fn test_max_num_of_substrings_04() {
+        assert_eq!(
+            Solution::max_num_of_substrings(String::from("badadbeabc")),
+            vec!["c".to_string(), "e".to_string()]
+        )
+    }
+}

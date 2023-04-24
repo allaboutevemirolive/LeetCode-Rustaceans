@@ -1,0 +1,57 @@
+// https://leetcode.com/problems/longest-path-with-different-adjacent-characters/solutions/3047337/rust-post-order-dfs-with-comments/
+pub fn longest_path(parent: impl AsRef<[i32]>, s: impl AsRef<[u8]>) -> i32 {
+    let labels = s.as_ref();
+    let parents = parent.as_ref();
+    assert_eq!(labels.len(), parents.len());
+
+    // Convert the parent-array toa graph
+    let mut graph = vec![vec![]; parents.len()];
+
+    // skip the 1st element, because it's the root and does nto have a parent (i.e. negative value)
+    for (node, parent) in parents.iter().copied().enumerate().skip(1) {
+        graph[parent as usize].push(node);
+    }
+
+    let mut answer = 0;
+    dfs(&graph, labels, &mut answer, 0);
+    answer
+}
+
+fn dfs(tree: &[Vec<usize>], labels: &[u8], answer: &mut i32, node: usize) -> i32 {
+    // Track the best 2 sub-tree paths that descend from this node
+    let (mut a, mut b) = (0, 0);
+
+    for &child in tree[node].iter() {
+        // Find-out the length of the current child's sub-tree.
+        // We always do a DFS, even if the labesl are the same, 
+        // because there might be a longer path that goes through 
+        // this child node that does not involve the current node
+        let next = dfs(tree, labels, answer, child);
+
+        // If the child node is labeled with a different letter,
+        // then consider this path
+        if labels[node] != labels[child] {
+            // Of all paths, remember only 2, because they form the longest path
+            (a, b) = best_paths(a, b, next);
+        }
+    }
+
+    // the longest path that goes through this node is
+    // the sum of the best two sub-paths +1 (for the current node)
+    *answer = (*answer).max(a + b + 1);
+
+    // return the longest sub-tree from that node +1 for the current node
+    a + 1
+}
+
+// helper to simplify the tracking of the best two paths
+fn best_paths(mut a: i32, mut b: i32, next: i32) -> (i32, i32) {
+    if next > a {
+        b = a;
+        a = next;
+    } else if next > b {
+        b = next;
+    }
+
+    (a, b)
+}

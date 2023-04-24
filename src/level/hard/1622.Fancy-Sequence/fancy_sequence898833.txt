@@ -1,0 +1,46 @@
+// https://leetcode.com/problems/fancy-sequence/solutions/898833/c-using-record-with-minimum-code-but-still-tle/
+class Fancy {
+public:
+    int mod = 1e9 + 7;
+    vector<int> nums, record, opers;
+    Fancy() {
+    }
+    
+    void append(int val) {
+        nums.push_back(val);
+        record.push_back(opers.size());
+    }
+    
+    void addAll(int inc) {
+        opers.push_back(inc);
+    }
+    
+    void multAll(int m) {
+        opers.push_back(-m);
+    }
+    
+    int getIndex(int idx) {
+        if (idx >= nums.size()) return -1;
+        long long num = nums[idx];
+        for (int i = record[idx]; i < opers.size(); i++) {
+            int oper = opers[i];
+            if (oper > 0) {
+                num += oper;
+            } else {
+                num *= -oper;
+            }
+            num = num % mod;
+        }
+        record[idx] = opers.size();
+        return nums[idx] = num;
+    }
+};
+
+/**
+ * Your Fancy object will be instantiated and called as such:
+ * Fancy* obj = new Fancy();
+ * obj->append(val);
+ * obj->addAll(inc);
+ * obj->multAll(m);
+ * int param_4 = obj->getIndex(idx);
+ */

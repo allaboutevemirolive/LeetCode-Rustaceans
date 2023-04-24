@@ -1,0 +1,94 @@
+// https://leetcode.com/problems/find-a-value-of-a-mysterious-function-closest-to-target/solutions/745809/rust-translated/
+// https://leetcode.com/problems/find-a-value-of-a-mysterious-function-closest-to-target/discuss/743453/Java-O(n)-Time-O(1)-Space
+
+impl Solution {
+    pub fn closest_to_target(mut arr: Vec<i32>, target: i32) -> i32 {
+        fn update_bit_count(num: i32, bit_counts: &mut [i32; 32], update: i32) {
+            for i in (0..32).rev() {
+                if (num >> i) & 1 == 1 {
+                    bit_counts[31 - i] += update;
+                }
+            }
+        }
+
+        fn convert_to_int(bit_counts: &[i32; 32], threshold: i32) -> i32 {
+            let mut res = 0;
+            for i in 0..32 {
+                if bit_counts[i] > 0 && bit_counts[i] == threshold {
+                    res |= 1 << (31 - i);
+                }
+            }
+            res
+        }
+        let n = arr.len();
+        let mut left = 0;
+        let mut right = 0;
+        let mut ans = (arr[0] - target).abs();
+        let mut curr = 0;
+        let mut bit_counts = [0; 32];
+
+        while right < n {
+            update_bit_count(arr[right], &mut bit_counts, 1);
+            right += 1;
+            curr = convert_to_int(&bit_counts, (right - left) as i32);
+            ans = std::cmp::min(ans, (curr - target).abs());
+            while left < right && curr < target {
+                update_bit_count(arr[left], &mut bit_counts, -1);
+                left += 1;
+                curr = convert_to_int(&bit_counts, (right - left) as i32);
+                ans = std::cmp::min(ans, (curr - target).abs());
+            }
+        }
+        ans
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_closest_to_target() {
+        assert_eq!(Solution::closest_to_target(vec![9, 12, 3, 7, 15], 5), 2)
+    }
+
+    #[test]
+    fn test_closest_to_target_02() {
+        assert_eq!(
+            Solution::closest_to_target(vec![1000000, 1000000, 1000000], 1),
+            999999
+        )
+    }
+
+    #[test]
+    fn test_closest_to_target_03() {
+        assert_eq!(Solution::closest_to_target(vec![1, 2, 4, 8, 16], 0), 0)
+    }
+
+    #[test]
+    fn test_closest_to_target_04() {
+        assert_eq!(
+            Solution::closest_to_target(
+                vec![4095, 31, 262143, 8191, 63, 2047, 31, 63, 4095, 131071, 524287, 32767],
+                33
+            ),
+            2
+        )
+    }
+
+    #[test]
+    fn test_closest_to_target_05() {
+        assert_eq!(
+            Solution::closest_to_target(
+                vec![
+                    2047, 63, 31, 32767, 1023, 524287, 255, 131071, 31, 63, 131071, 255, 262143,
+                    63, 255, 15, 8191, 65535, 511, 131071, 511, 15, 8191, 15, 511, 127, 65535, 15,
+                    16383, 4095, 4095, 65535, 524287, 511, 131071, 131071, 16383, 524287, 8191,
+                    127, 15, 31, 524287, 262143, 16383, 511, 8191, 63
+                ],
+                59
+            ),
+            4
+        )
+    }
+}

@@ -1,0 +1,45 @@
+// https://leetcode.com/problems/number-of-distinct-roll-sequences/solutions/2255441/rust-recursion/
+const MODULO: i32 = 1_000_000_007;
+
+impl Solution {
+    pub fn distinct_sequences(n: i32) -> i32 {
+        let n = n as usize;
+        let mut dp = vec![vec![vec![0; 7]; 7]; n + 1];
+
+        fn greatest_common_divisor(a: usize, b: usize) -> usize {
+            if b != 0 {
+                greatest_common_divisor(b, a % b)
+            } else {
+                a
+            }
+        }
+
+        fn distinct_sequences_recursion(
+            n: usize,
+            prev: usize,
+            prev_prev: usize,
+            dp: &mut Vec<Vec<Vec<i32>>>,
+        ) -> i32 {
+            if n == 0 {
+                return 1;
+            }
+
+            if dp[n][prev][prev_prev] == 0 {
+                for dice in 1..=6 {
+                    if dice != prev
+                        && dice != prev_prev
+                        && (prev == 0 || greatest_common_divisor(dice, prev) == 1)
+                    {
+                        dp[n][prev][prev_prev] +=
+                            distinct_sequences_recursion(n - 1, dice, prev, dp);
+                        dp[n][prev][prev_prev] %= MODULO;
+                    }
+                }
+            }
+
+            dp[n][prev][prev_prev]
+        }
+
+        distinct_sequences_recursion(n, 0, 0, &mut dp)
+    }
+}

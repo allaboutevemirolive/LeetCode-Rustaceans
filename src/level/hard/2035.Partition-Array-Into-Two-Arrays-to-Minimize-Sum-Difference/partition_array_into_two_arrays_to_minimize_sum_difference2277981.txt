@@ -1,0 +1,76 @@
+// https://leetcode.com/problems/partition-array-into-two-arrays-to-minimize-sum-difference/solutions/2277981/rust-meet-in-middle/
+impl Solution {
+    // the array is divided into two groups:
+    // nums[0], nums[1]...nums[n - 1] &
+    // nums[n], nums[n + 1]...nums[n + n - 1].
+    // each group contains n elements and 2^^n different subset sets
+    
+    // for each cnt (0 << cnt << n): 
+    // 1) let s be a sebset ofthe first group with cnt elements; and
+    // 2) let sum1 = sum(elements in the set) - 
+    //               sum(elements of the first group not in the set) 
+    // 3) data1[cnt] contains all the sum1 values from different 
+    // sunsets with size cnt
+    
+    // data2[k] is defined in a similiar way
+    
+    // after sorting each of the data[k], we can iterate through
+    // data1 + binary search data2 to find the best answer  
+    
+    pub fn minimum_difference(nums: Vec<i32>) -> i32 {
+        let n = nums.len() / 2;
+        let m = (1 << n) as usize;
+        
+        let mut data1: Vec<Vec<i32>> = vec![vec![]; n + 1];
+        let mut data2: Vec<Vec<i32>> = vec![vec![]; n + 1];
+        
+        for mask in 0..m {
+            let (mut sum1, mut sum2, mut cnt) = (0, 0, 0);
+            
+            for i in 0..n {
+                if (mask & (1 << i)) > 0 { cnt += 1; }
+                
+                if (mask & (1 << i)) > 0 { sum1 += nums[i]; }
+                else                     { sum1 -= nums[i]; }
+                if (mask & (1 << i)) > 0 { sum2 += nums[n + i]; }
+                else                     { sum2 -= nums[n + i]; }
+            }
+            
+            data1[cnt].push(sum1);
+            data2[cnt].push(sum2);
+        }
+        
+        for i in 0..n { data2[i].sort_unstable(); }
+        
+        let mut ret = i32::MAX;
+        for i in 0..=n {
+            for a in &data1[i] {
+                let k = Self::binary_search(&data2[n - i], -a);
+                if k != data2[n - i].len() { 
+                    ret = ret.min(i32::abs(a + data2[n - i][k])); 
+                }
+                if k > 0 { 
+                    ret = ret.min(i32::abs(a + data2[n - i][k - 1])); 
+                }
+            }
+        }
+        
+        ret
+    }
+ 
+    // requirement: data is a sorted in ascending order/
+    // returns the index of the first element in data 
+    // that is no less than a
+    fn binary_search(data: &Vec<i32>, a: i32) -> usize {
+        if a > data[data.len() - 1] { return data.len() }
+        
+        let (mut left, mut right) = (0usize, data.len() - 1);
+        while left < right {
+            let mid = left + (right - left) / 2;
+            if data[mid] >= a { right = mid; }
+            else              { left = mid + 1; } 
+        }
+        
+        left
+    }
+}

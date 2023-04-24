@@ -1,0 +1,160 @@
+// https://leetcode.com/problems/minimum-number-of-days-to-disconnect-island/solutions/826428/rust-translated-0ms-100/
+impl Solution {
+    pub fn min_days(g: Vec<Vec<i32>>) -> i32 {
+        const DIR: [i32; 5] = [0, 1, 0, -1, 0];
+
+        fn dfs(
+            grid: &Vec<Vec<i32>>,
+            i: i32,
+            j: i32,
+            depth: &mut Vec<Vec<i32>>,
+            low: &mut Vec<Vec<i32>>,
+            parent: &mut Vec<Vec<i32>>,
+            time: &mut i32,
+            is_articulation_point: &mut bool,
+        ) {
+            let m = grid.len();
+            let n = grid[0].len();
+            depth[i as usize][j as usize] = *time;
+            *time += 1;
+            low[i as usize][j as usize] = depth[i as usize][j as usize];
+            let mut children = 0;
+            for k in 0..4 {
+                let ni = i + DIR[k as usize];
+                let nj = j + DIR[k as usize + 1];
+                if ni >= 0
+                    && ni < m as i32
+                    && nj >= 0
+                    && nj < n as i32
+                    && grid[ni as usize][nj as usize] == 1
+                {
+                    //valid connection
+                    if depth[ni as usize][nj as usize] == -1 {
+                        children += 1;
+                        parent[ni as usize][nj as usize] = i * n as i32 + j;
+                        dfs(
+                            grid,
+                            ni,
+                            nj,
+                            depth,
+                            low,
+                            parent,
+                            time,
+                            is_articulation_point,
+                        );
+                        low[i as usize][j as usize] = std::cmp::min(
+                            low[i as usize][j as usize],
+                            low[ni as usize][nj as usize],
+                        );
+                        if low[ni as usize][nj as usize] >= depth[i as usize][j as usize]
+                            && parent[i as usize][j as usize] > -1
+                        {
+                            *is_articulation_point = true;
+                        }
+                    } else if ni * n as i32 + nj != parent[i as usize][j as usize] {
+                        //ignore the incoming path
+                        low[i as usize][j as usize] = std::cmp::min(
+                            low[i as usize][j as usize],
+                            depth[ni as usize][nj as usize],
+                        );
+                    }
+                }
+            }
+            if parent[i as usize][j as usize] == -1 && children > 1 {
+                *is_articulation_point = true;
+            }
+        }
+
+        let m = g.len();
+        let n = g[0].len();
+        let mut is_articulation_point = false;
+        let mut time = 0;
+
+        let mut lands = 0;
+        let mut islands = 0;
+
+        let mut depth = vec![vec![-1; n]; m];
+        let mut low = vec![vec![-1; n]; m];
+        let mut parent = vec![vec![-1; n]; m];
+
+        for i in 0..m {
+            for j in 0..n {
+                if g[i][j] == 1 {
+                    lands += 1;
+                    if depth[i][j] == -1 {
+                        dfs(
+                            &g,
+                            i as i32,
+                            j as i32,
+                            &mut depth,
+                            &mut low,
+                            &mut parent,
+                            &mut time,
+                            &mut is_articulation_point,
+                        );
+                        islands += 1;
+                    }
+                }
+            }
+        }
+        if islands == 0 || islands >= 2 {
+            return 0;
+        }
+        if lands == 1 {
+            return 1;
+        }
+        if is_articulation_point {
+            return 1;
+        }
+        return 2;
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_min_days() {
+        assert_eq!(
+            Solution::min_days(vec![vec![0, 1, 1, 0], vec![0, 1, 1, 0], vec![0, 0, 0, 0]]),
+            2
+        )
+    }
+
+    #[test]
+    fn test_min_days_02() {
+        assert_eq!(Solution::min_days(vec![vec![1, 1]]), 2)
+    }
+
+    #[test]
+    fn test_min_days_03() {
+        assert_eq!(Solution::min_days(vec![vec![1, 0, 1, 0]]), 0)
+    }
+
+    #[test]
+    fn test_min_days_04() {
+        assert_eq!(
+            Solution::min_days(vec![
+                vec![1, 1, 0, 1, 1],
+                vec![1, 1, 1, 1, 1],
+                vec![1, 1, 0, 1, 1],
+                vec![1, 1, 0, 1, 1]
+            ]),
+            1
+        )
+    }
+
+    #[test]
+    fn test_min_days_05() {
+        assert_eq!(
+            Solution::min_days(vec![
+                vec![1, 1, 0, 1, 1],
+                vec![1, 1, 1, 1, 1],
+                vec![1, 1, 0, 1, 1],
+                vec![1, 1, 1, 1, 1]
+            ]),
+            2
+        )
+    }
+}

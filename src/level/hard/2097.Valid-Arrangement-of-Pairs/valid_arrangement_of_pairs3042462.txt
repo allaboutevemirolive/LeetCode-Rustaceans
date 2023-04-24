@@ -1,0 +1,32 @@
+// https://leetcode.com/problems/valid-arrangement-of-pairs/solutions/3042462/rust-solution-eulerian-path/
+use std::collections::HashMap;
+impl Solution {
+    pub fn valid_arrangement(pairs: Vec<Vec<i32>>) -> Vec<Vec<i32>> {
+        let mut mp = HashMap::<i32, Vec<i32>>::new();
+        let mut degree = HashMap::<i32, i32>::new();
+        let mut u = pairs[0][0];
+
+        for p in pairs {
+            mp.entry(p[0]).or_insert(vec![]).push(p[1]);
+            *degree.entry(p[0]).or_insert(0) += 1;
+            *degree.entry(p[1]).or_insert(0) -= 1;
+        }
+        for (k, v) in degree {
+            if v == 1 { u = k; } 
+        }
+
+        let (mut temp, mut sk) = (vec![u], vec![]);
+        while let Some(u) = temp.pop() {
+            if mp.contains_key(&u) {
+                let v = mp.get_mut(&u).unwrap().pop().unwrap();
+                if mp.get_mut(&u).unwrap().is_empty() { mp.remove(&u); }
+                temp.push(u);
+                temp.push(v);
+            } else { sk.push(u); }
+        }
+
+        let mut ret = vec![];
+        for i in (1 .. sk.len()).rev() { ret.push(vec![sk[i], sk[i - 1]]); }
+        ret
+    }
+}

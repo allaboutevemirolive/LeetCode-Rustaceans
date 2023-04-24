@@ -1,0 +1,13 @@
+// https://leetcode.com/problems/maximum-score-from-performing-multiplication-operations/solutions/2582750/rust-solution/
+impl Solution {
+    pub fn maximum_score(nums: Vec<i32>, multipliers: Vec<i32>) -> i32 {
+        let mut d = vec![0; multipliers.len() + 1];
+        for (i, mi) in multipliers.into_iter().enumerate().rev() {
+            for (j, (l, r)) in nums.iter().zip(&nums[nums.len() - 1 - i..]).enumerate() {
+                d[j] = std::cmp::max(mi * l + d[j + 1], mi * r + d[j]);
+            }
+            d.truncate(i + 1);
+        }
+        d[0]
+    }
+}

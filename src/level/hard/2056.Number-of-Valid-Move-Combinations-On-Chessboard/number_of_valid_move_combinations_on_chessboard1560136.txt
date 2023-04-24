@@ -1,0 +1,82 @@
+// https://leetcode.com/problems/number-of-valid-move-combinations-on-chessboard/solutions/1560136/rust-24ms/
+type Pos = (i32, i32);
+
+impl Solution {
+    pub fn count_combinations(pieces: Vec<String>, positions: Vec<Vec<i32>>) -> i32 {
+        // preprocess Vec<i32> -> Pos
+        let src: Vec<Pos> = positions.iter().map(|p| (p[0], p[1])).collect();
+        let reachable_pos: Vec<Vec<Pos>> = src
+            .iter()
+            .zip(pieces.iter())
+            .map(|(pos, piece)| Solution::all_reachable_pos(pos, piece))
+            .collect();
+        Solution::possible_move(0, &mut vec![(0, 0); src.len()], &reachable_pos, &src)
+    }
+
+    // iterate all possible moveable positions
+    fn possible_move(i: usize, dst: &mut [Pos], reachable: &[Vec<Pos>], src: &[Pos]) -> i32 {
+        if i == reachable.len() {
+            return Solution::is_moveable(dst, src);
+        }
+
+        reachable[i].iter().fold(0, |acc, &r| {
+            if !dst[0..i].contains(&r) {
+                dst[i] = r;
+                acc + Solution::possible_move(i + 1, dst, reachable, src)
+            } else {
+                acc
+            }
+        })
+    }
+
+    fn is_moveable(dst: &[Pos], src: &[Pos]) -> i32 {
+        let dir: Vec<Pos> = src
+            .iter()
+            .zip(dst.iter())
+            .map(|(s, d)| ((d.0 - s.0).signum(), (d.1 - s.1).signum()))
+            .collect();
+        let mut src_pos = src.to_owned();
+        Solution::is_moveable_impl(&mut src_pos, dst, &dir)
+    }
+
+    fn is_moveable_impl(src: &mut [Pos], dst: &[Pos], dir: &[Pos]) -> i32 {
+        if src == dst {
+            return 1;
+        }
+        // src contains duplicates
+        if (1..src.len()).any(|i| src[..i].contains(&src[i])) {
+            return 0;
+        }
+        for i in 0..src.len() {
+            if src[i] != dst[i] {
+                src[i].0 += dir[i].0;
+                src[i].1 += dir[i].1;
+            }
+        }
+        Solution::is_moveable_impl(src, dst, dir)
+    }
+
+
+    #[rustfmt::skip]
+    fn all_reachable_pos(src: &Pos, piece: &str) -> Vec<Pos> {
+        let dir: Vec<Pos> = match piece {
+            "rook" => vec![(1, 0), (-1, 0), (0, 1), (0, -1)],
+            "bishop" => vec![(1, 1), (-1, -1), (1, -1), (-1, 1)],
+            "queen" => vec![(1, 0), (-1, 0), (0, 1), (0, -1),
+                            (1, 1), (-1, -1), (1, -1), (-1, 1)],
+            _ => panic!(),
+        };
+
+        let mut pos = vec![*src];
+        for d in dir {
+            for x in 1..8 {
+                let p = (src.0 + d.0 * x, src.1 + d.1 * x);
+                if (1..9).contains(&p.0) && (1..9).contains(&p.1) {
+                    pos.push(p);
+                }
+            }
+        }
+
+        pos
+    }
+}

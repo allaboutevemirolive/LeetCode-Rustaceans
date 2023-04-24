@@ -1,0 +1,38 @@
+// https://leetcode.com/problems/number-of-ways-to-reorder-array-to-get-same-bst/solutions/823590/rust-solution/
+static MODULUS: usize = 1_000_000_007;
+
+impl Solution {
+    pub fn num_of_ways(nums: Vec<i32>) -> i32 {
+        let len = nums.len();
+        // comb[n][k] = comb(n, k)
+        let mut comb = vec![vec![0; len]; len];
+        // calculate combinations
+        for i in 1..len {
+            comb[i][0] = 1;
+            for j in 1..i {
+                comb[i][j] = (comb[i - 1][j] + comb[i - 1][j - 1]) % MODULUS;
+            }
+            comb[i][i] = 1;
+        }
+        Self::helper(nums, &comb) as i32 - 1
+    }
+
+    pub fn helper(nums: Vec<i32>, comb: &Vec<Vec<usize>>) -> usize {
+        let len = nums.len();
+        if len <= 2 {
+            return 1;
+        }
+        let first = nums[0];
+        let (mut less, mut greater) = (vec![], vec![]);
+        for &num in &nums[1..] {
+            if num < first {
+                less.push(num);
+            } else {
+                greater.push(num);
+            }
+        }
+        comb[len - 1][less.len()] * Self::helper(less, comb) % MODULUS
+            * Self::helper(greater, comb)
+            % MODULUS
+    }
+}

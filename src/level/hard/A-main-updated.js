@@ -5,9 +5,9 @@ const fs = require('fs');
     const browser = await chromium.launch();
     const page = await browser.newPage();
 
-    const text_file = 'LeetCode-Hard-Page-4.txt'
+    const text_file = 'LeetCode-Hard-Page-8.txt'
 
-    const target_link = 'https://leetcode.com/problemset/all/?difficulty=HARD&page=4';
+    const target_link = 'https://leetcode.com/problemset/all/?difficulty=HARD&page=8';
 
     const target_language_class = '.language-rust, .language-python, .language-java, .language-cpp';
 

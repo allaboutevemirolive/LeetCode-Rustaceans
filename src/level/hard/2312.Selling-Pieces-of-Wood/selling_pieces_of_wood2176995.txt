@@ -1,0 +1,42 @@
+// https://leetcode.com/problems/selling-pieces-of-wood/solutions/2176995/rust-divide-and-merge-dfs-memo-o-m-n-m-n/
+use std::cmp::max;
+use std::collections::HashMap;
+impl Solution {
+    pub fn selling_wood(m: i32, n: i32, prices: Vec<Vec<i32>>) -> i64 {
+        let mut part_price: HashMap<(i32, i32), i64> = prices.iter()
+            .map(|x|((x[0], x[1]), x[2] as i64))
+            .collect();
+
+        // let mut part_price: HashMap<(i32, i32), i64> = HashMap::new();
+        // for p in prices {
+        //     part_price.insert((p[0], p[1]), p[2] as i64);
+        // }
+        let mut f: HashMap<(i32, i32), i64> = HashMap::new();
+        let ans = dfs(m, n, &part_price, &mut f);
+        ans
+    }
+}
+
+fn dfs(high: i32, wid: i32, part_price: &HashMap<(i32, i32), i64>, f: &mut HashMap<(i32, i32), i64>) -> i64 {
+    let mut ans: i64 = 0;
+    if f.contains_key(&(high, wid)) {
+        return f[&(high, wid)];
+    }
+    if part_price.contains_key(&(high, wid)) {
+        ans = part_price[&(high, wid)];
+    }
+    let half_high = high/2 + 1;
+    let half_wid = wid/2 + 1;
+    for h in 1..half_high {
+        let up = dfs(h, wid, part_price, f);
+        let down = dfs(high - h, wid, part_price, f);
+        ans = max(ans, up + down);
+    }
+    for w in 1..half_wid {
+        let left = dfs(high, w, part_price, f);
+        let right = dfs(high, wid - w, part_price, f);
+        ans = max(ans, left + right);
+    }
+    f.insert((high, wid), ans);
+    ans
+}

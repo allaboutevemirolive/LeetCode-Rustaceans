@@ -1,0 +1,41 @@
+// https://leetcode.com/problems/minimum-operations-to-make-the-array-k-increasing/solutions/1636326/rust-lis/
+impl Solution {
+    pub fn k_increasing(arr: Vec<i32>, k: i32) -> i32 {
+        let mut s = 0;
+        for i in 0..k{
+            let now:Vec<i32> = arr.iter().copied().skip(i as usize).step_by(k as usize).collect();
+            s += Solution::changes_needed(&now);
+        }
+        s
+    }
+    fn changes_needed(a: &[i32]) -> i32{
+        let mut dp:Vec<i32> = vec![];
+        for v in a{
+		    // for v in a{
+			//     let mut left:usize = 0;
+			//     let mut right = dp.len();
+			//     while left < right{
+			//         let mid = left + (right - left)/ 2;
+			//         if dp[mid] <= *v{
+			//             left = mid + 1;
+			//         }else{
+			//             right = mid;
+			//         }
+			//     }
+			//     if left == dp.len(){
+			//        dp.push(*v)
+			//     }else{
+			//         dp[left] = *v;
+			//     }
+			// }
+
+            let t = dp.partition_point(|&x| x <= *v);
+            if t == dp.len(){
+                dp.push(*v);
+            }else{
+                dp[t] = *v
+            }
+        }
+        (a.len() - dp.len()) as i32
+    }
+}

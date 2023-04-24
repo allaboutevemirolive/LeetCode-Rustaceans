@@ -1,0 +1,44 @@
+// https://leetcode.com/problems/string-compression-ii/solutions/2709343/rust-bottom-up-dp-100-time-and-memory-25-lines-of-idiomatic-code-commented-version/
+impl Solution {
+    pub fn get_length_of_optimal_compression(s: String, k: i32) -> i32 {
+        // Bigger than anything we could get, but small enough so it's possible to add f(count)
+        // later without saturating
+        let mut dp = [[i32::MAX - 101; 101]; 101];
+        dp[0].fill(0);
+
+        // If, using first i (+ 1) characters
+        for (i, c) in s.bytes().enumerate().map(|(i, c)| (i + 1, c)) {
+            // We remove at most n_rem characters
+            for to_rem in 0..=(i).min(k as usize) {
+                // dp[i][n_rem] = the best result possible
+
+                // Remove the current character
+                if to_rem > 0 {
+                    dp[i][to_rem] = dp[i - 1][to_rem - 1];
+                }
+
+                // Keep the current character, and remove previous characters to make a chain with
+                // the current character
+
+                let mut count = 0_i32;
+                let mut removed = 0;
+                for (j, c_) in s.bytes().enumerate().take(i).rev() {
+                    // If we remove from s[j..i] characters which are not s[i] we would have
+                    // count matching characters
+
+                    if c_ == c {
+                        count += 1;
+                    } else {
+                        removed += 1;
+                        if removed > to_rem {
+                            break;
+                        }
+                    }
+                    let f = |c: i32| (c as f32).log10().floor() as i32 + 1 + (c != 1) as i32;
+                    dp[i][to_rem] = dp[i][to_rem].min(dp[j][to_rem - removed] + f(count));
+                }
+            }
+        }
+        dp[s.len()][k as usize]
+    }
+}

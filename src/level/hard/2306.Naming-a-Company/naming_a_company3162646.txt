@@ -1,0 +1,23 @@
+// https://leetcode.com/problems/naming-a-company/solutions/3162646/rust-rememeber-26-2-is-much-easier-than-n-2/
+use std::collections::HashSet;
+
+impl Solution {
+    pub fn distinct_names(ideas: Vec<String>) -> i64 {
+        let mut counts = vec![vec![(0, 0); 26]; 26];
+        let used = ideas.iter().map(|v| v.as_str()).collect::<HashSet<_>>();
+        for name in ideas.iter() {
+            let bucket = (name.as_bytes()[0] - b'a') as usize;
+            for i in 0..26 {
+                let letter = (b'a' + i) as char;
+                let mut word = String::from(letter);
+                word.push_str(&name.as_str()[1..]);
+                if !used.contains(&word.as_str()) {
+                    counts[bucket][i as usize].0 += 1;
+                    counts[i as usize][bucket].1 += 1;
+                }
+            }
+        }
+        counts.into_iter().map(|v| v.into_iter()).flatten().map(|t| t.0*t.1).sum::<i64>()
+        
+    }
+}

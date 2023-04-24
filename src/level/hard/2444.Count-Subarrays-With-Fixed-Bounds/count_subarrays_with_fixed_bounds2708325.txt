@@ -1,0 +1,31 @@
+// https://leetcode.com/problems/count-subarrays-with-fixed-bounds/solutions/2708325/rust-sliding-window-with-comments/
+impl Solution {
+    pub fn count_subarrays(nums: Vec<i32>, min_k: i32, max_k: i32) -> i64 {
+        let mut rez = 0;
+
+        for chunk in nums.split(|n| *n < min_k || *n > max_k) {
+            let mut slow = 0;
+            let (mut min_i_opt, mut max_i_opt) = (None, None);
+            for fast in 0..chunk.len() {
+                if chunk[fast] == min_k {
+                    min_i_opt = Some(fast);
+                }
+                if chunk[fast] == max_k {
+                    max_i_opt = Some(fast);
+                }
+                if let (Some(min_i), Some(max_i)) = (min_i_opt.clone(), max_i_opt.clone()) {
+                    let (lo, hi) = (min_i.min(max_i), min_i.max(max_i));
+                    rez += (lo - slow + 1) as u64 * (chunk.len() - hi) as u64;
+                    if fast == min_i {
+                        slow = max_i + 1;
+                        max_i_opt = None;
+                    } else {
+                        slow = min_i + 1;
+                        min_i_opt = None;
+                    }
+                }
+            }
+        }
+        rez as _
+    }
+}

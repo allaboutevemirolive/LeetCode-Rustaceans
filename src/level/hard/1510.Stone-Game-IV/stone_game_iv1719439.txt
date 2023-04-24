@@ -1,0 +1,22 @@
+// https://leetcode.com/problems/stone-game-iv/solutions/1719439/rust-iterators-with-memoized-recursive-solution/
+impl Solution {
+    pub fn winner_square_game(n: i32) -> bool {
+        let mut squares: Vec<usize> = vec![1];
+        while squares[0] < n as usize {
+            squares.insert(0, squares[0] + 2 * squares.len() + 1);
+        }
+        fn winner_square_memo(n: usize, memo: &mut [Option<bool>], squares: &[usize]) -> bool {
+            memo[n].unwrap_or_else(|| {
+                if squares[0] == n { memo[n] = Some(true) }
+                else {
+                    memo[n] = Some(squares.iter()
+                            .skip_while(|&c| c > &n)
+                            .map(|choice| { winner_square_memo(n - choice, memo, squares) })
+                            .filter(|&opponent_win| !opponent_win).next() == Some(false));
+                }
+                memo[n].unwrap()
+            })
+        }
+        winner_square_memo(n as usize, &mut vec![None; n as usize + 1], &squares)
+    }
+}

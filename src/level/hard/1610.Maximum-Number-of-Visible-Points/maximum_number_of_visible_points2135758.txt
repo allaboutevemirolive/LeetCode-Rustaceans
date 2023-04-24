@@ -1,0 +1,93 @@
+// https://leetcode.com/problems/maximum-number-of-visible-points/solutions/2135758/rust-sliding-window/
+const ACCURACY: f64 = 0.000_000_000_001;
+
+pub fn visible_points(points: Vec<Vec<i32>>, angle: i32, origin: Vec<i32>) -> i32 {
+    if points.is_empty() {
+        return 0;
+    }
+
+    let field_of_view = ACCURACY + angle as f64;
+
+    let mut origin_in_points = 0;
+    let mut angles_from_origin = points
+        .iter()
+        // Count any points that overlap the origin point and always add them to the answer
+        .inspect(|x| {
+            if origin[0] == x[0] && origin[1] == x[1] {
+                origin_in_points += 1;
+            }
+        })
+        // Skip any points that are the same as the origin point,
+        //because they are always in the FoV regardless of the angle
+        .filter(|x| origin[0] != x[0] || origin[1] != x[1])
+        .map(|p| {
+            let dx = (p[0] - origin[0]) as f64;
+            let dy = (p[1] - origin[1]) as f64;
+            dy.atan2(dx)
+        })
+        // Normalize the angle to be in the range [0; TAU)
+        .map(|radians| (radians + std::f64::consts::TAU) % std::f64::consts::TAU)
+        // Use degrees, because it's easier to visualize and debug
+        .map(|radians| radians.to_degrees())
+        .collect::<Vec<_>>();
+
+    // If the list of points contained only the origin point, we can return immediately
+    if angles_from_origin.is_empty() {
+        return origin_in_points;
+    }
+
+    // Sort them in incresaing order in order to use the sliding window technique
+    angles_from_origin.sort_unstable_by(|&a, b| a.partial_cmp(b).unwrap());
+
+    // Sliding window "from" and "to"
+    let mut l = 0;
+    let mut r = 0;
+
+    // Field of view "from" and "to"
+    let mut fov_l = angles_from_origin[0];
+    let mut fov_r;
+
+    let mut answer = 0;
+
+    // iterate twice in order to count points that are at the 0-360 degrees border
+    for iter in 0..2 {
+        while r < angles_from_origin.len() {
+            // If we were using radians, then we should have used TAU instead of 360.0
+            //
+            // We need to add 2*PI on the second iteration.
+            // We can do it with an IF statement like that:
+            // ```rust
+            //  fov_r = angles_from_origin[l] + std::f64::consts::TAU * (iter as f64);
+            // ```
+            // but we can also take advantage of FMA instructions which might be faster :)
+            fov_r = 360.0f64.mul_add(iter as f64, angles_from_origin[r]);
+            r += 1;
+
+            while fov_r - fov_l > field_of_view {
+                l = (l + 1) % angles_from_origin.len();
+
+                // We need to add 2*PI on the second iteration, but only if L < R
+                // in other words - when L has started its own second iteration
+                // We can do it with an IF statement like that:
+                // ```rust
+                //  fov_l = angles_from_origin[l];
+                //  if iter != 0 && l < r{
+                //      fov_l += std::f64::consts::TAU * (iter as f64)
+                //  }
+                // ```
+                // but we can also take advantage of FMA instructions and branch-less code :)
+                let mul = ((iter != 0 && l < r) as usize * iter) as f64;
+                fov_l = 360.0f64.mul_add(mul, angles_from_origin[l]);
+            }
+
+            // handle the case when we are iterating for a second time and R < L
+            let r_add = angles_from_origin.len() * iter;
+            let l_add = angles_from_origin.len() * iter * ((l < r) as usize);
+            answer = answer.max((r + r_add) - (l + l_add));
+        }
+
+        r = 0;
+    }
+
+    answer as i32 + origin_in_points
+}

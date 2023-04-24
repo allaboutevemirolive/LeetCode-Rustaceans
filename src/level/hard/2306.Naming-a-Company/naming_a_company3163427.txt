@@ -1,0 +1,26 @@
+// https://leetcode.com/problems/naming-a-company/solutions/3163427/rust-group-by-initials/
+impl Solution {
+    pub fn distinct_names(ideas: Vec<String>) -> i64 {
+        let mut idea_sets = vec![std::collections::HashSet::new(); 26];
+        let mut name_count = 0;
+
+        for idea in ideas {
+            let index = idea.chars().nth(0).unwrap() as usize - 'a' as usize;
+            idea_sets[index].insert(String::from(&idea[1..]));
+        }
+
+        for i in 0..25 {
+            for j in i + 1..26 {
+                let idea_set_a = &idea_sets[i];
+                let idea_set_b = &idea_sets[j];
+
+                let intersection_count = idea_set_a.intersection(&idea_set_b).count();
+                name_count += (idea_set_a.len() - intersection_count)
+                    * (idea_set_b.len() - intersection_count)
+                    * 2;
+            }
+        }
+
+        name_count as i64
+    }
+}

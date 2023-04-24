@@ -1,0 +1,59 @@
+// https://leetcode.com/problems/parallel-courses-iii/solutions/1538441/rust-64ms-with-explainations/
+impl Solution {
+    fn update_calculate_node(node_index: usize, cache: &mut Vec<i32>, source_map: &HashMap<usize, Vec<usize>>, time: &Vec<i32>) -> i32 {
+        if cache[node_index] != 0 {
+            // already cached
+            return cache[node_index];
+        }
+        // find how long other prerequisite node takes
+        let source_time = match source_map.get(&node_index) {
+            None => {
+                0
+            }
+            Some(sources) => {
+                sources.iter()
+                    .map(|source_index| Solution::update_calculate_node(*source_index, cache, source_map, time))
+                    .max().unwrap_or(0)
+            }
+        };
+
+        // how long this node takes
+        let result = source_time + time[node_index - 1];
+        cache[node_index] = result;
+        result
+    }
+
+    pub fn minimum_time(n: i32, relations: Vec<Vec<i32>>, time: Vec<i32>) -> i32 {
+        // we need a parent->children relation for dfs algorithm
+        let mut source_nodes_map = HashMap::new();
+        for relation in relations.iter() {
+            if let [source, dest] = relation.as_slice() {
+                let sources = source_nodes_map.entry(*dest as usize).or_insert(vec![]);
+                sources.push(*source as usize);
+            }
+        }
+
+        let mut cache = vec![0; n as usize + 1];
+        // if some node has no parents
+        let max_leaf_time = *time.iter().max().unwrap();
+        // check all roots nodes which also recursively check all nodes with parents
+        let max_root_time = source_nodes_map.iter()
+            .map(|(&target_node, _)| Solution::update_calculate_node(target_node, &mut cache, &source_nodes_map, &time))
+            .max()
+            .unwrap_or(max_leaf_time);
+        // find the max
+        max_root_time.max(max_leaf_time)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::Solution;
+
+    #[test]
+    fn it_works() {
+        assert_eq!(Solution::minimum_time(1, vec![], vec![1]), 1);
+        assert_eq!(Solution::minimum_time(3, vec![vec![1, 3], vec![2, 3]], vec![3, 2, 5]), 8);
+        assert_eq!(Solution::minimum_time(5, vec![vec![1, 5], vec![2, 5], vec![3, 5], vec![3, 4], vec![4, 5]], vec![1, 2, 3, 4, 5]), 12);
+    }
+}

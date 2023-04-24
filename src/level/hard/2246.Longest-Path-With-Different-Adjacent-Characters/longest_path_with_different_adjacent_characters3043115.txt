@@ -1,0 +1,31 @@
+// https://leetcode.com/problems/longest-path-with-different-adjacent-characters/solutions/3043115/iterative-dfs-solution-in-rust/
+enum Action { Explore(usize), Restore(usize) }
+impl Solution {
+    pub fn longest_path(parent: Vec<i32>, s: String) -> i32 {
+        let labels = s.as_bytes();
+        let tree = parent.iter().enumerate()
+            .filter_map(|(n, &p)| if p < 0 { None } else { Some((n, p as usize)) } )
+            .fold(vec![vec![]; parent.len()], |mut tree, (n, p)| { tree[p].push(n); tree });
+        let mut max_len = 0;
+        let mut path_lengths = vec![0; parent.len()];
+        let mut stack = vec![Action::Explore(0)];
+        while let Some(action) = stack.pop() {
+            match action {
+                Action::Explore(node) => {
+                    stack.push(Action::Restore(node));
+                    stack.extend(tree[node].iter().map(|&n| Action::Explore(n)));
+                },
+                Action::Restore(node) => {
+                    let (p_max, max) = tree[node].iter()
+                        .filter(|&&child| labels[node]!=labels[child])
+                        .map(|&child| path_lengths[child])
+                        .fold((0, 0), |(p_max, max), len| if len > max { (max, len) } else { (p_max.max(len), max) });
+                    max_len = max_len.max(p_max + max + 1);
+                    path_lengths[node] = 1 + max;
+                }
+            }
+        }
+
+        max_len
+    }
+}

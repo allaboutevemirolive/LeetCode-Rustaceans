@@ -1,0 +1,32 @@
+// https://leetcode.com/problems/longest-cycle-in-a-graph/solutions/3342987/rust-dfs-solution/
+impl Solution {
+    pub fn longest_cycle(mut edges: Vec<i32>) -> i32 {
+        fn dfs(start: usize, edges: &mut [i32], seen: &mut [(i32, usize)]) -> i32 {
+            let mut current = start;
+            let mut step = 1;
+            seen[current] = (step, start);
+            while edges[current] >= 0 {
+                step += 1;
+                let next = edges[current] as usize;
+                edges[current] = -1;
+                current = next;
+                if seen[current].0 > 0 {
+                    return if seen[current].1 == start {
+                        step - seen[current].0
+                    } else {
+                        -1
+                    };
+                }
+                seen[current] = (step, start);
+            }
+            -1
+        }
+        let n = edges.len();
+        let mut result = -1;
+        let mut seen = vec![(0, 0); n];
+        for i in 0..n {
+            result = result.max(dfs(i, &mut edges, &mut seen));
+        }
+        result
+    }
+}

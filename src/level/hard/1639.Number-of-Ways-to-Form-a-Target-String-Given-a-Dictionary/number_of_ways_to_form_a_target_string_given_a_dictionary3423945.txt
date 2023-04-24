@@ -1,0 +1,94 @@
+// https://leetcode.com/problems/number-of-ways-to-form-a-target-string-given-a-dictionary/solutions/3423945/rust-with-comments-recursion-with-memoization-inverted-index/
+impl Solution {
+    pub fn num_ways(words: Vec<String>, target: String) -> i32 {
+        num_ways(words, target)
+    }
+}
+use std::collections::BTreeMap;
+
+const MOD: i64 = 10i64.pow(9) + 7;
+const ASCII_LEN: usize = (b'z' - b'a' + 1) as usize;
+
+pub fn num_ways<W: AsRef<[u8]>>(words: impl AsRef<[W]>, target: impl AsRef<[u8]>) -> i32 {
+    //  Some boiler plate that makes the function more flexible
+    // in order to be able to test locally without having to call `to_string()`
+    // on string slices
+    let words = words
+        .as_ref()
+        .iter()
+        .map(|w| w.as_ref())
+        .collect::<Vec<_>>();
+    let target = target.as_ref();
+
+    // Fast path: because we cannot use letters before the current index,
+    // if the word length is smaller than the target length we can never
+    // produce an answer different than 0
+    if words.is_empty() || words[0].len() < target.len() {
+        return 0;
+    }
+
+    // Build an "inverted index" pointing to the index within the "words` of each 
+    // character and how many time it occurs at that location
+    let mut chr_idx = vec![BTreeMap::default(); ASCII_LEN];
+    for word in words.iter().copied() {
+        for idx in 0..word.len() {
+            *chr_idx[(word[idx] - b'a') as usize].entry(idx).or_default() += 1;
+        }
+    }
+
+    let mut cache = vec![vec![-1; words[0].len()]; target.len()];
+    dfs(&mut cache, &chr_idx, target, words[0].len(), 0, 0) as i32
+}
+
+fn dfs(
+    cache: &mut [Vec<i64>],
+    chr_idx: &[BTreeMap<usize, i64>],
+    target: &[u8],
+    word_len: usize,
+    word_pos: usize,
+    target_pos: usize,
+) -> i64 {
+    // We've matched all characters from TARGET
+    if target_pos >= target.len() {
+        return 1;
+    }
+
+    // Do NOT re-compute already processed sub-trees
+    if cache[target_pos][word_pos] >= 0 {
+        return cache[target_pos][word_pos];
+    }
+
+    // Fast path: because we cannot use letters before the current index,
+    // if the word length is smaller than the target length we can never
+    // produce an answer different than 0
+    let limit = 1 + (word_len - word_pos) - (target.len() - target_pos);
+
+    // Because we are limited to ASCII lowercase, map the letter to
+    // an index starting from 0 to ASCII_LEN
+    let expected = (target[target_pos] - b'a') as usize;
+
+    // Instead of looping through all possible characters, we'll loop only
+    // through the characters we already know are correct
+    let chr_locations = &chr_idx[expected];
+
+    let mut answer = 0;
+    // Loop only through the positions that will NOT lead to exhausting the `WORDS`
+    // before being able to match the string in TARGET (see the FAST PATH note above)
+    for (&idx, &count) in chr_locations.range(word_pos..word_pos + limit) {
+        // compute the number of way in the current sub-tree
+        let value = dfs(cache, chr_idx, target, word_len, idx + 1, target_pos + 1);
+
+        // we know that there are COUNT more characters with the same value,
+        // which will produce the very same result (i.e. the same sub-tree),
+        // thus we can skip recomputing it by just multiplying the number of
+        // occurrences with the sub-tree value
+        answer += value * count;
+
+        // And don't forget to take the MOD as required by the problem statement
+        answer %= MOD;
+    }
+
+    // remember the current sub-tree
+    cache[target_pos][word_pos] = answer;
+    answer
+}

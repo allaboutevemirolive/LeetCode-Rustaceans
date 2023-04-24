@@ -1,0 +1,15 @@
+// https://leetcode.com/problems/maximum-score-from-performing-multiplication-operations/solutions/2455163/rust-bottom-up-and-top-down-dp-with-comments/
+impl Solution {
+    pub fn maximum_score(nums: Vec<i32>, multipliers: Vec<i32>) -> i32 {
+        let (n, m) = (nums.len(), multipliers.len());
+        let mut dp = vec![vec![0; m + 1]; m + 1];
+        for left in (0..m).rev() {
+            for right in (0..m - left).rev() {
+                let multiplier = multipliers[left + right];
+                dp[left][right] = (dp[left + 1][right] + multiplier * nums[left])
+                    .max(dp[left][right + 1] + multiplier * nums[n - right - 1]);
+            }
+        }
+        dp[0][0]
+    }
+}

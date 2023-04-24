@@ -1,0 +1,32 @@
+// https://leetcode.com/problems/minimum-deletions-to-make-array-divisible/solutions/2293183/rust-gcd/
+impl Solution {
+    pub fn min_operations(nums: Vec<i32>, nums_divide: Vec<i32>) -> i32 {
+        let mut d = nums_divide[0];
+        
+        for i in 1..nums_divide.len() { 
+            d = Self::gcd(d, nums_divide[i]);
+        }
+        
+        let mut count = 0;
+        let mut nums = nums;
+        
+        nums.sort();
+        nums.reverse();
+        while nums.is_empty() == false {
+            if nums[nums.len() - 1] > d || d % nums[nums.len() - 1] != 0 {
+                nums.pop();
+                count += 1;
+            } else { break; }
+        }
+        if nums.is_empty() { return -1 }
+        
+        count
+    }
+    
+    fn gcd(a: i32, b: i32) -> i32 {
+        let (a, b) = (a.max(b), a.min(b));
+        if b == 0 { return a }
+        
+        Self::gcd(b, a % b)
+    }
+}

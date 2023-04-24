@@ -1,0 +1,45 @@
+// https://leetcode.com/problems/naming-a-company/solutions/3163190/rust-beat-100-by-grouping-on-prefix-char/
+use std::collections::HashMap;
+use std::collections::HashSet;
+
+impl Solution {
+    pub fn distinct_names(ideas: Vec<String>) -> i64 {
+        let mut h = ('a'..='z').fold(HashMap::with_capacity(26), |mut h, i| {
+            h.insert(i, HashSet::new());
+            h
+        });
+        ideas.iter().for_each(|s| {
+            let (p, s) = s.split_at(1);
+            let c = p.chars().next().unwrap();
+            h.entry(c).or_insert(HashSet::new()).insert(s);
+        });
+        // println!("{h:?}");
+        let mut count = 0;
+        for i in 'a'..='z' {
+            for j in (i as u8 + 1) as char..='z' {
+                let comm = h.get(&i).unwrap().intersection(h.get(&j).unwrap()).count();
+                count += 2 * (h.get(&i).unwrap().len() - comm) * (h.get(&j).unwrap().len() - comm);
+                // faster than
+                // count += 2* (h.get(&i).unwrap().difference(h.get(&j).unwrap()).count()) * (h.get(&j).unwrap().difference(h.get(&i).unwrap()).count())
+            }
+        }
+        count as i64
+    }
+}
+
+
+macro_rules! vec_of_strings {
+    ($($x:expr),*) => (vec![$($x.to_string()),*]);
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::Solution;
+    #[test]
+    fn distinct_names() {
+        let result = Solution::distinct_names(vec_of_strings!["coffee", "donuts", "time", "toffee"]);
+        assert_eq!(result, 6);
+        let result = Solution::distinct_names(vec_of_strings!["lack", "back"]);
+        assert_eq!(result, 0);
+    }
+}

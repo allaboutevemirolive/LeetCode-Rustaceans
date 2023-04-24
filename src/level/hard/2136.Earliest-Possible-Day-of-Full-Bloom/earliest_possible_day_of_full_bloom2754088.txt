@@ -1,0 +1,11 @@
+// https://leetcode.com/problems/earliest-possible-day-of-full-bloom/solutions/2754088/python-c-java-rust-intuitive-visual-concise-calculation-of-time-with-detailed-comments/
+    class Solution:
+def earliestFullBloom(self, plantTime: List[int], growTime: List[int]) -> int:
+    plant_life=0
+    return max((plant_life:=plant_life+p)+g for g,p in reversed(sorted(zip(growTime,plantTime))))
+    
+    
+    count_time=0
+    for g,p in sorted(zip(growTime,plantTime)):
+        count_time=g+p if g >=count_time else count_time+p
+    return count_time

@@ -1,0 +1,43 @@
+// https://leetcode.com/problems/height-of-binary-tree-after-subtree-removal-queries/solutions/2760021/c-rust-simple-solution-using-two-dfs-searches/
+class Solution {
+    int countNodes(TreeNode* root) {
+        if (root == nullptr) return 0;
+        return 1 + countNodes(root->left) + countNodes(root->right);
+    }
+
+    void dfs_left(TreeNode* root, int h, int &maxDepth, vector<int> &height) {
+        if (root == nullptr) return;
+
+        height[root->val] = maxDepth;
+        maxDepth = max(h, maxDepth);
+
+        dfs_left(root->left, h + 1, maxDepth, height);
+        dfs_left(root->right, h + 1, maxDepth, height);
+    }
+
+    void dfs_right(TreeNode* root, int h, int &maxDepth, vector<int> &height) {
+        if (root == nullptr) return;
+
+        height[root->val] = max(height[root->val], maxDepth);
+        maxDepth = max(h, maxDepth);
+
+        dfs_right(root->right, h + 1, maxDepth, height);
+        dfs_right(root->left, h + 1, maxDepth, height);
+    }
+    
+public:
+    vector<int> treeQueries(TreeNode* root, vector<int>& queries) {
+        int n = countNodes(root);
+        
+        vector<int> left(n, 0), right(n, 0);;
+        int maxDepthLeft = 0, maxDepthRight = 0;
+        
+        dfs_left(root, 0, maxDepthLeft, left);
+        dfs_right(root, 0, maxDepthRight, right);
+
+        vector<int> ret;
+        for (auto &q: queries) ret.push_back(max(left[q], right[q]));
+
+        return ret;
+    }
+};

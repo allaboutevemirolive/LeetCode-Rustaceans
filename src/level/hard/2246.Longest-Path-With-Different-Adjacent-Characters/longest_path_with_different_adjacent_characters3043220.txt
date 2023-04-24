@@ -1,0 +1,34 @@
+// https://leetcode.com/problems/longest-path-with-different-adjacent-characters/solutions/3043220/rust-elixir-return-2-values-in-sub-function/
+impl Solution {
+    pub fn longest_path(parent: Vec<i32>, s: String) -> i32 {
+        let mut kids = vec![Vec::new(); parent.len()];
+        for (i, &x) in parent.iter().enumerate() {
+            if x >= 0 {
+                kids[x as usize].push(i);
+            }
+        }
+        Self::dfs(0, s.as_bytes(), &kids).0
+    }
+
+    fn dfs(curr: usize, bytes: &[u8], kids: &Vec<Vec<usize>>) -> (i32, i32) {
+        let mut ans1 = 1;
+        let mut longest = 0;
+        let mut longest2 = 0;
+        for &i in kids[curr].iter() {
+            let (sub1, sub2) = Self::dfs(i, bytes, kids);
+            ans1 = ans1.max(sub1);
+            if bytes[i] != bytes[curr] {
+                if sub2 > longest {
+                    longest2 = longest;
+                    longest = sub2;
+                }
+                else if sub2 > longest2 {
+                    longest2 = sub2;
+                }
+            }
+        }
+        ans1 = ans1.max(longest + 1 + longest2);
+        let ans2 = longest + 1;
+        (ans1, ans2)
+    }
+}

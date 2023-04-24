@@ -1,0 +1,89 @@
+// https://leetcode.com/problems/count-subtrees-with-max-distance-between-cities/solutions/889591/rust-translated-40ms-100/
+/*
+https://leetcode.com/problems/count-subtrees-with-max-distance-between-cities/discuss/888879/C%2B%2B-O(2-n)-solution.-bitmask-%2B-DFS-with-explanation.
+ */
+impl Solution {
+    pub fn count_subgraphs_for_each_diameter(n: i32, edges: Vec<Vec<i32>>) -> Vec<i32> {
+        use std::collections::{HashMap, HashSet};
+
+        fn dfs(
+            graph: &HashMap<i32, HashSet<i32>>,
+            u: i32,
+            prev: i32,
+            subtree: &mut i32,
+            mx: &mut i32,
+        ) -> i32 {
+            let mut arr = vec![0, 0];
+            *subtree ^= 1 << (u - 1);
+            for &v in graph.get(&u).unwrap() {
+                if v == prev || *subtree & (1 << (v - 1)) == 0 {
+                    continue;
+                }
+                let res = dfs(graph, v, u, subtree, mx) + 1;
+                arr.push(res);
+            }
+            arr.sort_unstable();
+            *mx = std::cmp::max(*mx, arr[arr.len() - 1] + arr[arr.len() - 2]);
+            arr[arr.len() - 1]
+        }
+
+        let mut ans = vec![0; n as usize - 1];
+        let mut graph = HashMap::<i32, HashSet<i32>>::new();
+        for e in edges.iter() {
+            graph.entry(e[0]).or_default().insert(e[1]);
+            graph.entry(e[1]).or_default().insert(e[0]);
+        }
+        let size = 1 << n;
+        for i in 1..size {
+            if (i - 1) & i == 0 {
+                continue;
+            }
+            let mut subtree = i;
+            let mut u = 0;
+            let mut mx = 0;
+            for j in 0..n {
+                if (1 << j) & i != 0 {
+                    u = j + 1;
+                    break;
+                }
+            }
+            dfs(&graph, u, -1, &mut subtree, &mut mx);
+            if subtree == 0 {
+                ans[mx as usize - 1] += 1;
+            }
+        }
+        ans
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_count_subgraphs_for_each_diameter() {
+        assert_eq!(
+            Solution::count_subgraphs_for_each_diameter(
+                4,
+                vec![vec![1, 2], vec![2, 3], vec![2, 4]]
+            ),
+            vec![3, 4, 0]
+        );
+    }
+
+    #[test]
+    fn test_count_subgraphs_for_each_diameter_02() {
+        assert_eq!(
+            Solution::count_subgraphs_for_each_diameter(2, vec![vec![1, 2]]),
+            vec![1]
+        );
+    }
+
+    #[test]
+    fn test_count_subgraphs_for_each_diameter_03() {
+        assert_eq!(
+            Solution::count_subgraphs_for_each_diameter(3, vec![]),
+            vec![2, 1]
+        );
+    }
+}

@@ -1,0 +1,65 @@
+// https://leetcode.com/problems/maximum-number-of-achievable-transfer-requests/solutions/871236/rust-translated-152ms-100/
+/*
+https://leetcode.com/problems/maximum-number-of-achievable-transfer-requests/discuss/866508/Java-easy-bitmask
+ */
+impl Solution {
+    pub fn maximum_requests(n: i32, requests: Vec<Vec<i32>>) -> i32 {
+        let mut ans = 0;
+        let total = (1i32 << (requests.len())) - 1;
+        for i in 1..=total {
+            let mut cur = i;
+            let mut net = vec![0; n as usize];
+
+            for j in 0..=requests.len() {
+                let b = cur & 1;
+                cur >>= 1;
+                if b == 1 {
+                    net[requests[j][0] as usize] -= 1;
+                    net[requests[j][1] as usize] += 1;
+                }
+            }
+            let mut flag = true;
+            for x in net {
+                if x != 0 {
+                    flag = false;
+                    break;
+                }
+            }
+            if flag {
+                ans = std::cmp::max(ans, i.count_ones());
+            }
+        }
+        ans as i32
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_maximum_requests() {
+        assert_eq!(
+            Solution::maximum_requests(
+                5,
+                vec![
+                    vec![0, 1],
+                    vec![1, 0],
+                    vec![0, 1],
+                    vec![1, 2],
+                    vec![2, 0],
+                    vec![3, 4]
+                ]
+            ),
+            5
+        );
+    }
+
+    #[test]
+    fn test_maximum_requests_02() {
+        assert_eq!(
+            Solution::maximum_requests(4, vec![vec![0, 3], vec![3, 1], vec![1, 2], vec![2, 0]]),
+            4
+        );
+    }
+}

@@ -1,0 +1,45 @@
+// https://leetcode.com/problems/minimum-number-of-days-to-eat-n-oranges/solutions/794905/rust-translated-0ms-2-1m-100/
+impl Solution {
+    pub fn min_days(n: i32) -> i32 {
+        use std::collections::HashMap;
+
+        fn helper(dp: &mut HashMap<i32, i32>, k: i32) -> i32 {
+            if k <= 1 {
+                return k;
+            };
+            if !dp.contains_key(&k) {
+                let ans = 1 + std::cmp::min(k % 2 + helper(dp, k / 2), k % 3 + helper(dp, k / 3));
+                dp.insert(k, ans);
+            }
+            *dp.get(&k).unwrap()
+        }
+
+        let mut dp = HashMap::<i32, i32>::new();
+        helper(&mut dp, n)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_min_days() {
+        assert_eq!(Solution::min_days(10), 4)
+    }
+
+    #[test]
+    fn test_min_days_02() {
+        assert_eq!(Solution::min_days(6), 3)
+    }
+
+    #[test]
+    fn test_min_days_03() {
+        assert_eq!(Solution::min_days(1), 1)
+    }
+
+    #[test]
+    fn test_min_days_04() {
+        assert_eq!(Solution::min_days(56), 6)
+    }
+}

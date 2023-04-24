@@ -1,0 +1,84 @@
+// https://leetcode.com/problems/fancy-sequence/solutions/899309/rust-translated-84ms-100/
+const MOD: i64 = 1_000_000_007;
+
+struct Fancy {
+    a: Vec<i32>,
+    inv: Vec<i32>,
+    s: i64,  // cumulative addition (%MOD)
+    m: i64,  // cumulative multiplication (%MOD)
+    rm: i64, //reverse cumulative multiplication (%MOD)
+}
+
+fn inverse(mut a: i32) -> i32 {
+    let mut x = 1;
+    let mut y = 0;
+    let mut m = MOD as i32;
+    while a > 1 {
+        let q = a / m;
+        let mut t = m;
+        m = a % m;
+        a = t;
+        t = y;
+        y = x - q * y;
+        x = t;
+    }
+    if x < 0 {
+        x + MOD as i32
+    } else {
+        x
+    }
+}
+impl Fancy {
+    fn new() -> Self {
+        Fancy {
+            a: vec![],
+            inv: (0..101).map(inverse).collect::<Vec<i32>>(),
+            s: 0,
+            m: 1,
+            rm: 1,
+        }
+    }
+
+    fn append(&mut self, val: i32) {
+        self.a
+            .push((((MOD - self.s + val as i64) * self.rm) % MOD) as i32);
+    }
+
+    fn add_all(&mut self, inc: i32) {
+        self.s = (self.s + inc as i64) % MOD;
+    }
+
+    fn mult_all(&mut self, val: i32) {
+        self.m = (self.m * val as i64) % MOD;
+        self.rm = (self.rm * self.inv[val as usize] as i64) % MOD;
+        self.s = (self.s * val as i64) % MOD;
+    }
+
+    fn get_index(&self, idx: i32) -> i32 {
+        if idx >= self.a.len() as i32 {
+            return -1;
+        }
+        ((self.a[idx as usize] as i64 * self.m + self.s) % MOD) as i32
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_fancy() {
+        let mut fancy = Fancy::new();
+        fancy.append(2);
+        fancy.add_all(3);
+        fancy.append(7);
+        fancy.mult_all(2);
+        assert_eq!(fancy.get_index(0), 10);
+        fancy.add_all(3);
+        fancy.append(10);
+        fancy.mult_all(2);
+        assert_eq!(fancy.get_index(0), 26);
+        assert_eq!(fancy.get_index(1), 34);
+        assert_eq!(fancy.get_index(2), 20);
+    }
+}

@@ -1,0 +1,26 @@
+// https://leetcode.com/problems/minimum-cost-to-make-array-equal/solutions/2735424/rust-weighted-median/
+impl Solution {
+    pub fn min_cost(nums: Vec<i32>, cost: Vec<i32>) -> i64 {
+        let mut total = 0;
+        let mut v = nums
+            .into_iter().map(|num| num as i64)
+            .zip(cost.into_iter().map(|c| {
+                total += c as i64;
+                c as i64
+            }))
+            .collect::<Vec<_>>();
+        v.sort_unstable();
+        let mut pivot = 0;
+        let mut pivot_cost = 0;
+        for (num, c) in v.iter() {
+            pivot_cost += *c;
+            if pivot_cost > total / 2 {
+                pivot = *num;
+                break;
+            }
+        }
+        v.into_iter()
+            .map(|(num, c)| c * (num - pivot).abs())
+            .sum()
+    }
+}

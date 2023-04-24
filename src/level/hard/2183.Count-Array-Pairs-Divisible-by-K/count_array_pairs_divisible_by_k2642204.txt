@@ -1,0 +1,25 @@
+// https://leetcode.com/problems/count-array-pairs-divisible-by-k/solutions/2642204/rust-easy-solution/
+use std::collections::*;
+ 
+impl Solution {
+	pub fn count_pairs(nums: Vec<i32>, k: i32) -> i64 {
+		fn gcd(x: i32, y: i32) -> i32 {
+			let (mut x, mut y) = (x, y);
+			while y != 0 { let t = x % y; x = y; y = t; }
+			x
+		}
+		let d = (1..=k).filter(|&i| k % i == 0).collect::<Vec<_>>();	// find all divisors of k
+		let mut r = HashMap::new();	// for divisor-to-index mapping
+		for (i, &x) in d.iter().enumerate() { r.insert(x, i); }
+		let mut ans: i64 = 0;
+		let mut a = vec![0; d.len()];	// # elements which can be divided by d[i]
+		for &x in &nums {
+			let g = gcd(x, k);
+			ans += a[r[&(k / g)]] as i64;
+			for i in 0..d.len() {
+				if x % d[i] == 0 { a[i] += 1; }
+			}
+		}
+		ans
+	}
+}

@@ -1,0 +1,74 @@
+// https://leetcode.com/problems/booking-concert-tickets-in-groups/solutions/2085603/rust-bit-but-help-improve-code-readiablity/
+use std::cmp::min;
+struct BookMyShow {
+    first: Vec<usize>,
+    bitArr: Vec<usize>,
+    n: i64,
+    m: i64,
+}
+
+
+/** 
+ * `&self` means the method takes an immutable reference.
+ * If you need a mutable reference, change it to `&mut self` instead.
+ */
+impl BookMyShow {
+    fn update(&mut self, mut idx: i64, delta: i64) {
+        idx += 1;
+        while ((idx as usize) < self.bitArr.len()) {
+            self.bitArr[idx as usize] += delta as usize;
+            idx += (idx & -idx);
+        }
+    }
+    fn prefix_sum(&mut self, mut idx: i64) -> i64 {
+        idx += 1;
+        let mut ans: i64 = 0;
+        while (idx > 0) {
+            ans += self.bitArr[idx as usize] as i64;
+            idx -= (idx & -idx);
+        }
+        ans
+    }
+    fn new(n: i32, m: i32) -> Self {
+        BookMyShow {
+            first: vec![0; 50001],
+            bitArr: vec![0; 50001],
+            n: n as i64,
+            m: m as i64,
+        }
+    }
+    
+    fn gather(&mut self, k_: i32, max_row_: i32) -> Vec<i32> {
+        let k: i64 = k_ as i64;
+        let max_row: i64 = max_row_ as i64;
+        if (max_row+1) * self.m - (self.prefix_sum(max_row)) < k {
+            return vec![];
+        }
+        for i in 0..=max_row {
+            if self.m - self.first[i as usize] as i64 >= k {
+                self.first[i as usize] += k as usize;
+                self.update(i as i64, k);
+                return vec![i as i32, self.first[i as usize] as i32 - k as i32];
+            }
+        }
+        vec![]
+    }
+    
+    fn scatter(&mut self, k_: i32, max_row_: i32) -> bool {
+        let mut k: i64 = k_ as i64;
+        let max_row: i64 = max_row_ as i64;
+        if (max_row+1) * self.m - self.prefix_sum(max_row) < k {
+            return false;
+        }
+        for i in 0..=max_row {
+            let rest = min(k, self.m - self.first[i as usize] as i64);
+            self.first[i as usize] += rest as usize;
+            self.update(i as i64, rest);
+            k -= rest;
+            if k == 0 {
+                return true;
+            }
+        }
+        return false;
+    }
+}
