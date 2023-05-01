@@ -1,0 +1,28 @@
+// https://leetcode.com/problems/largest-divisible-subset/solutions/684798/rust-solution-12ms/
+impl Solution {
+    pub fn largest_divisible_subset(ref mut nums: Vec<i32>) -> Vec<i32> {
+        nums.sort_unstable();
+        let n = nums.len();
+        let mut max_len = 0;
+        let mut max_key = -1;
+        let mut cnt = vec![1; n];
+        let mut pre = vec![-1; n];
+        for i in 0..n {
+            for j in 0..i {
+                if nums[i] % nums[j] == 0 && 1 + cnt[j] > cnt[i] {
+                    cnt[i] = 1 + cnt[j];
+                    pre[i] = j as i32;
+                }
+            }
+            if cnt[i] > max_len {
+                max_len = cnt[i];
+                max_key = i as i32;
+            }
+        }
+        let mut res = vec![];
+        while max_key >= 0 {
+            res.push(nums[max_key as usize]);
+            max_key = pre[max_key as usize];
+        }
+        res
+    }

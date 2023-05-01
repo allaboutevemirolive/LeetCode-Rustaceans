@@ -1,0 +1,25 @@
+// https://leetcode.com/problems/range-sum-query-mutable/solutions/2359760/simple-rust-solution/
+struct NumArray {
+    arr: Vec<i32>
+}
+impl NumArray {
+
+    fn new(nums: Vec<i32>) -> Self {
+        let mut num_array = NumArray {
+            arr: nums
+        };
+        return num_array
+    }
+    
+    fn update(&mut self, index: i32, val: i32) {
+        self.arr[index as usize ] = val;
+    }
+    
+    fn sum_range(&self, left: i32, right: i32) -> i32 {
+        let mut num = 0;
+        for i in &self.arr[left as usize..=right as usize ] {
+            num += i;
+        }
+        return num
+    }
+}

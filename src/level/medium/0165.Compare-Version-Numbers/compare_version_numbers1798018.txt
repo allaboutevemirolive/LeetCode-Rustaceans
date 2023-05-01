@@ -1,0 +1,29 @@
+// https://leetcode.com/problems/compare-version-numbers/solutions/1798018/rust-solution/
+impl Solution {
+    pub fn compare_version(version1: String, version2: String) -> i32 {
+        use std::cmp::Ordering::{Greater, Less};
+        
+        let (mut it_1, mut it_2) = (version1.split('.'), version2.split('.'));
+        loop {
+            let (s1, s2) = (it_1.next(), it_2.next());
+            if s1.is_none() && s2.is_none() {
+                break;
+            }
+
+            let s1 = s1.unwrap_or("0").trim_start_matches('0');
+            let s2 = s2.unwrap_or("0").trim_start_matches('0');
+            if s1.len() != s2.len() {
+                return (s1.len() as i32 - s2.len() as i32).signum();
+            }
+
+            for (c1, c2) in s1.chars().zip(s2.chars()) {
+                match c1.cmp(&c2) {
+                    Greater => return 1,
+                    Less => return -1,
+                    _ => (),
+                }
+            }
+        }
+        0
+    }
+}

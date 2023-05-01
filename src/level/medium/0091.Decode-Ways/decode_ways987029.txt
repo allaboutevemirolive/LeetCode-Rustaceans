@@ -1,0 +1,2 @@
+// https://leetcode.com/problems/decode-ways/solutions/987029/rust-o-1-space-oneliner-explained/
+s.chars().rev().fold((' ', 0, 1), |(p, np, n), c| (c, n, (if ('1'..='9').contains(&c) { n + format!("{}{}", c, p).parse::<i32>().ok().filter(|&i| i <= 26).map(|_| np).unwrap_or(0) } else { 0 }))).2

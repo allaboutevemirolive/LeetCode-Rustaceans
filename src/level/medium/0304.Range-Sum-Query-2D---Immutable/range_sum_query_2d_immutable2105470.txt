@@ -1,0 +1,47 @@
+// https://leetcode.com/problems/range-sum-query-2d-immutable/solutions/2105470/rust/
+struct NumMatrix {
+    m: usize,
+    n: usize,
+    dp: Vec<Vec<i32>>,
+}
+
+impl NumMatrix {
+    fn new(matrix: Vec<Vec<i32>>) -> Self {
+        let m = matrix.len();
+        let n = matrix[0].len();
+		// Problem says immutable, so we'll clone here. But since we own matrix, we
+		// would otherwise reuse it for efficiency.
+        let mut dp = matrix.clone();
+
+        for j in 1..n {
+            dp[0][j] += dp[0][j - 1];
+        }
+
+        for i in 1..m {
+            dp[i][0] += dp[i - 1][0];
+        }
+
+        for i in 1..m {
+            for j in 1..n {
+                dp[i][j] += dp[i - 1][j] + dp[i][j - 1] - dp[i - 1][j - 1];
+            }
+        }
+        Self { m, n, dp }
+    }
+
+    fn lookup(&self, row: usize, col: usize) -> i32 {
+        if row < self.m && col < self.n {
+            self.dp[row][col]
+        } else {
+            0
+        }
+    }
+
+    fn sum_region(&self, row1: i32, col1: i32, row2: i32, col2: i32) -> i32 {
+        let (row1, row2, col1, col2) = (row1 as usize, row2 as usize, col1 as usize, col2 as usize);
+        self.lookup(row2, col2)
+            - self.lookup(row2, col1.wrapping_sub(1))
+            - self.lookup(row1.wrapping_sub(1), col2)
+            + self.lookup(row1.wrapping_sub(1), col1.wrapping_sub(1))
+    }
+}

@@ -1,0 +1,27 @@
+// https://leetcode.com/problems/linked-list-random-node/solutions/957911/rust-stream-solution/
+use rand::{thread_rng, Rng};
+
+struct Solution {
+    head: Option<Box<ListNode>>
+}
+impl Solution {
+    fn new(head: Option<Box<ListNode>>) -> Self {
+        Self{
+            head    
+        }
+    }
+    fn get_random(&self) -> i32 {
+        let mut rng = thread_rng();
+        let mut c = self.head.as_ref().unwrap();
+        let mut count = 1;
+        let mut r = c.val;
+        while let Some(v) = c.next.as_ref() {
+            count += 1;
+            if rng.gen_range(0, count) == 0 {
+                r = v.val;
+            }
+            c = v;
+        }
+        r
+    }
+}

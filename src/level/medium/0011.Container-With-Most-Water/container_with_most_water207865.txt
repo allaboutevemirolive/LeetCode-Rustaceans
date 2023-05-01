@@ -1,0 +1,19 @@
+// https://leetcode.com/problems/container-with-most-water/solutions/207865/rust/
+fn max_area(height: Vec<i32>) -> i32 {
+    let mut i = 0;
+    let mut j = height.len() - 1;
+    let mut max = 0;
+
+    while i < j {
+        let h = height[i].min(height[j]);
+        max = max.max(h * (i - j) as i32);
+
+        if height[i] < height[j] {
+            i += 1;
+        } else {
+            j -= 1;
+        }
+    }
+
+    max
+}

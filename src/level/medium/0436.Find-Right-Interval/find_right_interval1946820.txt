@@ -1,0 +1,25 @@
+// https://leetcode.com/problems/find-right-interval/solutions/1946820/rust-btreemap/
+use std::collections::BTreeMap;
+
+impl Solution {
+    pub fn find_right_interval(intervals: Vec<Vec<i32>>) -> Vec<i32> {
+        let mut map: BTreeMap<i32, i32> = BTreeMap::new();
+        for (i, val) in intervals.iter().enumerate() {
+            map.insert(val[0], i as i32);
+        }
+
+        let mut res = vec![];
+        for val in intervals.iter() {
+            match map.range(val[1]..).next() {
+                None => {
+                    res.push(-1); 
+                },
+                Some((_, index)) => {
+                    res.push(*index);
+                }
+            }
+        }
+
+        res
+    }
+}

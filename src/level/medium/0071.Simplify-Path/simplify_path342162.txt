@@ -1,0 +1,19 @@
+// https://leetcode.com/problems/simplify-path/solutions/342162/rust-solution/
+impl Solution {
+    pub fn simplify_path(path: String) -> String {
+        let mut stack = vec![];
+        for part in path.split("/") {
+            if part == ".." {
+                stack.pop();
+            } else if part == "." {
+                continue;
+            } else {
+                if !part.is_empty() {
+                    stack.push(part);
+                }
+            }
+        }
+        
+        format!("/{}", stack.join("/"))
+    }
+}

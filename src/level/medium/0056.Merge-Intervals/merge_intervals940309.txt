@@ -1,0 +1,21 @@
+// https://leetcode.com/problems/merge-intervals/solutions/940309/rust-solution/
+impl Solution {
+    pub fn merge(mut intervals: Vec<Vec<i32>>) -> Vec<Vec<i32>> {
+        let mut ans :Vec<Vec<i32>> = Vec::new();
+        intervals.sort();
+        
+        let (mut prev_start, mut prev_end) = (intervals[0][0], intervals[0][1]);
+        for e in intervals.iter().skip(1) {
+            if e[0] < prev_end  &&  e[1] < prev_end {
+                continue; // interval completely subsumed, don't advance anything
+            }
+            else if prev_end < e[0] {
+                ans.push(vec![prev_start,prev_end]);
+                prev_start = e[0]; // advance prev_start               
+            }
+            prev_end = e[1]; // advance prev_end for both of the remaining cases
+        }
+        ans.push(vec![prev_start,prev_end]);
+        ans
+    }
+}

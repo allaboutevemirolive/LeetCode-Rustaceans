@@ -1,0 +1,82 @@
+// https://leetcode.com/problems/word-break/solutions/763606/rust-dp-0ms-100/
+impl Solution {
+    pub fn word_break(s: String, word_dict: Vec<String>) -> bool {
+        let mut min_len = 1_000_000_000;
+        let mut max_len = 0;
+        for w in &word_dict {
+            max_len = std::cmp::max(max_len, w.len());
+            min_len = std::cmp::min(min_len, w.len());
+        }
+        let v = s.as_bytes();
+        let n = v.len();
+        let mut dp = vec![false; n];
+//        println!("min = {}, max = {}, n = {}", min_len, max_len, n);
+        for i in min_len..n + 1 {
+            for j in min_len..=max_len {
+                if i < min_len {
+                    break;
+                };
+                let left = i - min_len;
+                let right = i - min_len + j;
+                if right > n {
+                    break;
+                }
+                let s2 = &s[left..right];
+                if word_dict.contains(&s2.to_string()) {
+                    if left > 0 {
+                        dp[right - 1] |= dp[left - 1];
+                    } else {
+                        dp[right - 1] = true
+                    }
+                    // println!("i = {}, j = {}, s = {}", i, j, s2);
+                    // println!("{:?}", dp);
+                }
+            }
+        }
+        dp[n - 1]
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_word_break() {
+        assert_eq!(
+            Solution::word_break(
+                "leetcode".to_string(),
+                vec!["leet".to_string(), "code".to_string(),]
+            ),
+            true
+        )
+    }
+
+    #[test]
+    fn test_word_break_02() {
+        assert_eq!(
+            Solution::word_break(
+                "applepenapple".to_string(),
+                vec!["apple".to_string(), "pen".to_string(),]
+            ),
+            true
+        )
+    }
+
+    #[test]
+    fn test_word_break_03() {
+        assert_eq!(
+            Solution::word_break(
+                "catsandog".to_string(),
+                vec![
+                    "cats".to_string(),
+                    "dog".to_string(),
+                    "sand".to_string(),
+                    "and".to_string(),
+                    "cat".to_string()
+                ]
+            ),
+            false
+        )
+    }
+}

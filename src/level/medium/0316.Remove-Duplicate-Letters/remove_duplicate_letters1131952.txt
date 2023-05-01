@@ -1,0 +1,27 @@
+// https://leetcode.com/problems/remove-duplicate-letters/solutions/1131952/rust-cheapest-best/
+pub fn remove_duplicate_letters(s: String) -> String {
+        let mut map = s
+            .chars()
+            .enumerate()
+            .map(|(i, c)| (c, (i, false)))
+            .collect::<HashMap<char, (usize, bool)>>();
+
+        s.chars()
+            .enumerate()
+            .fold(vec![' '], |mut stack, (i, a)| {
+                if !map.get(&a).unwrap().1 {
+                    let mut b = stack.pop().unwrap();
+                    while a < b && i < map.get(&b).unwrap().0 {
+                        map.get_mut(&b).unwrap().1 = false;
+                        b = stack.pop().unwrap();
+                    }
+                    stack.push(b);
+                    stack.push(a);
+                    map.get_mut(&a).unwrap().1 = true;
+                }
+                stack
+            })
+            .into_iter()
+            .skip(1)
+            .collect()
+    }

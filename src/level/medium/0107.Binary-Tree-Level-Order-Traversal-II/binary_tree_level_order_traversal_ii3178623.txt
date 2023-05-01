@@ -1,0 +1,49 @@
+// https://leetcode.com/problems/binary-tree-level-order-traversal-ii/solutions/3178623/rust-solution/
+// Definition for a binary tree node.
+// #[derive(Debug, PartialEq, Eq)]
+// pub struct TreeNode {
+//   pub val: i32,
+//   pub left: Option<Rc<RefCell<TreeNode>>>,
+//   pub right: Option<Rc<RefCell<TreeNode>>>,
+// }
+// 
+// impl TreeNode {
+//   #[inline]
+//   pub fn new(val: i32) -> Self {
+//     TreeNode {
+//       val,
+//       left: None,
+//       right: None
+//     }
+//   }
+// }
+use std::rc::Rc;
+use std::cell::RefCell;
+use std::collections::VecDeque;
+
+impl Solution {
+    pub fn level_order_bottom(root: Option<Rc<RefCell<TreeNode>>>) -> Vec<Vec<i32>> {
+        let mut vd : VecDeque<Rc<RefCell<TreeNode>>> = VecDeque::new();
+        if let Some(r) = root {
+            vd.push_back(r);
+        }
+        let mut answer = Vec::new();
+        while !vd.is_empty() {
+            let mut row = Vec::new();
+            for v in 0..vd.len() {
+                if let Some(node) = vd.pop_front() {
+                    row.push(node.borrow().val);
+                    if let Some(l) = node.borrow_mut().left.take() {
+                        vd.push_back(l);
+                    }
+                    if let Some(r) = node.borrow_mut().right.take() {
+                        vd.push_back(r);
+                    }
+                }
+            }
+            answer.push(row);
+        }
+        answer.reverse();
+        answer
+    }
+}

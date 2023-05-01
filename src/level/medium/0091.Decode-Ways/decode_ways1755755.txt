@@ -1,0 +1,30 @@
+// https://leetcode.com/problems/decode-ways/solutions/1755755/rust-simple-dp/
+    pub fn num_decodings(s: String) -> i32 {
+        let mut dp = vec![0; s.len() + 1];
+        let digits = s
+            .chars()
+            .map(|ch| ch.to_digit(10).expect("invalid input"))
+            .collect::<Vec<_>>();
+
+        if digits[0] == 0 {
+            return 0;
+        }
+
+        dp[0] = 1;
+        dp[1] = 1;
+
+        for (index, digit) in digits.iter().enumerate() {
+            if index != 0 {
+                let double_digit = digits[index - 1] * 10 + digit;
+                let as_single_digit = if *digit != 0 { dp[index] } else { 0 };
+                let as_double_digit = if double_digit >= 10 && double_digit <= 26 { dp[index - 1] } else { 0 };
+
+                if as_single_digit == 0 && as_double_digit == 0 {
+                    return 0;
+                }
+                dp[index + 1] = as_single_digit + as_double_digit;
+            }
+        }
+
+        dp[s.len()]
+    }

@@ -1,0 +1,48 @@
+// https://leetcode.com/problems/string-to-integer-atoi/solutions/630711/rust-0ms-time/
+impl Solution {
+    pub fn my_atoi(str: String) -> i32 {
+        let mut sign = '#';
+        let mut result = 0i32;
+        for chr in str.trim_start().chars() {
+            match chr {
+                '0'..='9' => {
+                    if sign == '#' {
+                        sign = '+';
+                    }
+
+                    let next = result * 10 + chr.to_digit(10).unwrap() as i32;
+                    
+                    if next / 10 != result {
+                        return if sign == '+' {
+                            i32::max_value()
+                        } else {
+                            i32::min_value()
+                        }
+                    }
+                    result = next;
+                }
+                '-' => {
+                    if result == 0 && sign == '#' {
+                        sign = '-';
+                    } else {
+                        break;
+                    }
+                },
+                '+' => {
+                    if result == 0 && sign == '#' {
+                        sign = '+';
+                    } else {
+                        break;
+                    }
+                },
+                _ => break,
+            }
+        }
+        
+        if sign == '-' {
+            -result
+        } else {
+            result
+        }
+    }
+}

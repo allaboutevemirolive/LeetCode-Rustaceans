@@ -1,0 +1,24 @@
+// https://leetcode.com/problems/path-sum-ii/solutions/2615947/rust-yars-yet-another-recursive-solution/
+use std::rc::Rc;
+use std::cell::RefCell;
+type OptNode = Option<Rc<RefCell<TreeNode>>>;
+impl Solution {
+    pub fn path_sum(root: OptNode, target_sum: i32) -> Vec<Vec<i32>> {
+        let mut ans = Vec::new();
+        Self::backtrack(&root, target_sum, &mut Vec::new(), &mut ans);
+        ans
+    }
+
+    fn backtrack(node: &OptNode, target_sum: i32, path: &mut Vec<i32>, ans: &mut Vec<Vec<i32>>) {
+        if let Some(n) = node {
+            let b = n.borrow();
+            path.push(b.val);
+            if b.left.is_none() && b.right.is_none() && b.val == target_sum {
+                ans.push(path.clone());
+            }
+            Self::backtrack(&b.left, target_sum - b.val, path, ans);
+            Self::backtrack(&b.right, target_sum - b.val, path, ans);
+            path.pop();
+        }
+    }
+}

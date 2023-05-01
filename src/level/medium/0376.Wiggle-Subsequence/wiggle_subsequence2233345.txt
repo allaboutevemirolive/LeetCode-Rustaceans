@@ -1,0 +1,18 @@
+// https://leetcode.com/problems/wiggle-subsequence/solutions/2233345/rust-greedy-one-liner-with-explanation/
+use std::cmp::Ordering::{Equal, Greater, Less};
+
+impl Solution {
+    pub fn wiggle_max_length(nums: Vec<i32>) -> i32 {
+        nums.windows(2)
+            .fold((1, Equal), |(max_len, prev_sign), w| {
+                match (prev_sign, w[1].cmp(&w[0])) {
+                    (Equal, sign @ Greater)
+                    | (Equal, sign @ Less)
+                    | (Greater, sign @ Less)
+                    | (Less, sign @ Greater) => (max_len + 1, sign),
+                    _ => (max_len, prev_sign),
+                }
+            })
+            .0
+    }
+}

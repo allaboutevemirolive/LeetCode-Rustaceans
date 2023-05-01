@@ -1,0 +1,18 @@
+// https://leetcode.com/problems/subsets/solutions/215073/rust-iterative-solution/
+impl Solution {
+    pub fn subsets(nums: Vec<i32>) -> Vec<Vec<i32>> {
+        let mut rtn: Vec<Vec<i32>> = vec![vec![]];
+        
+        let mut tmp;
+        for num in nums {
+            let mut sub = vec![];
+            for item in &rtn {
+                tmp = item.clone();
+                tmp.push(num);
+                sub.push(tmp);
+            }
+            rtn.append(& mut sub);
+        }
+        return rtn;
+    }
+}

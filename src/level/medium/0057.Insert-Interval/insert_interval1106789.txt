@@ -1,0 +1,39 @@
+// https://leetcode.com/problems/insert-interval/solutions/1106789/rust-cheapest-best/
+use std::cmp::Ordering::{Equal, Greater, Less};
+
+impl Solution {
+    pub fn insert(intervals: Vec<Vec<i32>>, mut new_interval: Vec<i32>) -> Vec<Vec<i32>> {
+        let mut result = vec![];
+        let mut iter = intervals.into_iter();
+        while let Some(interval) = iter.next() {
+            match (
+                interval[0].cmp(&new_interval[0]),
+                interval[1].cmp(&new_interval[1]),
+                interval[0].cmp(&new_interval[1]),
+                interval[1].cmp(&new_interval[0]),
+            ) {
+                (_, _, _, Less) => {
+                    result.push(interval);
+                }
+                (_, _, Greater, _) => {
+                    result.push(new_interval);
+                    new_interval = interval;
+                    break;
+                }
+                (Less, Less, _, Greater) | (Less, _, _, Equal) => {
+                    new_interval[0] = interval[0];
+                }
+                (Greater, Greater, Less, _) | (Equal, Greater, _, _) | (_, Greater, Equal, _) => {
+                    new_interval[1] = interval[1];
+                }
+                (Less, Greater, _, _) | (Less, Equal, _, _) => {
+                    new_interval[0] = interval[0];
+                    new_interval[1] = interval[1];
+                }
+                _ => {}
+            }
+        }
+        result.extend(vec![new_interval].into_iter().chain(iter));
+        result
+    }
+}

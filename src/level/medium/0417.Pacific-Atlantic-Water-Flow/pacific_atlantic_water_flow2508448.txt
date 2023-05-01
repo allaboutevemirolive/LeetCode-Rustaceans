@@ -1,0 +1,38 @@
+// https://leetcode.com/problems/pacific-atlantic-water-flow/solutions/2508448/rust-iterative-dfs-with-comments/
+#[derive(Copy, Clone, PartialEq)]
+enum Reaches {
+    Unknown,
+    Atlantic,
+    Pacific,
+}
+
+impl Solution {
+    pub fn pacific_atlantic(heights: Vec<Vec<i32>>) -> Vec<Vec<i32>> {
+        let (m, n) = (heights.len(), heights[0].len());
+        let mut visited = vec![vec![Reaches::Unknown; n]; m];
+        let mut stack: Vec<_> = (0..m).map(|r| (r, n-1, 0)).chain((0..n-1).map(|c| (m-1, c, 0))).collect();
+        while let Some((r, c, h)) = stack.pop() {
+            if r < m && c < n && visited[r][c] != Reaches::Atlantic && h <= heights[r][c] {
+                visited[r][c] = Reaches::Atlantic;
+                for w in [0, 1, 0, !0, 0].windows(2) {
+                    stack.push((r.wrapping_add(w[0]), c.wrapping_add(w[1]), heights[r][c]));
+                }
+            }
+        }
+
+        let mut rez = vec![];
+        stack = (0..m).map(|r| (r, 0, 0)).chain((1..n).map(|c| (0, c, 0))).collect();
+        while let Some((r, c, h)) = stack.pop() {
+            if r < m && c < n && visited[r][c] != Reaches::Pacific && h <= heights[r][c] {
+                if visited[r][c] == Reaches::Atlantic {
+                    rez.push(vec![r as _, c as _]);
+                }
+                visited[r][c] = Reaches::Pacific;
+                for w in [0, 1, 0, !0, 0].windows(2) {
+                    stack.push((r.wrapping_add(w[0]), c.wrapping_add(w[1]), heights[r][c]));
+                }
+            }
+        }
+        rez
+    }
+}

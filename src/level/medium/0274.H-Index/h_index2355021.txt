@@ -1,0 +1,37 @@
+// https://leetcode.com/problems/h-index/solutions/2355021/rust-sorting-solution-o-n-log-n-o-1-space/
+use std::collections::HashMap;
+
+impl Solution {
+    pub fn h_index(mut citations: Vec<i32>) -> i32 {
+        if citations.len() == 0 {
+            return 0;
+        }
+        
+        citations.sort();
+        
+        let mut cur = -1;
+        let mut cur_num = 0;
+        let mut last_point: i32 = -1;
+        let mut cur_h_index = 0;
+        
+        for i in 0 .. citations.len() {
+            cur_num = citations[i];
+            if cur_num != cur {
+                if cur == -1 {
+                    cur = cur_num;
+                    last_point = 0;
+                } else {
+                    let ge = (i as i32 - last_point) + citations.len() as i32 - i as i32;
+                    cur_h_index = i32::max(cur_h_index, i32::min(ge, cur));
+                    cur = cur_num;
+                    last_point = i as i32;
+                }
+            }
+        }
+        
+        let ge = (citations.len() as i32 - last_point) + citations.len() as i32 - citations.len() as i32;
+        cur_h_index = i32::max(cur_h_index, i32::min(ge, cur));
+        
+        cur_h_index
+    }
+}

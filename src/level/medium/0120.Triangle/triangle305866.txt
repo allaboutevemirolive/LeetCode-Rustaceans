@@ -1,0 +1,18 @@
+// https://leetcode.com/problems/triangle/solutions/305866/rust-solution/
+impl Solution {
+    pub fn minimum_total(triangle: Vec<Vec<i32>>) -> i32 {
+        if triangle.len() == 0 {
+            return 0;
+        } else if triangle.len() == 1 {
+            return triangle[0].iter().min().unwrap().to_owned();
+        } else {
+            let mut dp = triangle.last().unwrap().clone();
+            for i in (0..=triangle.len() - 2).rev() {
+                for j in 0..=i {
+                    dp[j] = dp[j].min(dp[j + 1]) + triangle[i][j];
+                }
+            }
+            return dp[0];
+        }
+    }
+}

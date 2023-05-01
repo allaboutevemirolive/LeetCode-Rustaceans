@@ -1,0 +1,21 @@
+// https://leetcode.com/problems/rectangle-area/solutions/415911/easy-rust-solution-with-simple-explain/
+///思路，先求两矩形的面积之和，减去他们的重叠面积
+/// 因此，这里主要是进行重叠区域的判断，即x或y轴上都有大于0的重叠区域
+impl Solution {
+    pub fn compute_area(a: i32, b: i32, c: i32, d: i32, e: i32, f: i32, g: i32, h: i32) -> i32 {
+        use std::cmp;
+        let sum = (c - a) * (d - b) + (g - e) * (h - f);
+        let x_vec = vec![a, c, e, g];
+        let y_vec = vec![b, d, f, h];
+        fn get_overlap(a_i: i32, c_i: i32, e_i: i32, g_i: i32) -> i32 {
+            if a_i > g_i || c_i < e_i {
+                0
+            } else {
+                cmp::min(g_i, c_i) - cmp::max(e_i, a_i)
+            }
+        }
+        let x_overlap = get_overlap(a, c, e, g);
+        let y_overlap = get_overlap(b, d, f, h);
+        sum - x_overlap * y_overlap
+    }
+}

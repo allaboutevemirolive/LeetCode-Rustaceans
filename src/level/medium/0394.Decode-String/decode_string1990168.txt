@@ -1,0 +1,76 @@
+// https://leetcode.com/problems/decode-string/solutions/1990168/rust-rdp/
+// Encoding grammar
+enum Node<'a> {
+    SEQ(Vec<Box<Node<'a>>>),   // sequence
+    REP((u32, Box<Node<'a>>)), // repeated
+    BLK(&'a str)               // block 
+}
+
+impl Solution {
+    fn parse<'a>(s: &'a str) -> Box<Node<'a>> {
+        let mut S: Vec<Box<Node<'a>>> = Vec::new();
+        let mut I: usize = 0;
+        let C = s.chars();
+        
+        while I < s.len() {
+            if let Ok(c) = s[I..I+1].parse::<u32>() {
+                let mut n: u32 = c;
+                let mut i = I+1;
+                while i < s.len() {
+                    match s[I..i].parse::<u32>() {
+                        Ok(v)  => { n = v; },
+                        Err(e) => { break; }
+                    }
+                    i += 1;
+                }
+                let mut b = 1;
+                let mut j = i;
+                while b > 0 && j < s.len() {
+                    match s.chars().nth(j).unwrap() {
+                        '[' => { b += 1; },
+                        ']' => { b -= 1; },
+                        _ => { }
+                    }
+                    j += 1;
+                }
+                S.push(Box::new(Node::REP(
+                    (n, Solution::parse(&s[i..j-1]))
+                )));
+                I = j;
+            } else {
+                let mut i = I;
+                while I < s.len() && !s.chars().nth(I).unwrap().is_digit(10) {
+                    I += 1;
+                }
+                S.push(Box::new(Node::BLK(&s[i..I])));
+            }
+        }
+        return Box::new(Node::SEQ(S));
+    }
+    fn decode(node: Box<Node>) -> String {
+        let mut R = String::new();
+        match (*node) {
+            Node::SEQ(s) => {
+                // concatenate a sequence
+                for v in s {
+                    R += &Solution::decode(v);
+                }
+            },
+            Node::BLK(s) => {
+                // add a single block of chars
+                R += s;
+            },
+            Node::REP(s) => {
+                // Add each copy of a Node
+                let d = Solution::decode(s.1);
+                for i in 0..s.0 {
+                    R += &d;
+                }
+            }
+        }
+        R
+    }
+    pub fn decode_string(s: String) -> String {
+        Solution::decode(Solution::parse(&s[..]))        
+    }
+}

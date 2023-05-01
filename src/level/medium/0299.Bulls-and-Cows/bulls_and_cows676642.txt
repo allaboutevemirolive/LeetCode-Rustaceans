@@ -1,0 +1,20 @@
+// https://leetcode.com/problems/bulls-and-cows/solutions/676642/rust-100-ac-clean-code-for-beginner/
+impl Solution {
+    pub fn get_hint(secret: String, guess: String) -> String {
+        let (mut A, mut B) = (0, 0);
+        let mut nums = [0; 10];
+        for (ch1, ch2) in secret.chars().zip(guess.chars()) {
+            if ch1 == ch2 {
+                A += 1;
+            } else {
+                let i = ch1 as usize - '0' as usize;
+                let j = ch2 as usize - '0' as usize;
+                if nums[i] < 0 { B += 1; }
+                if nums[j] > 0 { B += 1; }
+                nums[i] += 1;
+                nums[j] -= 1;
+            }
+        }
+        format!("{}A{}B", A, B)
+    }
+}

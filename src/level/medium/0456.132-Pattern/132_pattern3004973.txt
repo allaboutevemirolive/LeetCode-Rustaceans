@@ -1,0 +1,24 @@
+// https://leetcode.com/problems/132-pattern/solutions/3004973/rust-slow-simple-solution-without-stack/
+impl Solution {
+    pub fn find132pattern(nums: Vec<i32>) -> bool {
+        let mut nums = nums;
+        nums.dedup();
+
+        let n = match nums.len() {
+            1 | 2 => return false,
+            n => n,
+        };
+
+        'outi: for i in 0..n - 2 {
+            'outj: for j in i + 1..n - 1 {
+                if nums[i] >= nums[j] {continue 'outi;}
+                for k in j + 1..n {
+                    if nums[k] >= nums[j] {continue 'outj;}
+                    if nums[i] >= nums[k] {continue;}
+                    return true;
+                }
+            }
+        }
+        false
+    }
+}

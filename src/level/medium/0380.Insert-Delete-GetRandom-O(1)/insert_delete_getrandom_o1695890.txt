@@ -1,0 +1,47 @@
+// https://leetcode.com/problems/insert-delete-getrandom-o1/solutions/695890/rust-cheapest-best/
+use std::collections::HashMap;
+use rand::{thread_rng, Rng};
+
+struct RandomizedSet {
+    entries: Vec<i32>,
+    map: HashMap<i32, usize>,
+}
+
+impl RandomizedSet {
+    fn new() -> Self {
+        Self {
+            entries: vec![],
+            map: HashMap::new()
+        }
+    }
+
+    fn insert(&mut self, val: i32) -> bool {
+        match self.map.get(&val) {
+            Some(_) => false,
+            None => {
+                self.entries.push(val);
+                self.map.insert(val, self.entries.len() - 1);
+                true
+            }
+        }
+    }
+
+    fn remove(&mut self, val: i32) -> bool {
+        match self.map.get(&val) {
+            None => false,
+            Some(idx) => {
+                let i = idx.to_owned();
+                self.entries.swap_remove(i);
+                if let Some(v) = self.entries.get(i) {
+                    self.map.insert(*v, i);
+                }
+                self.map.remove(&val);
+                true
+            }
+        }
+    }
+
+    fn get_random(&self) -> i32 {
+        self.entries[thread_rng().gen_range(0, self.entries.len())]
+    }
+}

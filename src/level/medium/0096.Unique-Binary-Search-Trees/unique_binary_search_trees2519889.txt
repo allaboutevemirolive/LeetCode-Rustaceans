@@ -1,0 +1,21 @@
+// https://leetcode.com/problems/unique-binary-search-trees/solutions/2519889/rust-constant-time-and-space-compile-time-computation/
+pub fn num_trees(n: i32) -> i32 {
+    const N: usize = 20;
+    static CATALAN: [i32; N] = {
+        let mut dp = [0; N];
+        dp[0] = 1;
+        dp[1] = 1;
+        let mut i = 2;
+        while i < N {
+            let mut j = 0;
+            while j < i {
+                dp[i] += dp[j] * dp[i - j - 1];
+                j += 1;
+            }
+            i += 1;
+        }
+        dp
+    };
+
+    CATALAN[n as usize]
+}

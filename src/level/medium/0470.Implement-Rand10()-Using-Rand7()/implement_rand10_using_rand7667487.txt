@@ -1,0 +1,41 @@
+// https://leetcode.com/problems/implement-rand10-using-rand7/solutions/667487/rust-approach-1-not-accepted/
+// rand7 for testing
+use rand::Rng;
+fn rand7() -> i32 {
+    let mut rng = rand::thread_rng();
+    return rng.gen_range(1, 8);
+}
+
+struct Solution;
+impl Solution {
+    pub fn rand10() -> i32 {
+        let mut val = 50;
+        while val > 40 {
+            let a = rand7();
+            let b = rand7();
+            val = a + (b-1)*7;
+        }
+        1 + (val - 1) % 10 // 1-indexing
+    }
+}
+
+fn test_dist() {
+    let mut freq = vec![0; 10];
+    let samples = 10000;
+
+    println!("Testing distribution with {:?} samples", samples);
+
+    for _ in 0..samples {
+        let bin = Solution::rand10() - 1;
+        freq[bin as usize] += 1;
+    }
+
+    for f in freq {
+        print!("{} ", (f as f32)/(samples as f32));
+    }
+    println!();
+}
+
+fn main() {
+    test_dist();
+}

@@ -1,0 +1,24 @@
+// https://leetcode.com/problems/h-index/solutions/696078/rust-solution-0ms/
+impl Solution {
+    pub fn h_index(ref mut cs: Vec<i32>) -> i32 {
+        cs.sort_unstable();
+        let n = cs.len();
+        if n == 0 {
+            return 0;
+        }
+        let mut l = 0;
+        let mut r = n as i32 - 1;
+        let mut m = 0;
+        while l <= r {
+            m = ((r - l) / 2 + l) as usize;
+            if cs[m] == (n - m) as i32 {
+                return cs[m];
+            } else if cs[m] > (n - m) as i32 {
+                r = m as i32 - 1
+            } else {
+                l = m as i32 + 1
+            }
+        }
+        n as i32 - r - 1
+    }
+}

@@ -1,0 +1,39 @@
+// https://leetcode.com/problems/divide-two-integers/solutions/1985511/rust-solution-only-operators/
+impl Solution {
+    pub fn divide(dividend: i32, divisor: i32) -> i32 {
+        let mut N: i64 = dividend as i64;
+        let mut D: i64 = divisor as i64;
+        let mut S: i64 = 1; // sign
+        
+        // normalize to positive values
+        if N < 0 && D > 0 || D < 0 && N > 0 {
+            S = -1;
+        }
+        if N < 0 { N = !(N - 1); }
+        if D < 0 { D = !(D - 1); }
+
+        let mut Q: i64 = 0; // quotient 
+        let mut d = D;
+        let mut n = N;
+
+        while n >= d { 
+            let mut m = n - d;
+            let mut c = 1;
+            // add to the quotient exponentially 
+            while m > (d + d) {
+                c += c;
+                d += d;
+                m -= d;
+            }
+            Q += c;
+            n -= d;
+            d = D;
+        }
+        
+        if S == -1 {
+            // two's complement for negative case
+            Q = !Q + 1;
+        }
+        Q.max(std::i32::MIN as i64).min(std::i32::MAX as i64) as i32
+    }
+}

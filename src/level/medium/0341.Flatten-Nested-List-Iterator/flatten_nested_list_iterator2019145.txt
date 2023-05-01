@@ -1,0 +1,34 @@
+// https://leetcode.com/problems/flatten-nested-list-iterator/solutions/2019145/rust-solution-with-built-in-intoiter/
+struct NestedIterator {
+    iters: Vec<std::vec::IntoIter<NestedInteger>>,
+    next: i32,
+}
+
+impl NestedIterator {
+    fn new(nestedList: Vec<NestedInteger>) -> Self {
+        Self {
+            iters: vec![nestedList.into_iter()],
+            next: 0,
+        }
+    }
+    
+    fn next(&mut self) -> i32 {
+        self.next
+    }
+    
+    fn has_next(&mut self) -> bool {
+        while !self.iters.is_empty() {
+            while let Some(res) = self.iters.last_mut().unwrap().next() {
+                match res {
+                    NestedInteger::Int(num) => {
+                        self.next = num;
+                        return true;
+                    }
+                    NestedInteger::List(inner) => self.iters.push(inner.into_iter()),
+                }
+            }
+            self.iters.pop();
+        }
+        false
+    }
+}

@@ -1,0 +1,63 @@
+// https://leetcode.com/problems/4sum/solutions/3059298/rust-solution/
+use std::collections::*;
+
+impl Solution {
+  pub fn four_sum(nums: Vec<i32>, target: i32) -> Vec<Vec<i32>> {
+    let mut nums = nums.into_iter().map(|v| v as isize).collect::<Vec<isize>>();
+    nums.sort();
+    let target = target as isize;
+    let mut result = HashSet::new();
+    let mut dict = HashMap::new();
+    let n = nums.len();
+    let mut ci = 0;
+    let mut memo = vec![0i32;n];
+    for i in 0..n {
+      let v = nums[i];
+      if let Some(&key) = dict.get(&v) {
+        memo[key] += 1;
+      } else {
+        dict.insert(v, ci);
+        memo[ci] += 1;
+        ci += 1;
+      }
+    }
+
+    for i in 0..n {
+      let v1 = nums[i];
+      let key1 = *dict.get(&v1).unwrap();
+      for j in i+1..n {
+        if i == j { continue }
+        let v2 = nums[j];
+        let key2 = *dict.get(&v2).unwrap();
+        for k in j+1..n {
+          if i == k || j == k { continue }
+          let v3 = nums[k];
+          let key3 = *dict.get(&v3).unwrap();
+          let v4 = target - (v1+v2+v3);
+          
+          if let Some(&key4) = dict.get(&v4) {
+            let mut success = true;
+            let arr = vec![key1, key2, key3, key4];
+            for &ti in &arr {
+              memo[ti] -= 1;
+              if memo[ti] < 0 {
+                success = false;
+              }
+            }
+
+            for &ti in &arr {
+              memo[ti] += 1;
+            }
+
+            if success {
+              let mut temp = vec![v1 as i32, v2 as i32, v3 as i32, v4 as i32];
+              temp.sort();
+              result.insert(temp);
+            }
+          }
+        }
+      }
+    }
+    result.into_iter().collect::<Vec<Vec<i32>>>()
+  }
+}

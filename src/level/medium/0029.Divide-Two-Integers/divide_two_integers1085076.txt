@@ -1,0 +1,26 @@
+// https://leetcode.com/problems/divide-two-integers/solutions/1085076/rust-solution/
+impl Solution {
+    pub fn divide(dividend: i32, divisor: i32) -> i32 {
+        let negative = (dividend < 0) != (divisor < 0);
+        let (mut dividend, mut divisor) = (i64::from(dividend).abs(), i64::from(divisor).abs());
+        let mut ret = 0_i64;
+        let mut n = 1;
+        while (divisor << 1) <= dividend {
+            divisor <<= 1;
+            n <<= 1;
+        }
+        while n > 0 {
+            if dividend >= divisor {
+                ret += n;
+                dividend -= divisor;
+            }
+            divisor >>= 1;
+            n >>= 1;
+        }
+        (if negative {
+            -ret
+        } else {
+            ret.min(i64::from(std::i32::MAX))
+        }) as i32
+    }
+}

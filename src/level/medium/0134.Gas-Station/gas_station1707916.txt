@@ -1,0 +1,27 @@
+// https://leetcode.com/problems/gas-station/solutions/1707916/rust/
+
+impl Solution {
+    pub fn can_complete_circuit(gas: Vec<i32>, cost: Vec<i32>) -> i32 {
+        
+        let sum = |vec: Vec<i32>| -> i32 { 
+            vec.iter().sum::<i32>() };
+        //  Check that the sum of gas == sum of cost
+        if sum(gas.clone()) < sum(cost.clone()) { 
+            return -1
+        }
+        let mut total = 0;
+        let mut start = 0;
+        //  Iterate through each gas and cost and add their total
+        //  If we find negative sum, we move on to the next index
+        //  Once a positve index is found then that will be the starting point
+        for i in 0..gas.len() {
+            total += gas[i] - cost[i]; 
+            if total < 0 { 
+                //  Reset total to 0
+                total = 0;
+                start = i + 1;
+            }
+        }
+        start as i32
+    }
+}

@@ -1,0 +1,17 @@
+// https://leetcode.com/problems/kth-largest-element-in-an-array/solutions/950796/rust-binaryheap-0ms/
+use std::collections::BinaryHeap;
+
+impl Solution {
+    pub fn find_kth_largest(nums: Vec<i32>, k: i32) -> i32 {
+        let mut heap = BinaryHeap::new();
+        for num in nums {
+            heap.push(num);
+        }
+        let mut k = k;
+        while k > 1 {
+            heap.pop();
+            k -= 1;
+        }
+        *heap.peek().unwrap()
+    }
+}

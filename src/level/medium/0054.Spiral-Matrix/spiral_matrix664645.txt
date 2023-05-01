@@ -1,0 +1,31 @@
+// https://leetcode.com/problems/spiral-matrix/solutions/664645/easy-understand-rust-solution/
+pub fn spiral_order(matrix: Vec<Vec<i32>>) -> Vec<i32> {
+  if matrix.len() == 0 {
+    return vec![];
+  }
+  let mut visited = vec![vec![false; matrix[0usize].len()]; matrix.len()];
+  let mut result = vec![];
+  let dirs = [(0, 1), (1, 0), (0, -1), (-1, 0)];
+  let mut curr_x = 0i32;
+  let mut curr_y = 0i32;
+  let mut dir_p = 0usize;
+  for _ in 0..matrix.len() * matrix[0usize].len() {
+    result.push(matrix[curr_x as usize][curr_y as usize]);
+    visited[curr_x as usize][curr_y as usize] = true;
+    let mut next_x = curr_x + dirs[dir_p].0;
+    let mut next_y = curr_y + dirs[dir_p].1;
+    if next_x < 0
+      || next_x as usize >= matrix.len()
+      || next_y < 0
+      || next_y as usize >= matrix[0].len()
+      || visited[next_x as usize][next_y as usize]
+    {
+      dir_p = (dir_p + 1) % 4;
+      next_x = curr_x + dirs[dir_p].0;
+      next_y = curr_y + dirs[dir_p].1;
+    }
+    curr_x = next_x;
+    curr_y = next_y;
+  }
+  result
+}

@@ -1,0 +1,30 @@
+// https://leetcode.com/problems/longest-repeating-character-replacement/solutions/3326070/rust-solution/
+impl Solution {
+    pub fn character_replacement(s: String, k: i32) -> i32 {
+        let mut mp = [0; 26];
+        let s = s.into_bytes();
+        let (mut ans, mut max, end) = (0, 0, s.len() as i32);
+
+        let (mut left, mut right) = (0, 0);
+
+        while right < end {
+            let pos = (s[right as usize] - b'A') as usize;
+            mp[pos] += 1;
+
+            if mp[pos] > max {
+                max = mp[pos];
+            }
+
+            while right - left - max + 1 > k {
+                mp[(s[left as usize] - b'A') as usize] -= 1;
+                left += 1;
+            }
+
+            right += 1;
+
+            ans = i32::max(ans, right - left);
+        }
+
+        ans
+    }
+}

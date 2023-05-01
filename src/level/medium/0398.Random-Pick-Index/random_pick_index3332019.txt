@@ -1,0 +1,90 @@
+// https://leetcode.com/problems/random-pick-index/solutions/3332019/rust-3-solutions/
+mod rpi_brute_force {
+    use rand::rngs::ThreadRng;
+    use rand::Rng;
+
+    pub struct Solution {
+        nums: Vec<i32>,
+        rnd: ThreadRng,
+    }
+
+    impl Solution {
+        pub fn new(nums: Vec<i32>) -> Self {
+            Self {
+                nums,
+                rnd: rand::thread_rng(),
+            }
+        }
+        pub fn pick(&mut self, target: i32) -> i32 {
+            let mut indicies = vec![];
+            for (idx, &num) in self.nums.iter().enumerate() {
+                if num == target {
+                    indicies.push(idx as i32)
+                }
+            }
+            indicies[self.rnd.gen::<usize>() % indicies.len()]
+        }
+    }
+}
+
+mod rpi_hashmap_caching {
+    use rand::rngs::ThreadRng;
+    use rand::Rng;
+    use std::collections::HashMap;
+
+    pub struct Solution {
+        cache: HashMap<i32, Vec<i32>>,
+        rnd: ThreadRng,
+    }
+
+    impl Solution {
+        pub fn new(nums: Vec<i32>) -> Self {
+            let cache = nums
+                .into_iter()
+                .enumerate()
+                .fold(HashMap::new(), |mut acc, (i, num)| {
+                    acc.entry(num).or_insert(vec![]).push(i as i32);
+                    acc
+                });
+            Self {
+                cache,
+                rnd: rand::thread_rng(),
+            }
+        }
+        pub fn pick(&mut self, target: i32) -> i32 {
+            self.cache[&target][self.rnd.gen::<usize>() % self.cache[&target].len()]
+        }
+    }
+}
+
+mod rpi_reservoir_sampling {
+    use rand::rngs::ThreadRng;
+    use rand::Rng;
+
+    pub struct Solution {
+        nums: Vec<i32>,
+        rnd: ThreadRng,
+    }
+
+    impl Solution {
+        pub fn new(nums: Vec<i32>) -> Self {
+            Self {
+                nums,
+                rnd: rand::thread_rng(),
+            }
+        }
+        pub fn pick(&mut self, target: i32) -> i32 {
+            let mut idx = 0;
+            let mut count = 0;
+            for i in 0..self.nums.len() {
+                if self.nums[i] == target {
+                    count += 1;
+                    if self.rnd.gen::<i32>() % count == 0 {
+                        idx = i as i32;
+                    }
+                }
+            }
+            idx
+        }
+    }
+}

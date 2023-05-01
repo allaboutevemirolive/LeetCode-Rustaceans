@@ -1,0 +1,119 @@
+// https://leetcode.com/problems/can-i-win/solutions/369918/rust-compile-error-only-on-leetcode/
+use std::cmp;
+use std::collections::HashMap;
+
+#[derive(Debug, Clone, Copy, Eq, PartialEq, Hash)]
+struct Usage{
+    value: u32,
+    max_val: u32,
+}
+
+struct UsageIterator{
+    position: u32,
+    value: Usage,
+}
+
+impl Usage{
+    fn new(max_choosable: u32)->Self{
+        let max_choosable = cmp::max(max_choosable, 1);
+        let mut map = 0u32;
+        let mask = 1u32;
+        for i in 0..max_choosable{
+            map |= mask << i;
+        }
+        Usage{
+            value: map,
+            max_val: max_choosable,
+        }
+    }
+    
+    fn remove(self: Self, val: u32)->Self{
+        let mask = 1u32 << (val - 1);
+        if mask & self.value == 0{
+            panic!("double remove {val} from {:<32b}", self.value, val=val);
+        } 
+        Self{
+            value: self.value&!mask,
+            max_val: self.max_val,
+        }
+    }
+    
+    fn contains(self: Self, val: u32)->bool{
+        if val>self.max_val{
+            panic!("Too big contains check");
+        }
+        let mask = 1u32 << (val - 1);
+        return mask & self.value != 0;
+    }
+    
+    fn is_empty(self: Self)->bool{
+        self.value==0
+    }
+}
+
+impl IntoIterator for Usage{
+    type Item = u32;
+    type IntoIter = UsageIterator;
+    fn into_iter(self: Self)->Self::IntoIter{
+        Self::IntoIter{value:self, position: 1}
+    }
+}
+
+impl Iterator for UsageIterator{
+    type Item = u32;
+    fn next(&mut self) -> Option<u32>{
+        while self.position<=self.value.max_val{
+            let old_position = self.position;
+            self.position += 1;
+            if self.value.contains(old_position){
+                return Some(old_position);
+            }
+        }
+        return None;
+    }
+}
+
+impl Solution {
+    pub fn can_i_win(max_choosable_integer: i32, desired_total: i32) -> bool {
+        if (max_choosable_integer + 1)*max_choosable_integer / 2 < desired_total{
+            // Cannot reach desired_total at all
+            return false;
+        }
+        let elems = Usage::new(max_choosable_integer as u32);
+        let mut cache = HashMap::<(u32, Usage), bool>::new();
+        return Self::can_win_first(
+          desired_total as u32,
+          elems,
+          &mut cache,
+        );
+    }
+    
+    fn can_win_first(desired_total: u32, elems: Usage, 
+        cache: &mut HashMap<(u32, Usage), bool>
+    )->bool{
+        if let Some(res) = cache.get(&(desired_total, elems)){
+            return *res;
+        }
+        if elems.is_empty(){
+          cache.insert((desired_total, elems), false);
+          return false;
+        }
+        let mut result = false;
+        for value in elems{
+            if value >= desired_total{
+                result = true;
+                break;
+            }
+            if !Self::can_win_first(
+                desired_total - value,
+                elems.remove(value),
+                &mut *cache
+            ){
+                result = true;
+                break;
+            }
+        }
+        cache.insert((desired_total, elems), result);
+        return result;
+    }
+}

@@ -1,0 +1,37 @@
+// https://leetcode.com/problems/decode-string/solutions/2853317/rust-stack-solution-p/
+impl Solution {
+    pub fn decode_string(s: String) -> String {
+        // on [, push current result to stack, multiple to stack, reset cur, reset mult (entering new domain)
+        // on ], pop multiple from stack, multiple prev result, and then append
+        //       the prev result by our current (mult) times -- (set cur to prev, reset mult)
+        
+        let s = s.chars().collect::<Vec<char>>();
+        let (mut mult_vec, mut str_vec) = (vec![], vec![]);
+        let mut cur = vec![];
+        let mut cur_mult = 0;
+        
+        for v in s {
+            // check if num
+            if v as i32 - 0x30 >= 0 && v as i32 - 0x30 <= 9 {
+                cur_mult = (cur_mult * 10) + (v as i32 - 0x30);
+            } else if v == '[' {
+                str_vec.push(cur.clone());
+                cur = vec![];
+                mult_vec.push(cur_mult);
+                cur_mult = 0;
+            } else if v == ']' {
+                let last_mult = mult_vec.pop().unwrap();
+                let mut last = str_vec.pop().unwrap();
+                for _ in 0..last_mult {
+                    last = [last.clone(), cur.clone()].concat();
+                }
+                cur = last;
+                cur_mult = 0;
+            } else {
+                cur.push(v);
+            }
+        }
+        
+        cur.into_iter().collect::<String>()
+    }
+}

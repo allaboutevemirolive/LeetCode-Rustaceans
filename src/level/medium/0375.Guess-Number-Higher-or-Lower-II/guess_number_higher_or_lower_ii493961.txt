@@ -1,0 +1,17 @@
+// https://leetcode.com/problems/guess-number-higher-or-lower-ii/solutions/493961/rust-12ms-2-2mb-100/
+pub fn get_money_amount(n: i32) -> i32 {
+    let mut dp = vec![vec![0; n as usize + 1]; n as usize + 1];
+    return helper(&mut dp, 1, n);
+
+    fn helper(dp: &mut Vec<Vec<i32>>, lo: i32, hi: i32) -> i32 {
+        if lo >= hi { return 0; }
+        if dp[lo as usize][hi as usize] != 0 { return dp[lo as usize][hi as usize]; };
+        let mut max = i32::max_value();
+        for i in lo..hi + 1 {
+            max = std::cmp::min(max,
+                                std::cmp::max(helper(dp, lo, i - 1), helper(dp, i + 1, hi)) + i);
+        }
+        dp[lo as usize][hi as usize] = max;
+        max
+    }
+}

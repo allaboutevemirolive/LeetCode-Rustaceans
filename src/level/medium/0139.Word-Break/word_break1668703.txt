@@ -1,0 +1,24 @@
+// https://leetcode.com/problems/word-break/solutions/1668703/rust-backtracking-with-cache/
+    pub fn word_break(s: String, word_dict: Vec<String>) -> bool {
+        fn helper<'a>(
+            cache: &mut HashMap<&'a str, bool>,
+            s: &'a str,
+            wd: &Vec<String>,
+        ) -> bool {
+            match cache.get(s) {
+                Some(ans) => *ans,
+                None => {
+                    for word in wd {
+                        if s.starts_with(word) && (s.len() == word.len() || helper(cache, &s[word.len()..], wd)){
+                            cache.insert(s, true);
+                            return true;
+                        }
+                    }
+                    cache.insert(s, false);
+                    false
+                }
+            }
+        }
+        
+        helper(&mut HashMap::new(), &s, &word_dict)
+    }

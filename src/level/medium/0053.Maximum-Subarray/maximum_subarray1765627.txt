@@ -1,0 +1,13 @@
+// https://leetcode.com/problems/maximum-subarray/solutions/1765627/rust-dp/
+impl Solution {
+    pub fn max_sub_array(nums: Vec<i32>) -> i32 {
+        // f(n) = max(a[n], a[n]+f(n-1))
+        let mut max = nums[0];
+        let mut cur_max = max;
+        for n in 1..nums.len() {
+            cur_max = std::cmp::max(nums[n], nums[n] + cur_max);
+            max = std::cmp::max(max, cur_max);
+        }
+        max
+    }
+}

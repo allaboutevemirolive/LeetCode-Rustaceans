@@ -1,0 +1,58 @@
+// https://leetcode.com/problems/restore-ip-addresses/solutions/3079967/rust-backtrack-solution/
+impl Solution {
+    pub fn restore_ip_addresses(s: String) -> Vec<String> {
+        if s.len() == 0 || s.len() > 12 {
+            return vec![];
+        }
+
+        let mut res: Vec<String> = Vec::new();
+
+        Self::helper(&s, &mut res, "".to_string(), 0, 0);
+
+        res
+    }
+
+    fn helper(s: &String, res: &mut Vec<String>, ip: String, count: i32, start: usize) {
+        if count == 4 && start == s.len() {
+            res.push(ip);
+            return;
+        }
+
+        for i in start..s.len() {
+            match s.get(start..i + 1) {
+                Some(segment) => if Self::is_valid(&segment.to_string()) {
+                    let new_ip = if count == 0 { ip.clone() } else { ip.clone() + "." } + segment;
+                    Self::helper(s, res, new_ip, count + 1, i + 1);
+                },
+                _ => {}
+            }
+        }
+    }
+
+    fn is_valid(s: &String) -> bool {
+        if s.len() > 3 || s.len() < 1 {
+            return false;
+        }
+        
+        let chars: Vec<char> = s.chars().collect();
+
+        if chars[0] == '0' && chars.len() > 1 {
+            return false;
+        }
+
+        let mut num = 0;
+        for c in chars {
+            if c < '0' || c > '9' {
+                return false;
+            }
+
+            num = num * 10 + c as i32 - '0' as i32;
+
+            if num > 255 {
+                return false;
+            }
+        }
+
+        true
+    }
+}

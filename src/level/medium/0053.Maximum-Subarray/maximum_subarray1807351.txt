@@ -1,0 +1,14 @@
+// https://leetcode.com/problems/maximum-subarray/solutions/1807351/rust/
+impl Solution {
+    pub fn max_sub_array(nums: Vec<i32>) -> i32 {
+        let mut dp = nums;
+        
+        for i in 1..dp.len() {
+            if dp[i - 1] > 0 {
+                dp[i] += dp[i - 1];
+            }
+        }
+        
+        *dp.iter().max().unwrap()
+    }
+}

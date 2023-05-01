@@ -1,0 +1,53 @@
+// https://leetcode.com/problems/search-in-rotated-sorted-array-ii/solutions/3292031/rust-editorial-port/
+impl Solution {
+    pub fn search(nums: Vec<i32>, target: i32) -> bool {
+        fn is_bin_search_helpful(nums: &Vec<i32>, start: usize, element: i32) -> bool {
+            nums[start] != element
+        }
+        fn exists_in_first_array(nums: &Vec<i32>, start: usize, element: i32) -> bool {
+            // returns true if element exists in first array, false if it exists in second
+            nums[start] <= element
+        }
+        if nums.is_empty() {
+            return false;
+        }
+        let n = nums.len();
+        let mut lo = 0;
+        let mut hi = n - 1;
+
+        while lo <= hi {
+            let mid = lo + (hi - lo) / 2;
+            if nums[mid] == target {
+                return true;
+            }
+            if !is_bin_search_helpful(&nums, lo, nums[mid]) {
+                lo += 1;
+                continue;
+            }
+            // which array does the pivot belongs to
+            let pivot_array = exists_in_first_array(&nums, lo, nums[mid]);
+            // which array does the target belongs to
+            let target_array = exists_in_first_array(&nums, lo, target);
+
+            if pivot_array ^ target_array {
+                // If pivot and target exist in different sorted arrays,
+                // recall that xor is true when both operands are distinct
+                if pivot_array {
+                    lo = mid + 1;
+                    // pivot in the first, target in the second
+                } else {
+                    hi = mid - 1;
+                    // target in the first, pivot in the second
+                }
+            } else {
+                // if pivot and target exist in same sorted array
+                if nums[mid] < target {
+                    lo = mid + 1;
+                } else {
+                    hi = mid - 1;
+                }
+            }
+        }
+        false     
+    }
+}

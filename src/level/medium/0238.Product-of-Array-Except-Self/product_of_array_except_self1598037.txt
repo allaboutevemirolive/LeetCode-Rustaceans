@@ -1,0 +1,32 @@
+// https://leetcode.com/problems/product-of-array-except-self/solutions/1598037/rust-solution/
+impl Solution {
+    pub fn product_except_self(nums: Vec<i32>) -> Vec<i32> {
+        let mut mul: i32 = 1;
+        let mut count_zero: i32 = 0;
+        for i in 0..nums.len() {
+            if nums[i] == 0 {
+                count_zero +=1 ;
+            } else {
+                mul *= nums[i];
+            }
+        }
+        
+        let mut ans: Vec<i32> = Vec::new();
+        
+        for i in 0..nums.len() {
+            if count_zero > 1 {
+                ans.push(0);
+            } else if count_zero == 1{
+                if nums[i] == 0 {
+                    ans.push(mul);
+                } else {
+                    ans.push(0);
+                }
+            } else {
+                ans.push(mul/nums[i]);
+            }
+        }
+        
+        ans
+    }
+}

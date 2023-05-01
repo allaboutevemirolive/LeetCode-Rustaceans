@@ -1,0 +1,30 @@
+// https://leetcode.com/problems/integer-to-roman/solutions/528696/simple-rust-impl/
+impl Solution {
+    // 1 I             
+    // 4 IV 
+    // 5 V             
+    // 9 IX 
+    // 10 X             
+    // 40 XL 
+    // 50 L             
+    // 90 XC 
+    // 100 C             
+    // 400 CD 
+    // 500 D             
+    // 900 CM   
+    // 1000 M                  
+    const base_str:&'static [&'static str] = &["M","CM","D","CD","C","XC","L","XL","X","IX","V","IV","I"];
+    const base:&'static [usize] = &[1000,900,500,400,100,90,50,40,10,9,5,4,1];
+
+    pub fn int_to_roman(num: i32) -> String {
+        let mut n = num as usize;
+        let mut r = String::new();
+        for i in 0..Self::base.len(){
+            for _ in  0..n / Self::base[i]{
+                r.push_str(Self::base_str[i]);
+            }
+            n %= Self::base[i];
+        }
+        r
+    }
+}

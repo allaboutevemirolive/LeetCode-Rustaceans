@@ -1,0 +1,105 @@
+// https://leetcode.com/problems/design-add-and-search-words-data-structure/solutions/774217/rust-with-trie/
+use std::collections::HashMap;
+
+#[derive(Debug, Default, Clone)]
+struct WordDictionary {
+    end_flag: HashMap<char, bool>,
+    links: HashMap<char, WordDictionary>,
+}
+
+/**
+ * `&self` means the method takes an immutable reference.
+ * If you need a mutable reference, change it to `&mut self` instead.
+ */
+impl WordDictionary {
+    /** Initialize your data structure here. */
+    fn new() -> Self {
+        Default::default()
+    }
+
+    /** Adds a word into the data structure. */
+    fn add_word(&mut self, word: String) {
+        self.add_char_vector(word.chars().collect())
+    }
+
+    fn add_char_vector(&mut self, word: Vec<char>) {
+        let n = word.len();
+        if n == 0 {
+            return;
+        }
+        let ch = word[0];
+        if n == 1 {
+            self.end_flag.entry(ch).or_insert(true);
+            self.links
+                .entry(ch)
+                .or_insert_with(|| WordDictionary::default());
+            return;
+        }
+        let mut w = word;
+        w.remove(0);
+        let t = self
+            .links
+            .entry(ch)
+            .or_insert_with(|| WordDictionary::default());
+        t.add_char_vector(w);
+    }
+
+    /** Returns if the word is in the data structure. A word could contain the dot character '.' to represent any one letter. */
+    fn search(&self, word: String) -> bool {
+        self.search_char_vector(word.chars().collect())
+    }
+
+    fn search_char_vector(&self, word: Vec<char>) -> bool {
+        let n = word.len();
+        if n == 0 {
+            return true;
+        }
+        let ch = word[0];
+        if ch != '.' {
+            if n == 1 {
+                return self.links.get(&ch).is_some()
+                    && self.end_flag.get(&ch).is_some()
+                    && *self.end_flag.get(&ch).unwrap();
+            }
+            let mut w = word;
+            w.remove(0);
+            return match self.links.get(&ch) {
+                Some(t) => t.search_char_vector(w),
+                None => false,
+            };
+        } else {
+            if n == 1 {
+                return self.links.values().next().is_some()
+                    && self.end_flag.values().next().is_some();
+            } else {
+                let mut w = word;
+                w.remove(0);
+                for ch in self.links.keys() {
+                    if self.links.get(ch).unwrap().search_char_vector(w.clone()) {
+                        return true;
+                    }
+                }
+                false
+            }
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_dict() {
+        let mut dict = WordDictionary::default();
+        dict.add_word("bad".to_string());
+        dict.add_word("dad".to_string());
+        dict.add_word("mad".to_string());
+        assert!(!dict.search("pad".to_string()));
+        assert!(dict.search("bad".to_string()));
+        assert!(dict.search(".ad".to_string()));
+        assert!(dict.search("b..".to_string()));
+        assert!(dict.search("ma.".to_string()));
+        assert!(dict.search(".a.".to_string()));
+    }
+}

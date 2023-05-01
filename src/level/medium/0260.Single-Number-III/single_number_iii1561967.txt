@@ -1,0 +1,20 @@
+// https://leetcode.com/problems/single-number-iii/solutions/1561967/rust-hashset/
+use std::collections::HashSet;
+
+impl Solution {
+    pub fn single_number(nums: Vec<i32>) -> Vec<i32> {
+        let mut hash_table: HashSet<i32> = HashSet::new();
+        for i in 0..nums.len() {
+            if hash_table.contains(&nums[i]) {
+                hash_table.remove(&nums[i]);
+            } else {
+                hash_table.insert(nums[i]);
+            }
+        }
+        let mut ans: Vec<i32> = Vec::new();
+        for x in hash_table.iter() {
+            ans.push(*x);
+        }
+        ans
+    }
+}

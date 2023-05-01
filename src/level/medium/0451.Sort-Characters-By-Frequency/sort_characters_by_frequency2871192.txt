@@ -1,0 +1,21 @@
+// https://leetcode.com/problems/sort-characters-by-frequency/solutions/2871192/rust-o-n-simple-w-notes-0ms/
+use std::iter::repeat;
+
+macro_rules! idx { ($ch:expr) => { $ch as usize - '0' as usize } }
+
+impl Solution {
+    pub fn frequency_sort(s: String) -> String {
+        let mut chars: Vec<(_, _)>;
+        
+        chars = ('0'..='z').map(|ch| (0, ch)).collect();
+
+        s.chars().for_each(|ch| chars[idx!(ch)].0 += 1);
+
+        chars.sort_unstable_by_key(|(n, _)| s.len() - n);
+
+        chars.into_iter()
+             .take_while(|(n, _)| *n > 0)
+             .flat_map(|(n, ch)| repeat(ch).take(n))
+             .collect()
+    }
+}

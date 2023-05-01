@@ -1,0 +1,43 @@
+// https://leetcode.com/problems/linked-list-random-node/solutions/3278604/rust-reservoir-sampling-diy-rng-0ms/
+use std::time::SystemTime;
+
+const MULTIPLIER: u64 = 6364136223846793005;
+const INCREMENT : u64 = 1442695040888963407;
+
+type NodeOpt = Option<Box<ListNode>>;
+
+struct Solution {
+    head: NodeOpt,
+    seed: u64,
+}
+
+impl Solution {
+
+    fn new(head: NodeOpt) -> Self {
+        let seed = SystemTime::now().elapsed().unwrap().as_nanos() as u64;
+        Self { head, seed }
+    }
+
+    fn get_random(&mut self) -> i32 {
+        let mut seed = self.seed;
+
+        let mut quickrand = || { 
+            seed = seed.wrapping_mul(MULTIPLIER).wrapping_add(INCREMENT);
+            (seed % u64::MAX) as f64 / u64::MAX as f64 
+        };
+
+        let mut node_opt = self.head.as_ref();
+        let mut rand_val = 0;
+        let mut i = 1.0;
+
+        while let Some(node) = node_opt {
+            if quickrand() < 1.0 / i {
+                rand_val = node.val;
+            }
+            i += 1.0;
+            node_opt = node.next.as_ref();
+        }
+        self.seed = seed;
+        rand_val
+    }
+}

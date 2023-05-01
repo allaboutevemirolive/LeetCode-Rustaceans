@@ -1,0 +1,18 @@
+// https://leetcode.com/problems/multiply-strings/solutions/2873236/rust-solution/
+impl Solution {
+    pub fn multiply(num1: String, num2: String) -> String {
+        let mut result = vec![0; num1.len() + num2.len()];
+        for (i, c1) in num1.chars().rev().enumerate() {
+            for (j, c2) in num2.chars().rev().enumerate() {
+                let sum = (c1 as u8 - b'0') * (c2 as u8 - b'0') + result[i + j];
+                result[i + j] = sum % 10;
+                result[i + j + 1] += sum / 10;
+            }
+        }
+        let mut result = result.into_iter().rev().skip_while(|&x| x == 0).collect::<Vec<_>>();
+        if result.is_empty() {
+            result.push(0);
+        }
+        result.into_iter().map(|x| (x + b'0') as char).collect()
+    }
+}

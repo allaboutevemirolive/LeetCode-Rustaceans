@@ -1,0 +1,208 @@
+// https://leetcode.com/problems/decode-string/solutions/1923652/rust-dyn-trait-treenode-solution/
+use std::cell::RefCell;
+use std::fmt::{Debug, Formatter};
+use std::rc::Rc;
+
+type TreeNode = Rc<RefCell<dyn Node>>;
+
+trait Node: Debug + Render {
+    /// Adds a child node to the current node. Child's parent must be initialized by a caller.
+    fn add_child(&mut self, child: TreeNode);
+
+    /// Returns the parent node. Used for traversing the tree.
+    fn get_parent(&self) -> Option<TreeNode>;
+
+    /// Adds a char to a node.
+    fn add_char(&mut self, c: char);
+
+    /// Returns whether node is terminal. Only terminal nodes can be concatenated.
+    fn is_terminal(&self) -> bool;
+}
+
+trait Render {
+    /// Renders the node and its descendants in a string.
+    fn render(&self, buf: &mut String);
+}
+
+#[derive(Default)]
+struct RootNode {
+    children: Vec<TreeNode>,
+}
+
+impl Debug for RootNode {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        let children = self.children.iter()
+            .map(|child| child.borrow())
+            .collect::<Vec<_>>();
+
+        write!(f, "RootNode {{ {:#?} }}", children)
+    }
+}
+
+impl Render for RootNode {
+    fn render(&self, buf: &mut String) {
+        for child in self.children.iter() {
+            child.borrow().render(buf);
+        }
+    }
+}
+
+
+
+impl Node for RootNode {
+    fn add_child(&mut self, child: TreeNode) {
+        self.children.push(child);
+    }
+
+    fn get_parent(&self) -> Option<TreeNode> {
+        None
+    }
+
+    fn add_char(&mut self, c: char) {
+        match self.children.last_mut() {
+            // If the last child is a terminal node, don't create a new node
+            Some(node) if node.borrow_mut().is_terminal() =>
+                node.borrow_mut().add_char(c),
+            _ =>
+                self.children.push(TextNode::new_rc(c.to_string()))
+        }
+    }
+
+    fn is_terminal(&self) -> bool {
+        false
+    }
+}
+
+struct RepetitionsNode {
+    parent: TreeNode,
+    children: Vec<TreeNode>,
+    num_repetitions: usize,
+}
+
+impl Debug for RepetitionsNode {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        let tmp = self.children.iter().map(|child| child.borrow()).collect::<Vec<_>>();
+        write!(f, "RepetitionsNode {{ {} {:#?} }}", self.num_repetitions, tmp)
+    }
+}
+
+impl Render for RepetitionsNode {
+    fn render(&self, buf: &mut String) {
+        for _ in 0..self.num_repetitions {
+            for child in self.children.iter(){
+                child.borrow().render(buf);
+            }
+        }
+    }
+}
+
+impl Node for RepetitionsNode {
+    fn add_child(&mut self, child: TreeNode) {
+        self.children.push(child);
+    }
+
+    fn get_parent(&self) -> Option<TreeNode> {
+        Some(self.parent.clone())
+    }
+
+    fn add_char(&mut self, c: char) {
+        match self.children.last_mut() {
+            Some(node) if node.borrow_mut().is_terminal() =>
+                node.borrow_mut().add_char(c),
+            _ =>
+                self.children.push(TextNode::new_rc(c.to_string()))
+        }
+    }
+
+    fn is_terminal(&self) -> bool {
+        false
+    }
+}
+
+impl RepetitionsNode {
+    fn new_rc(parent: TreeNode, num_repetitions: usize) -> Rc<RefCell<RepetitionsNode>> {
+        Rc::new(RefCell::new(Self {
+            parent,
+            children: Vec::new(),
+            num_repetitions,
+        }))
+    }
+}
+
+struct TextNode {
+    text: String,
+}
+
+impl TextNode {
+    fn new_rc(text: String) -> Rc<RefCell<TextNode>> {
+        Rc::new(RefCell::new(Self {
+            text,
+        }))
+    }
+}
+
+impl Debug for TextNode {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(f, "TextNode {{ {} }}", self.text)
+    }
+}
+
+impl Render for TextNode {
+    fn render(&self, buf: &mut String) {
+        buf.push_str(&self.text);
+    }
+}
+
+impl Node for TextNode {
+    fn add_child(&mut self, _: TreeNode) {
+        panic!("TextNode can't add a child");
+    }
+
+    fn get_parent(&self) -> Option<TreeNode> {
+        None
+    }
+
+    fn add_char(&mut self, c: char) {
+        self.text.push(c);
+    }
+
+    fn is_terminal(&self) -> bool {
+        true
+    }
+}
+
+/// https://leetcode.com/problems/decode-string/
+impl Solution {
+    pub fn decode_string(s: String) -> String {
+        let mut current_count = 0;
+
+        let root: TreeNode = Rc::new(RefCell::new(RootNode::default()));
+        let mut current_node = root.clone();
+
+        for ch in s.chars() {
+            match ch {
+                '[' => {
+                    let node = RepetitionsNode::new_rc(current_node.clone(), current_count);
+                    current_node.borrow_mut().add_child(node.clone());
+                    current_node = node;
+
+                    current_count = 0;
+                }
+                ']' => {
+                    let parent = current_node.borrow().get_parent().unwrap();
+                    current_node = parent;
+                }
+                '0'..='9' => {
+                    current_count = current_count * 10 + (ch as u8 - b'0') as usize
+                }
+                _ => {
+                    current_node.borrow_mut().add_char(ch);
+                }
+            }
+        }
+
+        let mut result = String::new();
+        root.borrow().render(&mut result);
+        result
+    }
+}

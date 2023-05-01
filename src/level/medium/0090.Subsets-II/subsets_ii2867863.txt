@@ -1,0 +1,19 @@
+// https://leetcode.com/problems/subsets-ii/solutions/2867863/rust-bitmask/
+use std::collections::BTreeSet;
+use std::collections::HashSet;
+impl Solution {
+    pub fn subsets_with_dup(mut nums: Vec<i32>) -> Vec<Vec<i32>> {
+        nums.sort();
+        let mut vec: BTreeSet<Vec<i32>> = BTreeSet::new();
+        let le : usize = nums.len();
+        for i in 0..(1 << le) {
+            let mut v: Vec<i32> = Vec::new();
+            for j in 0..le {
+                if i & (1 << j) != 0 { v.push(nums[j]);}
+            }
+            vec.insert(v);
+        }
+        let mut va: Vec<_> = vec.into_iter().collect();
+        return va;
+    }
+}

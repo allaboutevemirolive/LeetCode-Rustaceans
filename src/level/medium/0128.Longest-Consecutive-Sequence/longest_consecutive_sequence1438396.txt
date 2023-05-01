@@ -1,0 +1,17 @@
+// https://leetcode.com/problems/longest-consecutive-sequence/solutions/1438396/rust-o-n/
+pub fn longest_consecutive(nums: Vec<i32>) -> i32 {
+    let sequence: std::collections::HashSet<&i32> = nums.iter().collect();
+
+
+    nums.
+        iter().
+        filter(|x| !sequence.contains(&(*x - 1))).
+        map(|x| {
+            let (mut current_count, mut num) = (0, *x);
+            while sequence.contains(&num) {
+                num += 1;
+                current_count += 1;
+            }
+            current_count
+        }).max().unwrap_or_default()
+}

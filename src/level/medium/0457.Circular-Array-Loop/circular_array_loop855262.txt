@@ -1,0 +1,46 @@
+// https://leetcode.com/problems/circular-array-loop/solutions/855262/clean-fast-rust-solution/
+fn find_first(nonloop: &[bool]) -> Option<usize> {
+    for (i, &x) in nonloop.iter().enumerate() {
+        if !x {
+            return Some(i);
+        }
+    }
+    None
+}
+
+impl Solution {
+    pub fn circular_array_loop(nums: Vec<i32>) -> bool {
+        let n = nums.len();
+        let mut nonloop = vec![false; n];
+        while let Some(cur) = find_first(&nonloop) {
+            let mut visited = vec![cur];
+            let mut last = cur;
+            let direction = nums[cur] >= 0;
+
+            let mut cur = cur;
+            loop {
+                cur += (n as i32 + nums[cur]) as usize;
+                cur %= n;
+                let current_direction = nums[cur] >= 0;
+                if nonloop[cur] || last == cur {
+                    for x in visited {
+                        nonloop[x] = true;
+                    }
+                    nonloop[cur] = true;
+                    break;
+                } else if current_direction != direction {
+                    for x in visited {
+                        nonloop[x] = true;
+                    }
+                    break;
+                } else if visited.iter().find(|&&x| x == cur).is_some() {
+                    return true;
+                } else {
+                    visited.push(cur);
+                    last = cur;
+                }
+            }
+        }
+        false
+    }
+}

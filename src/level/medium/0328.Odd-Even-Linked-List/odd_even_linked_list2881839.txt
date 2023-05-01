@@ -1,0 +1,23 @@
+// https://leetcode.com/problems/odd-even-linked-list/solutions/2881839/rust-with-sub-function/
+type OptNode = Option<Box<ListNode>>;
+
+impl Solution {
+    pub fn odd_even_list(mut head: OptNode) -> OptNode {
+        let mut even_head = head.as_mut()?.next.take();
+        // ? means unwrap(), or a shortcut to return None if head is None
+        let mut odd = &mut head;
+        let mut even = &mut even_head;
+        
+        fn next_m<'a>(node: &'a mut OptNode) -> &'a mut OptNode {
+            &mut node.as_mut().unwrap().next
+        }
+        while even.is_some() && next_m(even).is_some() {
+            *next_m(odd) = next_m(even).take();
+            odd = next_m(odd);
+            *next_m(even) = next_m(odd).take();
+            even = next_m(even);
+        }
+        *next_m(odd) = even_head;
+        head
+    }
+}

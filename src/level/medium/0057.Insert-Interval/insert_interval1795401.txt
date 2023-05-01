@@ -1,0 +1,27 @@
+// https://leetcode.com/problems/insert-interval/solutions/1795401/rust-o-n-log-n/
+use std::cmp::max;
+impl Solution {
+    pub fn insert(intervals: Vec<Vec<i32>>, new_interval: Vec<i32>) -> Vec<Vec<i32>> {
+        let mut itvs = intervals.clone();
+        itvs.push(new_interval);
+        itvs.sort();
+        let mut res = vec![];
+        for mut vec in itvs {
+            // println!("vec is {:#?}", vec);
+            if res.len() == 0 {
+                res.push(vec);
+            } else {
+                if let Some(tail) = res.last_mut() {
+                    // println!("tail is {:#?}", tail);
+                    if vec[0] > tail[1] {
+                        res.push(vec);
+                    } else {
+                        tail[1] = max(vec[1], tail[1]);
+                    }
+                }
+            }
+            // println!("res is {:#?}", res);
+        }
+        res
+    }
+}

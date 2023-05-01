@@ -1,0 +1,35 @@
+// https://leetcode.com/problems/rotate-image/solutions/2310452/rust-solution/
+impl Solution {
+    pub fn rotate(matrix: &mut Vec<Vec<i32>>)
+    {
+        let len = matrix.len();
+
+        let mut ptr_swap = |coord1: (usize, usize), coord2: (usize, usize)|
+        {
+            unsafe
+            {
+                std::ptr::swap
+                            (
+                                &mut matrix[coord1.0][coord1.1] as *mut i32,
+                                &mut matrix[coord2.0][coord2.1] as *mut i32
+                            )
+            };
+        };
+
+        for i in 1..len
+        {
+            let mut j = 0_usize;
+
+            while j < i
+            {
+                ptr_swap((i, j), (j, i));
+                j += 1;
+            }
+        }
+
+        for el in matrix
+        {
+            el.reverse();
+        }
+    }
+}

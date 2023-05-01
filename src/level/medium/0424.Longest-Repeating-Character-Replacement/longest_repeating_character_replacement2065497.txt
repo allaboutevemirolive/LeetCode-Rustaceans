@@ -1,0 +1,33 @@
+// https://leetcode.com/problems/longest-repeating-character-replacement/solutions/2065497/rust-9ms-2-4-mb/
+use std::collections::HashMap;
+impl Solution {
+    pub fn character_replacement(s: String, k: i32) -> i32 {
+        
+        /*
+            O (n) where n is the size of the String
+            O (n) for the extra space we used to collect String to List and               HashMap
+        
+            The idea here is to use sliding window and Hashmap to count the 
+            frequency of each letters, while keeping in the size of the 
+            window. 
+            We only shift L pointer forward (by decrementing frequency) 
+            when our max_replacement > k required;
+            
+        */
+        let mut s: Vec<char> = s.chars().collect();
+        let mut frequency: HashMap<char, usize> = HashMap::new();
+        let (mut l, mut res) = (0, 0);
+        
+        for r in 0..s.len() { 
+            *frequency.entry(s[r]).or_default() +=1;
+            let max_frequency = frequency.values().max().unwrap(); 
+            let max_replacement = (r - l + 1) - max_frequency;
+            if max_replacement > k as usize { 
+                *frequency.entry(s[l]).or_default() -=1;
+                l +=1;
+            }
+            res = usize::max(res, r - l + 1);
+        }
+        res as i32
+    }
+}

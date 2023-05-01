@@ -1,0 +1,30 @@
+// https://leetcode.com/problems/coin-change/solutions/955498/a-rust-dp-solution/
+use std::cmp;
+
+impl Solution {
+    pub fn coin_change(coins: Vec<i32>, amount: i32) -> i32 {
+        let amount = amount as usize;
+    
+        let mut dp_table = vec![None; amount + 1];
+        dp_table[0] = Some(0);
+    
+        for i in 1..=amount {
+            let mut next = None;
+            for coin in &coins {
+                let prev = i as i32 - coin;
+                if prev >= 0  {
+                    next = match (dp_table[prev as usize], next) {
+                        (Some(prev_times), Some(next)) => Some(cmp::min(next, prev_times + 1)),
+                        (Some(prev_times), None) => Some(prev_times + 1),
+                        (None, Some(next)) => Some(next),
+                        (None, None) => None,
+                    }
+                }
+            }
+            dp_table[i] = next;
+        }
+    
+        dp_table[amount].unwrap_or(-1)
+    }
+
+}

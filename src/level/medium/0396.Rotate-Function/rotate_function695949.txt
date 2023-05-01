@@ -1,0 +1,16 @@
+// https://leetcode.com/problems/rotate-function/solutions/695949/rust-simple/
+use std::cmp::max;
+use std::i32;
+
+impl Solution {
+    pub fn max_rotate_function(mut a: Vec<i32>) -> i32 {
+        if a.len() == 0 {
+            return 0;
+        }
+
+        (1..a.len() + 1).map(|_| {
+            a.rotate_right(1);
+            a.iter().enumerate().map(|(i, n)| i as i32 * *n).sum::<i32>()
+        }).fold(i32::MIN, |acc, cur| max(acc, cur))
+    }
+}

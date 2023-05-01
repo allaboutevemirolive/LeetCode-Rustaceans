@@ -1,0 +1,25 @@
+// https://leetcode.com/problems/find-all-duplicates-in-an-array/solutions/3312907/rust-cyclic-sort/
+impl Solution {
+    pub fn find_duplicates(mut nums: Vec<i32>) -> Vec<i32> {
+        fn cyclic_sort_approach(mut nums: Vec<i32>) -> Vec<i32> {
+            let mut duplicates = vec![];
+            let mut i = 0;
+            while i < nums.len() {
+                let correct_idx = nums[i] as usize - 1;
+                if nums[correct_idx] != nums[i] {
+                    nums.swap(correct_idx, i);
+                } else {
+                    i += 1;
+                }
+            }
+
+            for i in 0..nums.len() {
+                if nums[i] as usize - 1 != i {
+                    duplicates.push(nums[i]);
+                }
+            }
+            duplicates
+        }
+        cyclic_sort_approach(nums) 
+    }
+}

@@ -1,0 +1,37 @@
+// https://leetcode.com/problems/smallest-number-in-infinite-set/solutions/3452125/rust-binary-heap-solution/
+use std::collections::BinaryHeap;
+struct SmallestInfiniteSet {
+    min_heap: BinaryHeap<i32>,
+    set: Vec<bool>,
+}
+impl SmallestInfiniteSet {
+    fn new() -> Self {
+        Self {
+            min_heap: BinaryHeap::from(vec![-1]),
+            set: vec![true; 1100],
+        }
+    }
+
+    fn pop_smallest(&mut self) -> i32 {
+        let mut pop = self.min_heap.pop().unwrap();
+        let ans = -pop;
+        self.set[ans as usize] = false;
+        while !self.set[-pop as usize + 1] {
+            pop -= 1;
+        }
+        if !self.min_heap.is_empty() && *self.min_heap.peek().unwrap() == pop - 1 {
+            return ans;
+        }
+        self.min_heap.push(pop - 1);
+        ans
+    }
+
+    fn add_back(&mut self, num: i32) {
+        if !self.set[num as usize] {
+            self.set[num as usize] = true;
+            if -(*self.min_heap.peek().unwrap_or(&(-num))) > num {
+                self.min_heap.push(-num);
+            }
+        }
+    }
+}

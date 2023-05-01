@@ -1,0 +1,48 @@
+// https://leetcode.com/problems/matchsticks-to-square/solutions/1744226/iterative-rust-solution-with-optimal-complexity/
+impl Solution {
+    pub fn makesquare(matchsticks: Vec<i32>) -> bool {
+        let sum: usize = matchsticks.iter().sum::<i32>() as usize;
+        if sum % 4 != 0 {
+            return false;
+        }
+        
+        let all: usize = (1 << matchsticks.len()) - 1; //0b11111
+        // list of masks that forms sum/4
+        let mut cache_1side: Vec<usize> = Vec::with_capacity(all + 1);
+        // can we form 2*sideLen?
+        let mut cache_2side: Vec<bool> = vec![false; all +1];
+
+        for mask1 in 1..all //000001
+        {
+            if Self::sum_by_mask(mask1, &matchsticks) == sum/4
+            {    
+                // find considered mask which gives the same sum/4
+                for mask2 in &cache_1side {
+                    if (mask1 & mask2) == 0 {
+                        if cache_2side[all ^ (mask1 | mask2)] {
+                            return true;
+                        }
+                        cache_2side[mask1 | mask2] = true;
+                    }
+                }
+                cache_1side.push(mask1);
+            }
+        }
+
+        return false;
+    }
+    
+    fn sum_by_mask(mut mask: usize, nums: &Vec<i32>) -> usize {
+        let mut res: usize = 0;
+        let mut i: usize = 0;
+        while mask != 0 {
+            if (mask & 1) != 0 {
+                assert!(i < nums.len());
+                res += nums[i] as usize;
+            }
+            i += 1;
+            mask >>= 1;
+        }
+        return res;
+    }
+}

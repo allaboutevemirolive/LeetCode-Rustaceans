@@ -1,0 +1,125 @@
+// https://leetcode.com/problems/lru-cache/solutions/1582014/unsafe-rust-with-pointers-c-like/
+use std::collections::HashMap;
+use std::ptr;
+
+#[derive(Debug)]
+struct Node {
+    key: i32,
+    val: i32,
+    next: *mut Node,
+    prev: *mut Node,
+}
+
+impl Node {
+    fn new(key: i32, value: i32) -> Self {
+        return Self {
+            key: key,
+            val: value,
+            next: ptr::null_mut(),
+            prev: ptr::null_mut(),
+        };
+    }
+}
+
+#[derive(Debug)]
+struct DLinkList {
+    head: Box<Node>,
+    tail: Box<Node>,
+}
+
+impl DLinkList {
+    fn new() -> Self {
+        let mut head_node = Box::new(Node::new(-1, -1));
+        let mut tail_node = Box::new(Node::new(-2, -2));
+        head_node.next = &mut *tail_node;
+        tail_node.prev = &mut *head_node;
+        return Self {
+            head: head_node,
+            tail: tail_node,
+        };
+    }
+    fn insert(&mut self, node: *mut Node) {
+        unsafe {
+            let next: *mut Node = (*self.head).next;
+            (*next).prev = &mut *node;
+            (*node).next = next;
+            (*self.head).next = &mut *node;
+            (*node).prev = &mut *self.head;
+        }
+    }
+    fn remove(&mut self, node: *mut Node) {
+        unsafe {
+            let next = (*node).next;
+            let prev = (*node).prev;
+            (*prev).next = next;
+            (*next).prev = prev;
+        }
+    }
+    fn remove_from_tail(&mut self) {
+        unsafe {
+            let prev: *mut Node = (*self.tail).prev;
+            (*(*prev).prev).next = &mut *self.tail;
+            (*self.tail).prev = (*prev).prev;
+        }
+    }
+    fn print_list(&self) {
+        let mut cur: *const Node = &*self.head;
+        unsafe {
+            println!("nodes in linked list:");
+            while !cur.is_null() {
+                print!("{}:{}    ", (*cur).key, (*cur).val);
+                cur = (*cur).next;
+            }
+            println!("");
+        }
+    }
+}
+
+struct LRUCache {
+    capacity: i32,
+    cache: HashMap<i32, Box<Node>>,
+    list: DLinkList,
+}
+
+impl LRUCache {
+    fn new(capacity: i32) -> Self {
+        Self {
+            capacity: capacity,
+            cache: HashMap::new(),
+            list: DLinkList::new(),
+        }
+    }
+
+    fn get(&mut self, key: i32) -> i32 {
+        if !self.cache.contains_key(&key) {
+            return -1;
+        }
+        let node: *mut Node = &mut **self.cache.get_mut(&key).unwrap();
+        self.list.remove(node);
+        self.list.insert(node);
+        return unsafe { (*node).val };
+    }
+
+    fn put(&mut self, key: i32, value: i32) {
+        unsafe {
+            let mut new_node = Box::new(Node::new(key, value));
+            let new_node_addr: *mut Node = &mut *new_node;
+            if self.cache.contains_key(&key) {
+                let old_node_addr: *mut Node = &mut **self.cache.get_mut(&key).unwrap();
+                self.list.remove(old_node_addr);
+            } else {
+                if self.cache.len() == self.capacity as usize {
+                    let last_node: *mut Node = (*self.list.tail).prev;
+                    let last_node_key: i32 = (*last_node).key;
+                    self.list.remove_from_tail();
+                    self.cache.remove(&last_node_key);
+                }
+            }
+            self.list.insert(new_node_addr);
+            self.cache.insert(key, new_node);
+        }
+    }
+    fn print_lru(&self) {
+        println!("cache:\n {:?}", &self.cache);
+    }
+}

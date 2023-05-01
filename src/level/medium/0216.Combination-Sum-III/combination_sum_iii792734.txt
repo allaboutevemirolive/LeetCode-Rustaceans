@@ -1,0 +1,32 @@
+// https://leetcode.com/problems/combination-sum-iii/solutions/792734/rust-backtracking-solution/
+
+impl Solution {
+    pub fn combination_sum3(k: i32, n: i32) -> Vec<Vec<i32>> {
+        fn comb(k: usize, n: i32, mut cur: i32, l: &mut Vec<i32>, res: &mut Vec<Vec<i32>>) {
+            if l.len() == k {
+                return;
+            }
+            while cur <= 9 {
+                let mut c = l.clone();
+                let s = c.iter().sum::<i32>() + cur;
+
+                if n < s {
+                    break;
+                }
+                
+                c.push(cur);
+                if s == n && c.len() == k {
+                    res.push(c.clone());
+                    break;
+                }
+    
+                comb(k, n, cur+1, &mut c, res);
+                cur += 1;   
+            }
+        }
+        
+        let (mut l, mut res) = (vec![], vec![]);
+        comb(k as usize, n, 1, &mut l, &mut res);
+        res
+    }
+}

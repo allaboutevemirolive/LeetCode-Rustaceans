@@ -1,0 +1,23 @@
+// https://leetcode.com/problems/rotate-array/solutions/1555813/single-pass-in-place-rust/
+fn rotate(nums: &mut Vec<i32>, k: i32) {
+    if nums.len() > 0 {
+        let length = nums.len();
+        let mut cycle = 0;
+        let mut start = cycle;
+
+        while cycle < length {
+            let mut idx = start;
+            loop {
+                let destination_idx = (idx + k as usize) % length;
+                nums.swap(start, destination_idx);
+                idx = destination_idx;
+                cycle += 1;
+
+                if start == idx {
+                    start += 1;
+                    break
+                }
+            }
+        }
+    }
+}

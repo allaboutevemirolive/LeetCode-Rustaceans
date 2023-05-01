@@ -1,0 +1,18 @@
+// https://leetcode.com/problems/subsets-ii/solutions/746493/rust-cheapest-best/
+use std::collections::HashSet;
+
+impl Solution {
+    pub fn subsets_with_dup(mut nums: Vec<i32>) -> Vec<Vec<i32>> {
+        (0..2usize.pow(nums.len() as u32))
+            .map(|i| {
+                let mut s = nums
+                    .iter()
+                    .enumerate()
+                    .filter(|&(j, _)| (i >> j) % 2 == 1)
+                    .map(|(_, el)| *el)
+                    .collect::<Vec<i32>>();
+                s.sort();
+                s
+            }).collect::<HashSet<Vec<i32>>>().into_iter().collect()
+    }
+}

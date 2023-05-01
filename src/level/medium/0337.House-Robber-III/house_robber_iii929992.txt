@@ -1,0 +1,17 @@
+// https://leetcode.com/problems/house-robber-iii/solutions/929992/minimum-cost-to-move-chips-to-the-same-position-rust-time-o-n-2-0-ms-space-o-n-2-2-1-mb/
+impl Solution {
+    pub fn min_cost_to_move_chips(position: Vec<i32>) -> i32 {
+        let mut min_cost = std::i32::MAX;
+        let max_position = *position.iter().max().unwrap();
+        for destination in 0..max_position {
+            let mut total_cost = 0;
+            for (_, chip_position) in position.iter().enumerate() {
+                let distance_to_destination = (*chip_position - destination).abs();
+                let cost = distance_to_destination % 2;
+                total_cost += cost;
+            }
+            min_cost = std::cmp::min(min_cost, total_cost);
+        }
+        min_cost
+    }
+}

@@ -1,0 +1,34 @@
+// https://leetcode.com/problems/permutations-ii/solutions/2571274/rust-backtracing-swap/
+
+impl Solution {
+    pub fn permute_unique(nums: Vec<i32>) -> Vec<Vec<i32>> {
+        let mut nums = nums;
+        let mut res = Vec::new();
+        res.push(nums.clone());
+        Self::helper(&mut nums, 0, &mut res);
+
+        res
+    }
+
+    fn helper(nums: &mut Vec<i32>, i: usize, res: &mut Vec<Vec<i32>>) {
+        let mut ss = std::collections::HashSet::new();
+        for k in (i)..nums.len() {
+            if k == i {
+                Solution::helper(nums, i + 1, res);
+            } else {
+                if nums[i] == nums[k] {
+                    continue;
+                }
+                if ss.get(&nums[k]).is_some() {
+                    continue;
+                }
+                ss.insert(nums[k]);
+                nums.swap(i, k);
+                res.push(nums.clone());
+                Solution::helper(nums, i + 1, res);
+
+                nums.swap(i, k);
+            }
+        }
+    }
+}

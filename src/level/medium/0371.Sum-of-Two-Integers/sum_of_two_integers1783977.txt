@@ -1,0 +1,5 @@
+// https://leetcode.com/problems/sum-of-two-integers/solutions/1783977/rust-solution/
+    pub fn get_sum(a: i32, b: i32) -> i32 {
+        return [a, b].iter().sum();
+    }
+}

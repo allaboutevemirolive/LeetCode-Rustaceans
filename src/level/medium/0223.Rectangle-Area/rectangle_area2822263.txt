@@ -1,0 +1,18 @@
+// https://leetcode.com/problems/rectangle-area/solutions/2822263/rust-self-explanatory-geometric-solution/
+impl Solution {
+    pub fn compute_area(ax1: i32, ay1: i32, ax2: i32, ay2: i32, bx1: i32, by1: i32, bx2: i32, by2: i32) -> i32 {
+        let area_a = ((ax2 - ax1) * (ay2 - ay1)).abs();
+        let area_b = ((bx2 - bx1) * (by2 - by1)).abs();
+        
+        // 1 above 2, 1 left 2, 1 below 2, 1 right 2
+        if ay1 >= by2 || ax2 <= bx1 || ay2 <= by1 || ax1 >= bx2 {
+            return area_a + area_b;
+        }
+        
+        area_a + area_b - {
+            let w = std::cmp::min(ax2, bx2) - std::cmp::max(ax1, bx1);
+            let h = std::cmp::min(ay2, by2) - std::cmp::max(ay1, by1);
+            h * w
+        }
+    }
+}

@@ -1,0 +1,15 @@
+// https://leetcode.com/problems/best-time-to-buy-and-sell-stock-ii/solutions/2678103/rust-solution/
+   pub fn max_profit(prices: Vec<i32>) -> i32 {
+            let mut profit=0;
+            let mut stock=prices[0];
+            for i in 1..prices.len(){
+                if(prices[i]<=stock){
+                    stock=prices[i];
+                }
+                else{
+                    profit+=prices[i]-stock;
+                    stock=prices[i];
+                }
+            }
+            profit
+        }

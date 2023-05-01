@@ -1,0 +1,27 @@
+// https://leetcode.com/problems/spiral-matrix/solutions/864307/easy-rust-solution/
+impl Solution {
+    pub fn spiral_order(matrix: Vec<Vec<i32>>) -> Vec<i32> {
+        let mut result: Vec<i32> = vec![];
+        if matrix.len() <= 0 {
+            return result;
+        }
+           
+        let compass = vec![vec![0, 1], vec![1, 0], vec![0, -1], vec![-1, 0]];
+        let mut direction = 0;
+        let mut steps = vec![matrix[0].len(), matrix.len() - 1];
+        let mut row = 0;
+        let mut col = -1;
+        
+        while steps[direction % 2] > 0 {
+            for _ in 0..steps[direction % 2] {
+                row += compass[direction][0];
+                col += compass[direction][1];
+                result.push(matrix[row as usize][col as usize]);
+            }
+            steps[direction % 2] -= 1;
+            direction = (direction + 1) % 4;
+        }
+        
+        return result;
+    }
+}

@@ -1,0 +1,48 @@
+// https://leetcode.com/problems/decode-string/solutions/942495/rust-recursive-with-slices-easy-solution-0-ms-2-1-mb/
+pub fn decode_string(s: String) -> String {
+	Self::multiply(&s[..], 1)
+}
+
+fn multiply(s: &str, count: usize) -> String {
+	let mut res = String::with_capacity(s.len() * count);
+
+	let mut bracket_count = 0;
+	let mut chunk_start = 0;
+	let mut multiplier_start = 0;
+	let mut digits = String::new();
+	for (i, ch) in s.chars().enumerate() {
+		match ch {
+			'0'..='9' => {
+				if bracket_count == 0 {
+					if digits.len() == 0 {
+						multiplier_start = i;
+					}
+					digits.push(ch);
+				}
+			}
+			'[' => {
+				bracket_count += 1;
+			}
+			']' => {
+				bracket_count -= 1;
+				if bracket_count == 0 {
+					res.push_str(&s[chunk_start..multiplier_start]);
+					res.extend(
+						Self::multiply(
+							&s[multiplier_start + digits.len() + 1..i],
+							digits.parse().unwrap(),
+						)
+						.chars(),
+					);
+					digits.clear();
+					chunk_start = i + 1;
+				}
+			}
+			_ => (),
+		}
+	}
+
+	res.push_str(&s[chunk_start..]);
+
+	res.repeat(count)
+}

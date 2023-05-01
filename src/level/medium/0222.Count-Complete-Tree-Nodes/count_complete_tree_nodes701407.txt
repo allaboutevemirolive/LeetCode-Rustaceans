@@ -1,0 +1,50 @@
+// https://leetcode.com/problems/count-complete-tree-nodes/solutions/701407/rust-solution-with-best-time-o-log-n/
+use std::cell::RefCell;
+use std::rc::Rc;
+impl Solution {
+    pub fn count_nodes(root: Option<Rc<RefCell<TreeNode>>>) -> i32 {
+        if root.is_none() {
+            return 0;
+        }
+        
+        count_nodes(root)
+    }
+}
+
+fn count_nodes(root: Option<Rc<RefCell<TreeNode>>>) -> i32 {
+    let height = get_height(&root);
+    let missing_nodes = count_missing_nodes(&root, height);
+
+    2i32.pow(height) - missing_nodes - 1
+}
+
+fn get_height(node: &Option<Rc<RefCell<TreeNode>>>) -> u32 {
+    match node {
+        Some(x) => get_height(&x.borrow().left) + 1,
+        None => 0,
+    }
+}
+
+fn count_missing_nodes(node: &Option<Rc<RefCell<TreeNode>>>, height: u32) -> i32 {
+    let node = if let Some(x) = node {
+        Rc::clone(x)
+    } else {
+        return 1;
+    };
+
+    if height <= 1 {
+        return 0;
+    }
+
+    let right = &node.borrow().right;
+    let right_count = count_missing_nodes(right, height - 1);
+
+    if right_count < 2i32.pow(height - 2) {
+        right_count
+    } else {
+        let left = &node.borrow().left;
+        let left_count = count_missing_nodes(left, height - 1);
+
+        left_count + right_count
+    }
+}

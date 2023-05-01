@@ -1,0 +1,9 @@
+// https://leetcode.com/problems/unique-paths/solutions/2362251/rust-basic-ncr/
+impl Solution {
+    pub fn unique_paths(m: i32, n: i32) -> i32 {
+        // (m + n - 2) choose (m - 1)
+        let r = (m - 1).min(n - 1) as i64;
+        let other = (m + n - 2) as i64 - r;
+        (1..=r).fold(1, |acc, x| acc * (x + other) / x) as i32
+    }
+}

@@ -1,0 +1,71 @@
+// https://leetcode.com/problems/repeated-dna-sequences/solutions/542730/rust-4ms-solution-clean-code/
+use std::collections::HashMap;
+
+impl Solution {
+    pub fn find_repeated_dna_sequences(s: String) -> Vec<String> {
+        let mut hash_map: HashMap<u32, u32> = HashMap::new();
+        let mut hash = 0;
+
+        for ind in 0..s.len() {
+            Solution::update_hash(ind, &s, &mut hash);
+            *hash_map.entry(hash).or_insert(0) += 1;
+        }
+
+        let mut answer: Vec<String> = Vec::new();
+        for (key, value) in hash_map {
+            if value > 1 {
+                let dna_str = Solution::decrypt(key);
+                answer.push(dna_str);
+            }
+        }
+
+        answer
+    }
+
+    fn update_hash(ind: usize, s: &str, hash: &mut u32) {
+        *hash <<= 2;
+
+        if ind >= 10 {
+            let val_to_delete = Solution::convert_dna_char(s.as_bytes()[ind - 10] as char);
+            let shift = 2 * 10;
+            *hash -= val_to_delete << shift;
+        }
+
+        let val_to_add = Solution::convert_dna_char(s.as_bytes()[ind] as char);
+        *hash += val_to_add;
+    }
+
+    fn decrypt(hash: u32) -> String {
+        let mut dna_str = String::new();
+
+        for ind in 0..10 {
+            let shift = 2 * ind;
+            let mask = 0b11 << shift;
+            let val = (hash & mask) >> shift;
+
+            dna_str.push(Solution::deconvert_dna_char(val));
+        }
+
+        dna_str
+    }
+
+    fn convert_dna_char(chr: char) -> u32 {
+        match chr {
+            'A' => 0,
+            'C' => 1,
+            'G' => 2,
+            'T' => 3,
+            _ => panic!("Invalid dna char: {}", chr),
+        }
+    }
+
+    fn deconvert_dna_char(char_hash: u32) -> char {
+        match char_hash {
+            0 => 'A',
+            1 => 'C',
+            2 => 'G',
+            3 => 'T',
+            _ => panic!("Invalid dna hash: {}", char_hash),
+        }
+    }
+}

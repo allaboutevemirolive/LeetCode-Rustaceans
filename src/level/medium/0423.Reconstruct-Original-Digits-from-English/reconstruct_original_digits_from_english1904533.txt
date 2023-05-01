@@ -1,0 +1,33 @@
+// https://leetcode.com/problems/reconstruct-original-digits-from-english/solutions/1904533/rust/
+fn original_digits(string: String) -> String {
+	let mut acc = string.chars().fold([0; 10], |mut acc, ch| {
+		if let Some(index) = match ch {
+			'z' => Some(0),
+			'w' => Some(2),
+			'x' => Some(6),
+			's' => Some(7),
+			'g' => Some(8),
+			'u' => Some(4),
+			'f' => Some(5),
+			'h' => Some(3),
+			'i' => Some(9),
+			'o' => Some(1),
+			_ => None,
+		} {
+			acc[index] += 1;
+		}
+		acc
+	});
+	acc[7] -= acc[6];
+	acc[5] -= acc[4];
+	acc[3] -= acc[8];
+	acc[9] = acc[9] - acc[8] - acc[5] - acc[6];
+	acc[1] = acc[1] - acc[0] - acc[2] - acc[4];
+
+	acc
+		.iter()
+		.cloned()
+		.enumerate()
+		.flat_map(|(index, repeat)| std::iter::repeat(('0' as u8 + index as u8) as char).take(repeat))
+		.collect()
+}

@@ -1,0 +1,27 @@
+// https://leetcode.com/problems/letter-combinations-of-a-phone-number/solutions/1720501/rust-iterative/
+	pub fn letter_combinations(digits: String) -> Vec<String> {
+        let mapper = vec![vec![], vec![], vec!["a","b","c"], vec!["d","e","f"], 
+		vec!["g","h","i"], vec!["j","k","l"], vec!["m","n","o"], vec!["p","q","r","s"], 
+		vec!["t","u","v"], vec!["w","x","y","z"]];
+        let mut vec: Vec<String> = Vec::new();
+        let num_vec: Vec<char> = digits.chars().collect();
+        vec.push(String::from(""));
+        
+        for num in num_vec {
+            let mut v = Vec::new();
+            for prev in vec {
+                for ch in &mapper[num as usize - '0' as usize] {
+                    let mut st = prev.clone();
+                    st.push_str(ch);
+                    v.push(st);
+                }
+            }
+            vec = v;
+        }
+		
+        if vec.len() == 1 {
+            vec.remove(0);
+        }
+		
+        vec
+    }

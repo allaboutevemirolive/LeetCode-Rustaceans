@@ -1,0 +1,20 @@
+// https://leetcode.com/problems/find-the-duplicate-number/solutions/3134437/rust-binary-search-solution/
+impl Solution {
+    pub fn find_duplicate(nums: Vec<i32>) -> i32 {
+        let mut lo = 1;
+        let mut hi = nums.len() as i32;
+        while lo < hi {
+            let mid = (lo + hi) >> 1;
+            let count = nums.iter()
+                .filter(|&&x| x >= lo && x <= mid)
+                .count() as i32;
+            if count > mid - lo + 1 {
+                hi = mid;
+            }
+            else {
+                lo = mid + 1;
+            }
+        }
+        lo
+    }
+}

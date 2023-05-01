@@ -1,0 +1,19 @@
+// https://leetcode.com/problems/arithmetic-slices/solutions/1916144/rust-ver/
+impl Solution {
+    pub fn number_of_arithmetic_slices(nums: Vec<i32>) -> i32 {
+       if nums.len() < 3 {
+            return 0;
+        }
+        let mut sum = 0;
+        let mut last = 0;
+        for triple in nums.windows(3) {
+            if triple[2] - triple[1] == triple[1] - triple[0] {
+                sum += last + 1;
+                last = last + 1;
+            } else {
+                last = 0;
+            }
+        }
+        sum
+    }
+}

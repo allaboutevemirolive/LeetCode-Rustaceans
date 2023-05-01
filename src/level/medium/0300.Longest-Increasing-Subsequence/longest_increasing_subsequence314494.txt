@@ -1,0 +1,19 @@
+// https://leetcode.com/problems/longest-increasing-subsequence/solutions/314494/rust-binary-search-o-nlogn-solution-and-dp-o-n2-solution/
+impl Solution {
+    pub fn length_of_lis(nums: Vec<i32>) -> i32 {
+        if nums.len() <= 1 { return nums.len() as i32; }
+        
+        let mut lis = vec![];
+        lis.push(nums[0]);
+        
+        for i in 1..nums.len() {
+            match lis.binary_search(&nums[i]) {
+                Ok(n) => (),
+                Err(n) => {
+                    if n >= lis.len() { lis.push(nums[i]); } else { lis[n] = nums[i]; }
+                },
+            }
+        }
+        lis.len() as i32
+    }
+}

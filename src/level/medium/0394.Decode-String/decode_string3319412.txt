@@ -1,0 +1,48 @@
+// https://leetcode.com/problems/decode-string/solutions/3319412/rust-recursive-solution-0ms/
+impl Solution {
+    pub fn decode_string(s: String) -> String {
+        fn rec_parse(s: &Vec<char>, mut i: usize, stack: &mut Vec<String>) {
+            if i >= s.len() {
+                return;
+            }
+            match s[i] {
+                _ if s[i].is_alphabetic() => {
+                    let d_start = i;
+                    while i < s.len() && s[i].is_alphabetic() {
+                        i += 1;
+                    }
+                    let string = s[d_start..i].iter().copied().collect::<String>();
+                    stack.push(string);
+                    rec_parse(s, i, stack);
+                }
+                _ if s[i].is_ascii_digit() => {
+                    let d_start = i;
+                    while i < s.len() && s[i].is_ascii_digit() {
+                        i += 1;
+                    }
+                    let repeat_num = s[d_start..i].iter().copied().collect::<String>();
+                    stack.push(repeat_num);
+                    rec_parse(s, i + 1, stack);
+                }
+                '[' => {
+                    rec_parse(s, i + 1, stack);
+                }
+                ']' => {
+                    let mut string = "".to_string();
+                    while stack.last().unwrap().parse::<usize>().is_err() {
+                        string = format!("{}{}", stack.pop().unwrap().as_str(), string);
+                    }
+                    let num = stack.pop().unwrap().parse::<usize>().unwrap();
+                    stack.push(string.repeat(num));
+                    rec_parse(s, i + 1, stack);
+                }
+                _ => panic!(),
+            }
+        }
+
+        let mut stack = vec![];
+        let s = s.chars().collect::<Vec<_>>();
+        rec_parse(&s, 0, &mut stack);
+        stack.join("")
+    }
+}

@@ -1,0 +1,28 @@
+// https://leetcode.com/problems/matchsticks-to-square/solutions/2325705/rust-golang-accepted-hashmap/
+use std::collections::HashMap;
+impl Solution {
+  pub fn makesquare(matchsticks: Vec<i32>) -> bool {
+	  let sum = matchsticks.iter().fold(0, |acc, x| acc+x);
+	  if sum%4 != 0 || matchsticks.len() < 4 {return false;}
+	  let mut dp: HashMap<usize,bool> = HashMap::new();
+	  Self::f(0, 4, sum/4,0,&matchsticks, 0, &mut dp)
+  }
+  fn f(i: usize, k: i32, sum: i32, cur_sum: i32, sticks: &Vec<i32>, mut mask: usize, dp: &mut HashMap<usize,bool>)-> bool {
+	if k==0 {return true;}
+	if let Some(ans) = dp.get(&mask){return ans.clone()};
+	if sum == cur_sum {return Self::f(0, k-1, sum, 0, sticks, mask,dp);}
+	for ind in i..sticks.len() {
+	  if mask & (1<<ind) != 0 {continue;}
+	  if cur_sum + sticks[ind] <= sum {
+		mask |= 1<<ind;
+		if Self::f(i+1, k, sum, cur_sum+sticks[ind], sticks, mask, dp) {
+			dp.insert(mask.clone(),true);
+			return true;
+		}
+		mask ^= 1<<ind;
+	  }
+	}
+	dp.insert(mask.clone(), false);
+	false
+  }
+}

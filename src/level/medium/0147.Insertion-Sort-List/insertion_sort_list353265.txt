@@ -1,0 +1,80 @@
+// https://leetcode.com/problems/insertion-sort-list/solutions/353265/rust-8ms-2-8mb/
+impl Solution {
+    pub fn insertion_sort_list(head: Option<Box<ListNode>>) -> Option<Box<ListNode>> {
+        fn seperate_list(head: &mut Box<ListNode>) -> Option<Box<ListNode>> {
+            //            let mut fast = head.next.as_ref().unwrap().as_ref();
+
+            let fast_helper = head.clone();
+            let mut fast: &ListNode = fast_helper.as_ref();
+            let mut slow: &mut ListNode = head.as_mut();
+            while fast.next.is_some() && fast.next.as_ref().unwrap().next.is_some() {
+                slow = slow
+                    .next // Option<Box<ListNode>>
+                    .as_mut() // Option<& mut Box<ListNode>>
+                    .unwrap() // &mut Box<ListNode>
+                    .as_mut(); // &mut ListNode
+                fast = fast
+                    .next // Option<Box<ListNode>>  .... ①
+                    .as_ref() // Option<&Box<ListNode>> .... ②
+                    .unwrap() // &Box<ListNode>         .... ③
+                    .next // as ①
+                    .as_ref() // as ②
+                    .unwrap() // as ③
+                    .as_ref(); // &ListNode
+            }
+            let pivot = slow.next.take();
+            slow.next = None;
+            pivot
+        }
+
+        fn merge_list(
+            mut head_1: Option<Box<ListNode>>,
+            mut head_2: Option<Box<ListNode>>,
+        ) -> Option<Box<ListNode>> {
+            //            let (mut head_1, mut head_2) = (&mut head_1, &mut head_2);
+            let mut dummy = Box::new(ListNode::new(-1));
+            let mut cur = &mut dummy;
+            while head_1.is_some() && head_2.is_some() {
+                // println!("{:?}-------{:?}-----{:?}", head_1, head_2, cur);
+                if head_1.as_ref().unwrap().val < head_2.as_ref().unwrap().val {
+                    let mut node1 = head_1.unwrap(); //unwrap().next;
+                    let next = node1.next.take();
+                    cur.next = Some(node1);
+                    head_1 = next;
+                    cur = cur.next.as_mut().unwrap();
+                } else {
+                    let mut node2 = head_2.unwrap();
+                    let next = node2.next.take();
+                    cur.next = Some(node2);
+                    head_2 = next;
+                    cur = cur.next.as_mut().unwrap();
+                }
+            }
+
+            if head_1.is_some() {
+                cur.next = head_1;
+            } else if head_2.is_some() {
+                cur.next = head_2;
+            }
+
+            dummy.next
+        }
+        
+        
+        if head.is_none() {
+            return head;
+        }
+
+        let mut head = head;
+        let pivot = seperate_list(head.as_mut().unwrap());
+        
+        if pivot.is_none() {
+            return head;
+        }
+
+        let head_1 = Self::insertion_sort_list(head);
+        let head_2 = Self::insertion_sort_list(pivot);
+
+        merge_list(head_1, head_2)
+    }
+}

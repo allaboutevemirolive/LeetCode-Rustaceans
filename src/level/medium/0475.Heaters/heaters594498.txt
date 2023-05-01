@@ -1,0 +1,9 @@
+// https://leetcode.com/problems/heaters/solutions/594498/rust-simple-iterator-solution-but-slow/
+houses.iter()
+		.map(|h| heaters.iter()
+								.map(|ht| (h-ht).abs())
+								.min() // the smallest absolute difference between current house and each heater will be the closest heater to that house
+								.unwrap_or(std::i32::MIN) // if heaters is empty return the smallest possible value
+				)
+		.max() // to cover all the houses the radius must be the largest minimal distance between any house and its closest heater
+		.unwrap_or(std::i32::MAX) // if houses is empty return the largest possible value

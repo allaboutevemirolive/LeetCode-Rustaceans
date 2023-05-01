@@ -1,0 +1,119 @@
+// https://leetcode.com/problems/lru-cache/solutions/2387326/rust-use-wake-pointer/
+use std::{collections::HashMap, cell::RefCell, rc::Rc, rc::Weak, borrow::{Borrow, BorrowMut}};
+
+
+struct LRUCache {
+    capacity: usize,
+    nodes: HashMap<i32, Rc<RefCell<Node>>>,
+    head: Option<Rc<RefCell<Node>>>,
+    tail: Option<Rc<RefCell<Node>>>,
+}
+
+struct Node {
+    key: i32,
+    val: i32,
+    parent: Option<Weak<RefCell<Node>>>,
+    children: Option<Rc<RefCell<Node>>>,
+}
+
+impl LRUCache {
+    fn new(capacity: i32) -> Self {
+        let capacity = capacity as usize;
+        let head = Some(Rc::new(RefCell::new(Node {
+            key: -1,
+            val: -1,
+            parent: None,
+            children: None,
+        })));
+        let nodes = HashMap::with_capacity(capacity + 1);
+        LRUCache { capacity: capacity, nodes: nodes, head: head, tail: None }
+    }
+    fn get(&mut self, key: i32) -> i32 {
+        if let Some(node) = self.nodes.get(&key) {
+            let mut anode = node.as_ref().borrow_mut();
+            let val = anode.val;
+            // if have one item, drectly return to the val
+            if anode.children.is_none() {
+                return val;
+            }
+            
+            {
+            // get pre node
+            let pre_node = anode.parent.take().unwrap().upgrade().unwrap();
+
+            //get next node and next code'parent point to pre node
+            let next_node = anode.children.take().unwrap();
+            next_node.as_ref().borrow_mut().parent = Some(Rc::downgrade(&pre_node));
+
+            // pre_node's children point to next node
+            pre_node.as_ref().borrow_mut().children = Some(next_node);
+
+            }
+            
+            // add node to tail
+            anode.parent = Some(Rc::downgrade(self.tail.as_ref().unwrap()));
+            self.tail.as_ref().unwrap().as_ref().borrow_mut().children = Some(Rc::clone(node));
+
+            // change node as tail
+            self.tail = Some(Rc::clone(node));
+            drop(anode);
+            return val;
+        }else{
+            return -1;
+        }
+    }
+
+    fn put(&mut self, key: i32, value: i32) {
+        if let Some(node) = self.nodes.get(&key) {
+            node.as_ref().borrow_mut().val = value;
+            self.get(key); 
+            return ;
+        }else{
+            let node = Rc::new(RefCell::new(Node {
+                key: key,
+                val: value,
+                parent: None,
+                children: None, 
+            }));
+            // insert node to nodes
+            self.nodes.insert(key, Rc::clone(&node));
+
+            // if nodes hava none item
+            if self.nodes.len() == 1 {
+                // node's parent point to self.head and head'children point to the node
+                node.as_ref().borrow_mut().parent = Some(Rc::downgrade(self.head.as_ref().unwrap()));   
+                self.head.as_ref().unwrap().as_ref().borrow_mut().children = Some(Rc::clone(&node));
+                
+                // the new node as tail
+                self.tail = Some(node); 
+            }else{
+                // appent node to the tail
+                node.as_ref().borrow_mut().parent = Some(Rc::downgrade(self.tail.as_ref().unwrap()));
+                self.tail.as_ref().unwrap().as_ref().borrow_mut().children = Some(Rc::clone(&node));
+
+                // set new node as tail
+                self.tail = Some(node); 
+                
+                if self.nodes.len() > self.capacity {
+                    // get the first node
+                    let first_node = self.head.as_ref().unwrap().as_ref().borrow_mut().children.take().unwrap();
+                    first_node.as_ref().borrow_mut().parent = None;
+
+                    // get second node and second'parent point to head
+                    let second_node = first_node.as_ref().borrow_mut().children.take().unwrap();
+                    second_node.as_ref().borrow_mut().parent = Some(Rc::downgrade(self.head.as_ref().unwrap()));
+
+                    // head connect to second node
+                    self.head.as_ref().unwrap().as_ref().borrow_mut().children = Some(second_node);
+
+                    // from nodes remove first node
+                    let del_key = first_node.as_ref().borrow().key;
+                    self.nodes.remove(&del_key);
+                    // drop first node
+                    drop(first_node);
+                }
+            }
+        }
+    }
+} 
+

@@ -1,0 +1,21 @@
+// https://leetcode.com/problems/partition-equal-subset-sum/solutions/691235/rust-simple-solution/
+impl Solution {
+    pub fn can_partition(ns: Vec<i32>) -> bool {
+        let sum: i32 = ns.iter().sum();
+        if sum % 2 == 1 {
+            return false;
+        }
+        let target = sum / 2;
+        let max_idx = target as usize;
+        let mut dp = vec![false; max_idx + 1];
+        dp[0] = true;
+        for n in ns {
+            for j in (1..=max_idx).rev() {
+                if j >= n as usize && !dp[j] {
+                    dp[j] = dp[j - n as usize]
+                }
+            }
+        }
+        dp[max_idx]
+    }
+}

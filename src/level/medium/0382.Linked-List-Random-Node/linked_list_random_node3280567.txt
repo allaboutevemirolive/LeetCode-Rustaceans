@@ -1,0 +1,42 @@
+// https://leetcode.com/problems/linked-list-random-node/solutions/3280567/rust-elixir-splitting-the-list/
+use rand::prelude::*;
+
+type OptNode = Option<Box<ListNode>>;
+
+const LIST_COUNT: usize = 16;
+
+struct Solution {
+    v: Vec<OptNode>,
+    random: ThreadRng,
+}
+
+impl Solution {
+    fn new(mut head: OptNode) -> Self {
+        let mut v: Vec<OptNode> = vec![None; LIST_COUNT];
+        let mut random = rand::thread_rng();
+        while let Some(mut n) = head {
+            head = n.next;
+            let i = random.gen_range(0, LIST_COUNT);
+            n.next = v[i].take();
+            v[i] = Some(n);
+        }
+        Self { v, random }
+    }
+    
+    fn get_random(&mut self) -> i32 {
+        if self.v[0].is_none() {
+            let mut i = self.random.gen_range(1, LIST_COUNT);
+            while self.v[i].is_none() {
+                i = i % (LIST_COUNT - 1) + 1;
+            }
+            self.v[0] = self.v[i].take();
+        }
+        let mut n = self.v[0].take().unwrap();
+        let ans = n.val;
+        self.v[0] = n.next;
+        let i = self.random.gen_range(1, LIST_COUNT);
+        n.next = self.v[i].take();
+        self.v[i] = Some(n);
+        ans
+    }
+}

@@ -1,0 +1,16 @@
+// https://leetcode.com/problems/repeated-dna-sequences/solutions/3171512/rust-hashmap-and-windows-solution/
+use std::collections::HashMap;
+
+impl Solution {
+    pub fn find_repeated_dna_sequences(s: String) -> Vec<String> {
+        let mut h = HashMap::new();
+        let s : Vec<char> = s.chars().collect();
+        for p in s.windows(10) {
+            *h.entry(p.to_vec()).or_insert(0) += 1;
+        }
+        h.iter().filter_map(|(k, &v)| {match v > 1{
+            true => Some(k.into_iter().collect()),
+            false => None,
+        }}).collect()
+    }
+}

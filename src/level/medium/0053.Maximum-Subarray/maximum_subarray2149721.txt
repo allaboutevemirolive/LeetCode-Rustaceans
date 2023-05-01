@@ -1,0 +1,11 @@
+// https://leetcode.com/problems/maximum-subarray/solutions/2149721/rust/
+let mut local_max = 0;
+        let mut global_max = i32::MIN;
+        
+        for ind in 0..nums.len() {
+            local_max = std::cmp::max(nums[ind], nums[ind] + local_max);
+            if local_max > global_max {
+                global_max = local_max;
+            }
+        }
+        global_max

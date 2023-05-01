@@ -1,0 +1,29 @@
+// https://leetcode.com/problems/super-pow/solutions/1865079/rust-solution-o-1-space-4ms-beats-100/
+const MOD: i64 = 1337;
+impl Solution {
+    pub fn super_pow(a: i32, mut b: Vec<i32>) -> i32 {
+        let a = a as i64 % MOD;
+        if a == 1 {
+            return 1;
+        }
+        
+        if a == MOD {
+            return 0;
+        }
+        
+        b.into_iter()
+        .map(|b| b as i64)
+        .fold(1, |mut prev, mut cur| {
+            prev = (prev * prev) % MOD; // square
+            let prev_4 = prev * prev % MOD; // power 4
+            prev = (prev * (prev_4 * prev_4)) % MOD; // power 10
+            
+            (prev * 
+                format!("{cur:b}").chars()
+                .rev()
+                .map(|ch| ch as u8 - '0' as u8)
+                .fold((1, a), |(res, powa), bit| ((res * if bit == 0 { 1 } else { powa }) % MOD, (powa * powa) % MOD) ).0 
+            ) % MOD
+        }) as i32
+    }
+}

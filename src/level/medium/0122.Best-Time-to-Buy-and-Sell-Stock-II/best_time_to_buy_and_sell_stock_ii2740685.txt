@@ -1,0 +1,12 @@
+// https://leetcode.com/problems/best-time-to-buy-and-sell-stock-ii/solutions/2740685/0ms-rust-solution/
+    let mut sum: i32 = 0;
+    for low in 0..prices.len()-1 {
+        for high in low+1..prices.len() {
+            if prices[high] > prices[low] {
+                sum = sum + prices[high] - prices[low];
+            }
+            break;
+        }
+    }
+    sum
+}

@@ -1,0 +1,27 @@
+// https://leetcode.com/problems/reverse-integer/solutions/1967449/rust-solution/
+impl Solution {
+    pub fn reverse(x: i32) -> i32 {
+        match x < 0 {
+            true => {
+                -1 * {
+                    x.to_string()
+                        .chars()
+                        .skip(1)
+                        .collect::<String>()
+                        .chars()
+                        .rev()
+                        .collect::<String>()
+                        .parse::<i32>()
+                        .unwrap_or_default()
+                }
+            }
+            false => x
+                .to_string()
+                .chars()
+                .rev()
+                .collect::<String>()
+                .parse::<i32>()
+                .unwrap_or_default(),
+        }
+    }
+}

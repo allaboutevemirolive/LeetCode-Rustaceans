@@ -1,0 +1,19 @@
+// https://leetcode.com/problems/zigzag-conversion/solutions/2269599/rust/
+fn convert(s: String, num_rows: i32) -> String {
+	let diagonal_height = 0.max(num_rows - 2) as usize;
+	let num_rows = num_rows as usize;
+
+	let pattern = (0..num_rows)
+		.chain((0..diagonal_height).map(|index| num_rows - 2 - index));
+
+	s
+		.chars()
+		.zip(pattern.cycle())
+		.fold(vec![vec![]; num_rows], |mut bufs, (ch, index)| {
+			bufs[index].push(ch);
+			bufs
+		})
+		.into_iter()
+		.flatten()
+		.collect()
+}

@@ -1,0 +1,79 @@
+// https://leetcode.com/problems/rotate-list/solutions/885653/modular-rust-solution-60-lines-of-code/
+/*
+// Definition for singly-linked list.
+#[derive(PartialEq, Eq, Clone, Debug)]
+pub struct ListNode {
+    pub val: i32,
+    pub next: Option<Box<ListNode>>,
+}
+
+impl ListNode {
+    #[inline]
+    pub fn new(val: i32) -> Self {
+        ListNode { next: None, val }
+    }
+}
+
+pub struct Solution;
+*/
+
+type Node = ListNode;
+
+type Link = Option<Box<Node>>;
+
+impl Solution {
+    pub fn rotate_right(head: Link, k: i32) -> Link {
+        let mut list = List { head };
+        list.rotate(k as isize);
+        list.head
+    }
+}
+
+struct List {
+    head: Link,
+}
+
+impl List {
+    fn rotate(&mut self, k: isize) {
+        let n = self.len();
+        if n == 0 {
+            return;
+        }
+        let k = k.rem_euclid(n as isize) as usize;
+        if k == 0 {
+            return;
+        }
+
+        debug_assert!(0 < k && k < n);
+
+        let mut old_head = self.head.take().unwrap();
+
+        let new_tail = old_head.get_node(n - k - 1).unwrap();
+        let mut new_head = new_tail.next.take().unwrap();
+        let tail = new_head.get_node(k - 1).unwrap();
+        tail.next = Some(old_head);
+
+        self.head = Some(new_head);
+    }
+
+    fn len(&self) -> usize {
+        let mut count = 0;
+        let mut link = &self.head;
+        while let Some(node) = link {
+            count += 1;
+            link = &node.next;
+        }
+        count
+    }
+}
+
+impl Node {
+    /// Walk `i` steps forward in the linked list.
+    fn get_node(&mut self, i: usize) -> Option<&mut Node> {
+        let mut node = self;
+        for _ in 0..i {
+            node = node.next.as_mut()?;
+        }
+        Some(node)
+    }
+}

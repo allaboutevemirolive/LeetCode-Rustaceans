@@ -1,0 +1,32 @@
+// https://leetcode.com/problems/combination-sum-iv/solutions/2164341/rust-divide-and-merge-dfs-memo-o-n-m/
+use std::collections::HashMap;
+
+pub fn dfs(arr: &Vec<i32>, left: i32, f: &mut HashMap<i32, i32>) -> i32 {
+    let mut ans = 0;
+    if left == 0 {
+        return 1;
+    } else if left < 0 {
+        return 0;
+    }
+    if f.contains_key(&left) {
+        return f[&left];
+    }
+    let n = arr.len();
+    for i in 0..n {
+        let v = arr[i];
+        // println!("i {i}, v {v}, left {left}");
+        ans += dfs(arr, left - v, f);
+    }
+    f.insert(left, ans);
+    ans
+}
+
+impl Solution {
+    pub fn combination_sum4(nums: Vec<i32>, target: i32) -> i32 {
+        let mut arr = nums;
+        arr.sort();
+        let mut f = HashMap::new();
+        let ans = dfs(&arr, target, &mut f);
+        ans
+    }
+}

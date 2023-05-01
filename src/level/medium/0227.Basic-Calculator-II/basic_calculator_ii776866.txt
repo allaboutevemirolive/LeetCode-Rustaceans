@@ -1,0 +1,92 @@
+// https://leetcode.com/problems/basic-calculator-ii/solutions/776866/rust-solution/
+enum Token {
+    Int(i32),
+    Op(char),
+}
+
+fn next_token(s: &[u8], pos: &mut usize) -> Option<Token> {
+    while *pos != s.len() && s[*pos] == ' ' as u8 {
+        *pos += 1;
+    }
+    if *pos == s.len() {
+        return None;
+    }
+    let mut ret = None;
+    while *pos != s.len() {
+        let c = s[*pos] as char;
+        match (&mut ret, c.is_digit(10)) {
+            (None, true) => {
+                ret = Some(Token::Int(c as i32 - '0' as i32));
+            },
+            (None, false) => {
+                ret = Some(Token::Op(c));
+                *pos += 1;
+                return ret;
+            },
+            (Some(Token::Int(_)), false) | (Some(Token::Op(_)), true) => {
+                return ret;
+            },
+            (Some(Token::Int(v)), true) => {
+                *v = *v * 10 + (c as i32 - '0' as i32);
+            },
+            _ => {
+                unreachable!();
+            }
+        }
+        *pos += 1;
+    }
+    ret
+}
+
+fn step(l: i32, r: i32, o: char) -> i32 {
+    match o {
+        '+' => l + r,
+        '*' => l * r,
+        '/' => l / r,
+        '-' => l - r,
+        _ => unreachable!(),
+    }
+}
+
+fn get_priority(op: char) -> i32 {
+    match op {
+        '*' | '/' => 2,
+        '+' | '-' => 1,
+        _ => unreachable!(),
+    }
+}
+
+
+impl Solution {
+pub fn calculate(s: String) -> i32 {
+    let mut op_st = vec![];
+    let mut opnd_st = vec![];
+    let mut pos = 0;
+    while let Some(token) = next_token(s.as_bytes(), &mut pos) {
+        match token {
+            Token::Int(v) => {
+                opnd_st.push(v);
+            },
+            Token::Op(o) => {
+                while let Some(&top_op) = op_st.last() {
+                    if get_priority(top_op) < get_priority(o) {
+                        break;
+                    }
+                    op_st.pop();
+                    
+                    let r = opnd_st.pop().unwrap();
+                    let l = opnd_st.pop().unwrap();
+                    opnd_st.push(step(l, r, top_op));
+                }
+                op_st.push(o);
+            },
+        }
+    }
+    while let Some(c) = op_st.pop() {
+        let r = opnd_st.pop().unwrap();
+        let l = opnd_st.pop().unwrap();
+        opnd_st.push(step(l, r, c));
+    }
+    return opnd_st.pop().unwrap();
+}
+}

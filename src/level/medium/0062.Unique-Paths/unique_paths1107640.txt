@@ -1,0 +1,23 @@
+// https://leetcode.com/problems/unique-paths/solutions/1107640/rust-solution-0ms/
+impl Solution {
+    pub fn unique_paths(m: i32, n: i32) -> i32 {
+        let mut field: Vec<Vec<usize>> = (0..m).map(
+            |_| (0..n).map(|_| 0).collect::<Vec<usize>>() 
+        ).collect();
+
+        field[0][0] = 1;
+        
+        for row in 0..(m as usize) {
+            for col in 0..(n as usize) {
+                if col >= 1 {
+                    field[row][col] += field[row][col - 1]
+                }
+                if row >= 1 {
+                    field[row][col] += field[row - 1][col]
+                }
+            }
+        }
+        
+        field[field.len() - 1][field[0].len() - 1] as i32
+    }
+}

@@ -1,0 +1,15 @@
+// https://leetcode.com/problems/swap-nodes-in-pairs/solutions/233501/rust-0ms-100/
+impl Solution {
+    pub fn swap_pairs(head: Option<Box<ListNode>>) -> Option<Box<ListNode>> {
+        head.and_then(|mut n| {
+            match n.next {
+                Some(mut m) => {
+                    n.next = Solution::swap_pairs(m.next);
+                    m.next = Some(n);
+                    Some(m)
+                },
+                None => Some(n)
+            }
+        })
+    }
+}

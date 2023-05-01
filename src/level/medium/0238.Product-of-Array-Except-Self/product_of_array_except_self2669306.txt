@@ -1,0 +1,25 @@
+// https://leetcode.com/problems/product-of-array-except-self/solutions/2669306/rust-iterators-scan-zip/
+impl Solution {
+    pub fn product_except_self(nums: Vec<i32>) -> Vec<i32> {
+        let mut right: Vec<i32> = nums
+            .iter()
+            .rev()
+            .scan(1, |state, &x| {
+                let res = *state;
+                *state *= x;
+                Some(res)
+            })
+            .collect();
+        right.reverse();
+
+        nums.iter()
+            .scan(1, |state, &x| {
+                let res = *state;
+                *state *= x;
+                Some(res)
+            })
+            .zip(right)
+            .map(|(l, r)| l * r)
+            .collect()
+    }
+}

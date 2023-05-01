@@ -1,0 +1,126 @@
+// https://leetcode.com/problems/add-two-numbers-ii/solutions/929987/add-two-numbers-ii-rust-recursion-no-reverse-time-o-n-4-ms-space-o-n-2-1-mb/
+impl Solution {
+    pub fn add_two_numbers(
+        l1: Option<Box<ListNode>>,
+        l2: Option<Box<ListNode>>,
+    ) -> Option<Box<ListNode>> {
+        // Safe to unwrap because linked lists are guaranteed non-empty
+        let l1_len = l1.as_ref().unwrap().len();
+        let l2_len = l2.as_ref().unwrap().len();
+        let (sum, carry) = Solution::recursive_add(l1, l2, l1_len, l2_len);
+        if carry == 1 {
+            Some(Box::new(ListNode {
+                val: 1,
+                next: Some(Box::new(sum)),
+            }))
+        } else {
+            Some(Box::new(sum))
+        }
+    }
+
+    fn recursive_add(
+        l1: Option<Box<ListNode>>,
+        l2: Option<Box<ListNode>>,
+        l1_len: i32,
+        l2_len: i32,
+    ) -> (ListNode, i32) {
+        use std::cmp::Ordering::{Equal, Greater, Less};
+        match l1_len.cmp(&l2_len) {
+            // l1 is shorter than l2 so move to the next node in l2 and recurse
+            Less => {
+                let l1_val = 0;
+                let l2_val = l2.as_ref().unwrap().val;
+                let (sum_of_lower_digits, carry_of_lower_digits) =
+                    Solution::recursive_add(l1, l2.unwrap().next, l1_len, l2_len - 1);
+                let (sum, carry) = Solution::add_and_prepend_digit(
+                    sum_of_lower_digits,
+                    carry_of_lower_digits,
+                    l1_val,
+                    l2_val,
+                );
+                (sum, carry)
+            }
+            // l2 is shorter than l1 so move to the next node in l1 and recurse
+            Greater => {
+                let l1_val = l1.as_ref().unwrap().val;
+                let l2_val = 0;
+                let (sum_of_lower_digits, carry_of_lower_digits) =
+                    Solution::recursive_add(l1.unwrap().next, l2, l1_len - 1, l2_len);
+                let (sum, carry) = Solution::add_and_prepend_digit(
+                    sum_of_lower_digits,
+                    carry_of_lower_digits,
+                    l1_val,
+                    l2_val,
+                );
+                (sum, carry)
+            }
+            // l1 and l2 are the same length
+            Equal => {
+                let l1_val = l1.as_ref().unwrap().val;
+                let l2_val = l2.as_ref().unwrap().val;
+                if l1_len == 1 {
+                    // This is the least significant digit position so add the
+                    // digits and create the first sum node
+                    let (sum, carry) = Solution::add_digits_and_carry(l1_val, l2_val, 0);
+                    (ListNode::new(sum), carry)
+                } else {
+                    // This is not the least significant digith position so
+                    // move to the next node in both l1 and l2 and recurse
+                    let (sum_of_lower_digits, carry_of_lower_digits) = Solution::recursive_add(
+                        l1.unwrap().next,
+                        l2.unwrap().next,
+                        l1_len - 1,
+                        l2_len - 1,
+                    );
+                    let (sum, carry) = Solution::add_and_prepend_digit(
+                        sum_of_lower_digits,
+                        carry_of_lower_digits,
+                        l1_val,
+                        l2_val,
+                    );
+                    (sum, carry)
+                }
+            }
+        }
+    }
+
+    /// Add two digits plus a carry. Prepend the resulting digit to the sum of
+    /// the lower digits. Return the new sum head and the new carry.
+    fn add_and_prepend_digit(
+        sum_of_lower_digits: ListNode,
+        carry_of_lower_digits: i32,
+        digit1: i32,
+        digit2: i32,
+    ) -> (ListNode, i32) {
+        let (sum, carry) = Solution::add_digits_and_carry(digit1, digit2, carry_of_lower_digits);
+        (
+            ListNode {
+                val: sum,
+                next: Some(Box::new(sum_of_lower_digits)),
+            },
+            carry,
+        )
+    }
+
+    /// Add two digits plus a carry. Both digits must be less than or equal to 9
+    /// Returns the resulting digit and new carry which will be either 0 or 1.
+    fn add_digits_and_carry(digit1: i32, digit2: i32, carry: i32) -> (i32, i32) {
+        let sum = digit1 + digit2 + carry;
+        let new_carry = sum / 10;
+        let sum = if new_carry == 0 { sum } else { sum % 10 };
+        (sum, new_carry)
+    }
+}
+
+impl ListNode {
+    /// Calculate length of list
+    fn len(&self) -> i32 {
+        let mut count = 1;
+        let mut next = &self.next;
+        while let Some(node) = next {
+            count += 1;
+            next = &node.next;
+        }
+        count
+    }
+}

@@ -1,0 +1,23 @@
+// https://leetcode.com/problems/reverse-integer/solutions/3001620/rust-implementation/
+impl Solution {
+    pub fn reverse(n: i32) -> i32 {
+      let is_negative = n < 0;
+
+      let mut rev = 0;
+      let mut tmp = n.abs();
+      let mut pop;
+
+      while tmp > 0 {
+          pop = tmp % 10;
+          
+          if (i32::MAX - pop) / 10 < rev {
+            return 0;
+          }
+          
+          rev = rev * 10 + pop;
+          tmp /= 10;
+      }
+
+      rev * if is_negative { -1 } else { 1 }
+    }
+}

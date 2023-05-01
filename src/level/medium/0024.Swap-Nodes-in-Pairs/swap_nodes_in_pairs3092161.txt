@@ -1,0 +1,23 @@
+// https://leetcode.com/problems/swap-nodes-in-pairs/solutions/3092161/rust-moving-nodes-safe-legit-0ms/
+type NodeOpt = Option<Box<ListNode>>;
+
+impl Solution {
+    pub fn swap_pairs(head: NodeOpt) -> NodeOpt {
+        let mut source = head;
+        let mut dest   = None;
+        let mut tail   = &mut dest;
+
+        while let Some(mut n1) = source.take() {
+            if let Some(mut n2) = n1.next.take() {
+                source  = n2.next.take();
+                n2.next = Some(n1);
+                *tail   = Some(n2);
+                tail    = &mut tail.as_mut().unwrap().next
+                                   .as_mut().unwrap().next;
+            } else {
+                *tail = Some(n1);
+            }
+        }
+        dest
+    }
+}

@@ -1,0 +1,35 @@
+// https://leetcode.com/problems/partition-list/solutions/719013/rust-100-fast-solution/
+impl Solution {
+    pub fn partition(head: Option<Box<ListNode>>, x: i32) -> Option<Box<ListNode>> {
+        if head.is_none() {
+            return None;
+        }
+        let mut before_head = Some(Box::new(ListNode::new(0)));
+        let mut after_head = Some(Box::new(ListNode::new(0)));
+        let mut before = before_head.as_mut();
+        let mut after = after_head.as_mut();
+        let mut curr = head;
+
+        while let Some(node) = curr {
+            if node.val < x {
+                if let Some(b) = before {
+                    b.next = Some(node.clone());
+                    before = b.next.as_mut();
+                }
+            } else {
+                if let Some(a) = after {
+                    a.next = Some(node.clone());
+                    after = a.next.as_mut();
+                }
+            }
+            curr = node.next;
+        }
+        if let Some(a) = after {
+            a.next = None;
+        }
+        if let Some(b) = before {
+            b.next = after_head.unwrap().next;
+        }
+        before_head.unwrap().next
+    }
+}

@@ -1,0 +1,33 @@
+// https://leetcode.com/problems/smallest-number-in-infinite-set/solutions/3452101/rust-simple-treeset-solution/
+use std::collections::BTreeSet;
+
+struct SmallestInfiniteSet {
+    count:i32,
+    set:BTreeSet<i32>
+}
+
+impl SmallestInfiniteSet {
+    fn new() -> Self {
+        Self{count:0,set:BTreeSet::new()}
+    }
+
+    fn pop_smallest(&mut self) -> i32 {
+        let mut i = self.set.iter().peekable();
+//if set is empty we return the min so far and increment it
+        if i.peek() == None{
+            self.count+=1;
+            return self.count;
+        }
+//otherwise we return the first value in the set and remove it
+        let v = i.next().unwrap().clone();
+        self.set.remove(&v);
+        return v;
+    }
+
+    fn add_back(&mut self, num: i32) {
+//we add num to set is it's less than or equal to count
+        if num<=self.count {
+            self.set.insert(num);
+        }
+    }
+}

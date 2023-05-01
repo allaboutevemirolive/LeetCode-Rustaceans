@@ -1,0 +1,18 @@
+// https://leetcode.com/problems/unique-paths/solutions/355728/rust-100/
+impl Solution {
+    pub fn unique_paths(m: i32, n: i32) -> i32 {
+        let m = m as usize;
+        let n = n as usize;
+        
+        let mut memo = vec![0; m+1];
+        memo[m-1] = 1;
+        
+        for j in (0..n).rev() {
+            for i in (0..m).rev() {
+                memo[i] += memo[i+1];
+            }
+        }
+        
+        memo[0]
+    }
+}

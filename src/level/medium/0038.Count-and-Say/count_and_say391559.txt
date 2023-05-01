@@ -1,0 +1,51 @@
+// https://leetcode.com/problems/count-and-say/solutions/391559/rust-solution-using-custom-iterator/
+use std::str::Chars;
+
+struct CountAndSay<'a> {
+    chars: Chars<'a>,
+    cur_char: Option<char>
+}
+
+impl<'a> CountAndSay<'a> {
+    fn new(chars: Chars) -> CountAndSay {
+        CountAndSay{chars, cur_char: None}
+    }
+    
+    fn from_str(s: &str) -> CountAndSay {
+        let chars = s.chars();
+        CountAndSay{chars, cur_char: None}
+    }
+}
+
+impl<'a> Iterator for CountAndSay<'a> {
+    type Item = String;
+    
+    fn next(&mut self) -> Option<Self::Item> {
+        let mut count = 1;
+        loop {
+            match (self.cur_char, self.chars.next()) {
+                // end of string, terminate
+                (None, None) => {return None},
+                // begin of string
+                (None, Some(c)) => self.cur_char = Some(c),
+                // same char
+                (Some(c), Some(d)) if d == c => count += 1,
+                // new char/end of string, collect & return
+                (Some(c), char_opt) => {
+                    self.cur_char = char_opt;
+                    return Some(format!("{}{}", count, c));
+                }
+            }
+        }
+    }
+}
+
+impl Solution {
+    pub fn count_and_say(n: i32) -> String {
+        let mut res = "1".to_string();
+        for i in 1..n {
+            res = CountAndSay::from_str(&res).collect();
+        }
+        res
+    }
+}

@@ -1,0 +1,20 @@
+// https://leetcode.com/problems/perfect-squares/solutions/784835/rust-cheapest-best/
+impl Solution {
+    pub fn num_squares(n: i32) -> i32 {
+        let n = n as usize;
+        let mut squares = vec![];
+        (1..=(n as f64).sqrt().ceil() as usize).for_each(|x| {
+            squares.push(x.pow(2));
+        });
+
+        (1..=n).fold(vec![0; n + 1], |mut dp, i| {
+            dp[i] = squares
+                .iter()
+                .take_while(|s| **s <= i)
+                .map(|s| 1 + dp[i - *s])
+                .min()
+                .unwrap();
+            dp
+        })[n]
+    }
+}

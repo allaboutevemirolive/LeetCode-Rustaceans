@@ -1,0 +1,26 @@
+// https://leetcode.com/problems/repeated-dna-sequences/solutions/2946979/rust-from-a-python-main/
+use std::collections::HashSet;
+
+impl Solution {
+    pub fn find_repeated_dna_sequences(s: String) -> Vec<String> {
+        if s.len() < 10 {
+            return vec![]
+        }
+
+        let mut repeated: HashSet<&str> = HashSet::new();
+        let mut output: HashSet<String> = HashSet::new();
+
+
+        for left in 0..s.len()-9 {
+            let mut window = &s[left..left+10];
+
+            if repeated.contains(&window) {
+                output.insert(window.to_string());
+            }
+
+            repeated.insert(window);
+        }
+
+        output.into_iter().collect()
+    }
+}

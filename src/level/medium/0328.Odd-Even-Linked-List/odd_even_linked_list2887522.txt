@@ -1,0 +1,54 @@
+// https://leetcode.com/problems/odd-even-linked-list/solutions/2887522/rust-solution-with-explanation-o-n-time-o-1-space/
+// Definition for singly-linked list.
+// #[derive(PartialEq, Eq, Clone, Debug)]
+// pub struct ListNode {
+//   pub val: i32,
+//   pub next: Option<Box<ListNode>>
+// }
+// 
+// impl ListNode {
+//   #[inline]
+//   fn new(val: i32) -> Self {
+//     ListNode {
+//       next: None,
+//       val
+//     }
+//   }
+// }
+impl Solution {
+    pub fn odd_even_list(head: Option<Box<ListNode>>) -> Option<Box<ListNode>> {
+        if head.is_none() {
+            return None;
+        } else if head.as_ref().unwrap().next.is_none() {
+            return head;
+        }
+
+        let mut odd = head;
+        let mut even = odd.as_ref().unwrap().next.to_owned();
+        
+        let mut odd_tail = odd.as_mut();
+        let mut even_tail = even.as_mut();
+        
+        while even_tail.is_some() {
+            let new_odd = even_tail.as_ref().unwrap().next.to_owned();
+            let new_even = match new_odd.as_ref() {
+                Some(node) => node.next.to_owned(),
+                None => None,
+            };
+            
+            odd_tail.as_mut().unwrap().next = new_odd;
+            even_tail.as_mut().unwrap().next = new_even;
+            
+            if odd_tail.as_ref().unwrap().next.is_some() {
+                odd_tail = odd_tail.unwrap().next.as_mut();
+                even_tail = even_tail.unwrap().next.as_mut();
+            } else {
+                break;
+            }
+        }
+        
+        odd_tail.unwrap().next = even;
+        
+        odd
+    }
+}

@@ -1,0 +1,20 @@
+// https://leetcode.com/problems/coin-change/solutions/1152191/rust-bottom-up-dp-solution/
+impl Solution {
+    pub fn coin_change(coins: Vec<i32>, amount: i32) -> i32 {
+        let mut table = vec![std::i32::MAX; (amount + 1) as usize];
+        let last = amount as usize;
+        table[0] = 0;
+        
+        for a in 1..amount + 1 {
+            for c in coins.iter() {
+                let prev = (a - c) as usize;
+                if a - c >= 0 && table[prev] != std::i32::MAX {
+                    let curr = a as usize;
+                    table[curr] = table[curr].min(table[prev] + 1);
+                }
+            }
+        }
+        
+        if table[last] == std::i32::MAX { -1 } else { table[last] }
+    }
+}

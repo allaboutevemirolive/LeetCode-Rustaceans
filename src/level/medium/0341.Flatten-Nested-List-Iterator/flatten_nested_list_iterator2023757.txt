@@ -1,0 +1,44 @@
+// https://leetcode.com/problems/flatten-nested-list-iterator/solutions/2023757/rust-recursive-solution/
+// #[derive(Debug, PartialEq, Eq)]
+// pub enum NestedInteger {
+//   Int(i32),
+//   List(Vec<NestedInteger>)
+// }
+struct NestedIterator {
+  flat: Vec<i32>
+}
+
+
+/** 
+ * `&self` means the method takes an immutable reference.
+ * If you need a mutable reference, change it to `&mut self` instead.
+ */
+impl NestedIterator {
+
+    fn new(nestedList: Vec<NestedInteger>) -> Self {
+        let flat = Self::flatten(&nestedList).into_iter().rev().collect();
+        Self {
+            flat: flat
+        }
+    }
+    
+    fn next(&mut self) -> i32 {
+        let next = self.flat.pop();
+        next.unwrap()
+    }
+    
+    fn has_next(&self) -> bool {
+        !self.flat.is_empty()
+    }
+    
+    fn flatten(nestedList: &Vec<NestedInteger>) -> Vec<i32> {
+        let mut acc = vec!();
+        for n in nestedList {
+              match n {
+                  NestedInteger::Int(x) => acc.push(*x),
+                  NestedInteger::List(v) => acc.append(&mut Self::flatten(v)),
+              }
+            }
+        acc
+    }
+}

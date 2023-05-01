@@ -1,0 +1,17 @@
+// https://leetcode.com/problems/integer-break/solutions/1288514/rust-cheapest-best/
+impl Solution {
+    pub fn integer_break(n: i32) -> i32 {
+        (2..=n)
+            .fold(vec![0, 1], |mut acc, n| {
+                acc.push(
+                    (1..n)
+                        .map(|m| (acc[m as usize] * (n - m)).max(m * (n - m)))
+                        .max()
+                        .unwrap(),
+                );
+                acc
+            })
+            .pop()
+            .expect("Invalid input")
+    }
+}

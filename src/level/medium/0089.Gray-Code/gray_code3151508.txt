@@ -1,0 +1,10 @@
+// https://leetcode.com/problems/gray-code/solutions/3151508/gray-code-rust-fast-and-easy-solution-beats-100-in-both-time-and-space-complexity/
+impl Solution {
+    pub fn gray_code(n: i32) -> Vec<i32> {
+        (0..(1<<n)).map(into_gray).collect()
+    }
+}
+#[inline]
+fn into_gray(n : i32) -> i32 {
+    n ^ (n >> 1)
+}

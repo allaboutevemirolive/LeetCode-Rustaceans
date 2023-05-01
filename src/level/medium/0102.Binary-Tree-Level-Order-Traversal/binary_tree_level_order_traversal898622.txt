@@ -1,0 +1,35 @@
+// https://leetcode.com/problems/binary-tree-level-order-traversal/solutions/898622/rust/
+   use std::rc::Rc;
+    use std::cell::RefCell;
+    use std::collections::VecDeque;
+    impl Solution {
+        pub fn level_order(root: Option<Rc<RefCell<TreeNode>>>) -> Vec<Vec<i32>> {
+            let mut res: Vec<Vec<i32>> = vec![];
+            let mut q: VecDeque<Rc<RefCell<TreeNode>>> = VecDeque::new();
+            if let Some(node) = root {
+                q.push_front(node);
+            }
+            while q.len() > 0 {
+                let mut current_level: Vec<i32> = vec![];
+                let mut next_level: Vec<Rc<RefCell<TreeNode>>> = vec![];
+                for node in &q {
+                    let x = node.borrow();
+                    current_level.push(x.val);
+                    let left = x.left.clone();
+                    let right = x.right.clone();
+                    if let Some(left) = left {
+                        next_level.push(left);
+                    }
+                    if let Some(right) = right {
+                        next_level.push(right);
+                    }
+                }
+                q.clear();
+                res.push(current_level);
+                for x in next_level {
+                    q.push_back(x);
+                }
+            }
+            res
+        }
+    }

@@ -1,0 +1,64 @@
+// https://leetcode.com/problems/permutations-ii/solutions/3446889/rust-iterator-of-lexicographically-increasing-permutations/
+struct Permutations<T> {
+    data: Option<Vec<T>>,
+}
+
+impl<T: Clone + Ord> Permutations<T> {
+    pub fn new(mut data: Vec<T>) -> Self {
+        data.sort_unstable();
+        Self { data: Some(data) }
+    }
+
+    fn next_permutation(mut data: Vec<T>) -> Option<Vec<T>> {
+        // Inversion point `k` where `data[k+1]` is greater
+        // than `data[k]`; `data[k+1..]` is guaranteed to be
+        // monotonically decreasing. Return `None` if no `k`
+        // meets this condition.
+        let k = (1..data.len())
+            .rev()
+            .filter(|&i| data[i] > data[i-1])
+            .next()? - 1;
+        
+        // Perform the swap resulting in the lexicographically
+        // minimal permutation that is greater than `data`.
+        for i in (k+1..data.len()).rev() {
+            if data[k] < data[i] {
+                data.swap(k, i);
+                break;
+            }
+        }
+
+        // Sort elements after the inversion point to minimize
+        // the lexicographical ordering of the result. As
+        // `data[k+1..]` is monotonically decreasing, reversing
+        // the elements is sufficient.
+        Self::reverse(&mut data[k+1..]);
+        Some(data)
+    }
+
+    fn reverse(xs: &mut [T]) {
+        let n = xs.len();
+        for i in 0..n/2 {
+            xs.swap(i, n-i-1);
+        }
+    }
+}
+
+impl<T: Clone + Ord> Iterator for Permutations<T> {
+    type Item = Vec<T>;
+    
+    fn next(&mut self) -> Option<Self::Item> {
+        let (result, data) = match self.data.take() {
+            Some(data) => (data.clone(), data),
+            None => return None,
+        };
+        self.data = Self::next_permutation(data);
+        Some(result)        
+    }
+}
+
+impl Solution {
+    pub fn permute_unique(nums: Vec<i32>) -> Vec<Vec<i32>> {
+        Permutations::new(nums).collect()
+    }
+}

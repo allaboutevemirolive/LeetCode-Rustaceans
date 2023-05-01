@@ -1,0 +1,23 @@
+// https://leetcode.com/problems/queue-reconstruction-by-height/solutions/407727/rust-8ms-100/
+use std::iter::repeat;
+
+impl Solution {
+  pub fn reconstruct_queue(people: Vec<Vec<i32>>) -> Vec<Vec<i32>> {
+    let mut people = people;
+    let people_count = people.len();
+    people.sort_by(|x, y| {
+      if x[0] != y[0] {
+        y[0].partial_cmp(&x[0]).unwrap()
+      } else {
+        x[1].partial_cmp(&y[1]).unwrap()
+      }
+    });
+    let mut ans: Vec<Vec<i32>> = repeat(vec![0, 0]).take(people.len()).collect();
+
+    for cur in people.into_iter() {
+      let idx = cur[1] as usize;
+      ans.insert(idx, cur);
+    }
+    ans[0..people_count].to_vec()
+  }
+}

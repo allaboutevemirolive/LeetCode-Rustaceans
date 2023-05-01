@@ -1,0 +1,56 @@
+// https://leetcode.com/problems/largest-divisible-subset/solutions/923795/rust-12ms-o-n-2/
+impl Solution {
+    pub fn largest_divisible_subset(nums: Vec<i32>) -> Vec<i32> {
+        // check empty set
+        if nums.is_empty() {
+            return Vec::new();
+        }
+        
+        // sort
+        let mut nums = nums;
+        nums.sort_unstable();
+        
+        // init trace
+        let n = nums.len();
+        let mut trace = vec![0 as usize; n];
+        let mut f = vec![1 as usize; n]; // where f[i] is largest set that ends with nums[i]
+
+        // itself
+        trace[0] = 1; 
+        f[0] = 1;
+        
+        let mut largest = 1;
+        let mut index = 0;
+        
+        for i in 1..n {
+            // itself
+            trace[i] = i + 1; 
+            
+            for j in 0..i {
+                if nums[i] % nums[j] == 0 { // found
+                    if f[j] + 1 > f[i] {
+                        f[i] = f[j] + 1;
+                        trace[i] = j + 1;
+                    }
+                }
+            }
+            
+            if f[i] > largest {
+                largest = f[i];
+                index = i;
+            }
+        }
+        
+        let mut ans = Vec::with_capacity(largest);
+        loop {
+            ans.push(nums[index]);
+            
+            let next = trace[index] - 1;
+            if next == index {
+                return ans;
+            } else {
+                index = next
+            }
+        }
+    }
+}

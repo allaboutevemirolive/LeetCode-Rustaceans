@@ -1,0 +1,66 @@
+// https://leetcode.com/problems/maximum-product-subarray/solutions/2565971/rust-solution/
+fn helper(arr: Vec<isize>) -> isize {
+    let n = arr.len();
+    if n == 1 {
+        return arr[0]
+    }
+
+    let mut temp = 1;
+    for &v in &arr {
+        temp *= v;
+    }
+
+    let mut max = temp;
+    if 0 < max {
+        return max
+    }
+
+    let base = temp;
+    for i in 0..n {
+        temp /= arr[i];
+        if 0 < temp {
+            max = std::cmp::max(max, temp);
+            break
+        }
+    }
+    temp = base;
+    for i in (0..n).rev() {
+        temp /= arr[i];
+        if 0 < temp {
+            max = std::cmp::max(max, temp);
+        }
+    }
+    max
+}
+
+impl Solution {
+    pub fn max_product(nums: Vec<i32>) -> i32 {
+        let mut nums_arr = vec![vec![]];
+        let mut max = isize::min_value();
+        for &v in &nums {
+            let v = v as isize;
+            max = std::cmp::max(max, v);
+            let li = nums_arr.len()-1;
+            if v == 0 {
+                if !nums_arr[li].is_empty() {
+                    nums_arr.push(vec![]);
+                }
+            } else {
+                nums_arr[li].push(v);
+            }
+        }
+
+        if nums_arr[nums_arr.len()-1].is_empty() {
+            nums_arr.pop();
+        }
+
+        if nums_arr.is_empty() {
+            return 0
+        }
+
+        for arr in nums_arr {
+            max = std::cmp::max(helper(arr), max);
+        }
+        max as i32
+    }
+}

@@ -1,0 +1,29 @@
+// https://leetcode.com/problems/min-stack/solutions/1398335/rust-one-stack/
+struct MinStack {
+    storage: Vec<(i32, i32)>
+}
+
+impl MinStack {
+
+    fn new() -> Self {
+        return MinStack {storage: vec![]}
+    }
+
+    fn push(&mut self, val: i32) {
+        let mut new_min = val;
+        if !self.storage.is_empty() { new_min = val.min(self.get_min())}
+        self.storage.push((val, new_min))
+    }
+
+    fn pop(&mut self) {
+        self.storage.pop();
+    }
+
+    fn top(&self) -> i32 {
+        self.storage.last().unwrap().0
+    }
+
+    fn get_min(&self) -> i32 {
+        self.storage.last().unwrap().1
+    }
+}

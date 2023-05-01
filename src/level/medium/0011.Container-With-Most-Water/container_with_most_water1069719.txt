@@ -1,0 +1,19 @@
+// https://leetcode.com/problems/container-with-most-water/solutions/1069719/rust-two-pointers/
+use std::cmp;
+
+impl Solution {
+    pub fn max_area(h: Vec<i32>) -> i32 {
+        let mut l = 0;
+        let mut r = h.len() as i32 - 1;
+        
+        let mut ans = 0;
+        while l < r {
+            ans = cmp::max(ans, (r - l) * cmp::min(h[l as usize], h[r as usize]));
+            match h[l as usize] < h[r as usize] {
+                true =>  l += 1,
+                false => r -= 1,
+            }
+        }
+        ans
+    }
+}

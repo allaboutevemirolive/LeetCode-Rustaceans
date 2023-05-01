@@ -1,0 +1,46 @@
+// https://leetcode.com/problems/maximum-product-subarray/solutions/796147/rust-kadane-s-algorithm-variant-o-n-time-o-1-space/
+pub struct Solution;
+
+impl Solution {
+    pub fn max_product(nums: Vec<i32>) -> i32 {
+        let mut res = nums[0];
+        let mut l = 0;
+        let mut r = 0;
+        let n = nums.len();
+        for i in 0..n {
+            l = (if l == 0 { 1 } else { l }) * nums[i];
+            r = (if r == 0 { 1 } else { r }) * nums[n - i - 1];
+            res = res.max(l).max(r);
+        }
+        res
+    }
+}
+
+fn main() {
+    println!("{}", Solution::max_product(vec![2, 4, -5, -10, 20]));
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_0() {
+        assert_eq!(6, Solution::max_product(vec![2, 3, -2, 4]));
+    }
+
+    #[test]
+    fn test_1() {
+        assert_eq!(0, Solution::max_product(vec![-2, 0, -1]));
+    }
+
+    #[test]
+    fn test_2() {
+        assert_eq!(8000, Solution::max_product(vec![2, 4, -5, -10, 20]))
+    }
+
+    #[test]
+    fn test_3() {
+        assert_eq!(10, Solution::max_product(vec![10]));
+    }
+}

@@ -1,0 +1,30 @@
+// https://leetcode.com/problems/word-break/solutions/686722/idiomatic-rust-100-2mb/
+impl Solution {
+    pub fn word_break(s: String, mut word_dict: Vec<String>) -> bool {
+        word_dict.sort_by(|a, b| b.cmp(a));
+        let mut cache: HashMap<&str, bool> = [("", true)].iter().cloned().collect();
+        Solution::helper(&word_dict, &mut cache, s.as_str())
+    }
+
+    fn helper<'a>(word_dict: &Vec<String>, cache: &mut HashMap<&'a str, bool>, s: &'a str) -> bool {
+        match cache.get(s) {
+            Some(x) => *x,
+            _ => {
+                let result = word_dict
+                    .iter()
+                    .filter(|w| s.starts_with(*w))
+                    .map(|part| &s[part.len()..])
+                    .try_fold(false, |acc, cur| {
+                        if acc {
+                            None
+                        } else {
+                            Some(Solution::helper(word_dict, cache, cur))
+                        }
+                    })
+                    .unwrap_or(true);
+                cache.insert(s, result);
+                result
+            }
+        }
+    }
+}

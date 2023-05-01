@@ -1,0 +1,80 @@
+// https://leetcode.com/problems/delete-node-in-a-bst/solutions/1193715/rust-cheapest-best/
+use std::rc::Rc;
+use std::cell::RefCell;
+
+impl Solution {
+    pub fn delete_node(
+        mut root: Option<Rc<RefCell<TreeNode>>>,
+        key: i32,
+    ) -> Option<Rc<RefCell<TreeNode>>> {
+        root.delete(key);
+        root
+    }
+}
+
+trait Insertable<T> {
+    fn insert(&mut self, item: T);
+}
+
+impl Insertable<Rc<RefCell<TreeNode>>> for TreeNode {
+    fn insert(&mut self, other: Rc<RefCell<TreeNode>>) {
+        if other.borrow().val >= self.val {
+            let right = self.right.take();
+            if let Some(node) = right {
+                node.borrow_mut().insert(other);
+                self.right = Some(node);
+            } else {
+                self.right = Some(other);
+            }
+        } else {
+            let left = self.left.take();
+            if let Some(node) = left {
+                node.borrow_mut().insert(other);
+                self.left = Some(node);
+            } else {
+                self.left = Some(other);
+            }
+        }
+    }
+}
+
+trait Deletable<T> {
+    fn delete(&mut self, key: T);
+}
+
+impl Deletable<i32> for Option<Rc<RefCell<TreeNode>>> {
+    fn delete(&mut self, key: i32) {
+        if let Some(node) = self.take() {
+            let val = node.borrow().val;
+            match val.cmp(&key) {
+                std::cmp::Ordering::Equal => {
+                    let left = node.borrow_mut().left.take();
+                    let right = node.borrow_mut().right.take();
+                    match (left, right) {
+                        (None, None) => {
+                            *self = None;
+                        }
+                        (Some(left), None) => {
+                            *self = Some(left);
+                        }
+                        (None, Some(right)) => {
+                            *self = Some(right);
+                        }
+                        (Some(left), Some(right)) => {
+                            right.borrow_mut().insert(left);
+                            *self = Some(right);
+                        }
+                    }
+                }
+                std::cmp::Ordering::Greater => {
+                    node.borrow_mut().left.delete(key);
+                    *self = Some(node);
+                }
+                std::cmp::Ordering::Less => {
+                    node.borrow_mut().right.delete(key);
+                    *self = Some(node);
+                }
+            }
+        }
+    }
+}

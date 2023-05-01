@@ -1,0 +1,23 @@
+// https://leetcode.com/problems/simplify-path/solutions/1051351/python-rust-stack-solution/
+impl Solution {
+    pub fn simplify_path(path: String) -> String {
+        let tokens = path.split('/').into_iter().filter(|&x| x != "").collect::<Vec<_>>();
+        let mut stack: Vec<String> = Vec::new();
+        
+        for token in tokens {
+            if token == "." {
+                continue;
+            } else if token == ".." {
+                if stack.len() > 0 {
+                    stack.pop();
+                }
+            } else {
+                stack.push(token.to_string());
+            }
+        }
+        
+        let mut res = "/".to_string();
+        res.push_str(&stack.join("/"));
+        res
+    }
+}

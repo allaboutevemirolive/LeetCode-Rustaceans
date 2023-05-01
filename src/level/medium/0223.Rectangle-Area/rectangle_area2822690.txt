@@ -1,0 +1,59 @@
+// https://leetcode.com/problems/rectangle-area/solutions/2822690/rust-efficient-simple-solution/
+impl Solution {
+    pub fn compute_area(ax1: i32, ay1: i32, ax2: i32, ay2: i32, 
+                        bx1: i32, by1: i32, bx2: i32, by2: i32) 
+        -> i32 
+    {
+        let rec_1 = Rectangle::new((ax1, ay1), (ax2, ay2));
+        let rec_2 = Rectangle::new((bx1, by1), (bx2, by2));
+        let rec_3 = rec_1.intersect(&rec_2);
+
+        // The total area is the area of both rects minus the overlap.
+        rec_1.area() + rec_2.area() - rec_3.map_or(0, |r| r.area())
+    }
+}
+
+struct Point { x: i32, y: i32 }
+
+/// Represents a rectangle holding the lower-left and upper-right coords.
+///
+struct Rectangle {
+    ll: Point,
+    ur: Point,
+}
+
+impl Rectangle {
+    /// Creates a new rectangle given the lower-left and upper-right coords.
+    ///
+    fn new(ll: (i32, i32), ur: (i32, i32)) -> Self {
+        Self { 
+            ll: Point { x: ll.0, y: ll.1 }, 
+            ur: Point { x: ur.0, y: ur.1 } 
+        }
+    }
+    
+    /// Returns the area of the rectangle.
+    ///
+    fn area(&self) -> i32 {
+        (self.ur.x - self.ll.x) * (self.ur.y - self.ll.y)
+    }
+    
+    /// Returns a rectangle representing the region of overlap between self and
+    /// and the other rectangle. If the rectangles don't overlap, None is 
+    /// returned.
+    ///
+    fn intersect(&self, other: &Rectangle) -> Option<Self> {
+        // Test for overlap between rectangles.
+        if self.ll.x < other.ur.x && self.ur.x > other.ll.x &&
+           self.ll.y < other.ur.y && self.ur.y > other.ll.y
+        {
+            Some(
+                // Create the rectangle that represents the overlapping region.
+                Self::new(
+                    (self.ll.x.max(other.ll.x), self.ll.y.max(other.ll.y)), 
+                    (self.ur.x.min(other.ur.x), self.ur.y.min(other.ur.y)))
+            )
+        }
+        else { None }
+    }
+}

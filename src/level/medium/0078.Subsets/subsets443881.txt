@@ -1,0 +1,15 @@
+// https://leetcode.com/problems/subsets/solutions/443881/rust-dfs/
+    pub fn subsets(nums: Vec<i32>) -> Vec<Vec<i32>> {
+        let mut res = vec![];
+        Self::dfs(&nums[..], 0, &mut vec![], &mut res);
+        res
+    }
+    pub fn dfs(nums: &[i32], idx: usize, cur: &mut Vec<i32>,
+               res: &mut Vec<Vec<i32>>) {
+        res.push(cur.clone());
+        (idx..nums.len()).for_each(|j| {
+            cur.push(nums[j]);
+            Self::dfs(nums, j+1, cur, res);
+            cur.pop();
+        })
+    }

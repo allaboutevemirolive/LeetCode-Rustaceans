@@ -1,0 +1,18 @@
+// https://leetcode.com/problems/subsets/solutions/1317190/rust-naive-imperative-solution/
+impl Solution {
+    pub fn subsets(nums: Vec<i32>) -> Vec<Vec<i32>> {
+        let mut res = vec![vec![]];
+
+        for num in nums {
+            let len = res.len();
+            
+            for i in 0..len {
+                let mut sub = res[i].clone();
+                sub.push(num);
+                res.push(sub)
+            }
+        }
+        
+        res
+    }
+}

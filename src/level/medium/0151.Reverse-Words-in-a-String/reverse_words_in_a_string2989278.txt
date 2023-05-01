@@ -1,0 +1,15 @@
+// https://leetcode.com/problems/reverse-words-in-a-string/solutions/2989278/rust-solution/
+impl Solution {
+  pub fn reverse_words(s: String) -> String {
+    let s = s.trim();
+    let s = s.split(" ").into_iter().map(|v| v.to_string()).collect::<Vec<String>>();
+    let mut arr = vec![];
+    for ss in s {
+      if ss.len() != 0 {
+        arr.push(ss);
+      }
+    }
+    arr.reverse();
+    arr.join(" ")
+  }
+}

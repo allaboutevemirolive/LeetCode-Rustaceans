@@ -1,0 +1,40 @@
+// https://leetcode.com/problems/flatten-nested-list-iterator/solutions/2393294/rust-vec-i32-solution/
+struct NestedIterator {
+    data: Vec<i32>
+}
+
+
+/** 
+ * `&self` means the method takes an immutable reference.
+ * If you need a mutable reference, change it to `&mut self` instead.
+ */
+impl NestedIterator {
+
+    fn new(nestedList: Vec<NestedInteger>) -> Self {
+        let mut data: Vec<i32> = vec![];
+        
+        Self::dfs(&nestedList, &mut data);
+        
+        Self  { data }
+    }
+    
+    fn dfs(nestedList: &Vec<NestedInteger>, data: &mut Vec<i32>) {
+        for it in nestedList.into_iter().rev().collect::<Vec<_>>() {
+            match it {
+                NestedInteger::Int(a) => data.push(*a),
+                NestedInteger::List(list) => Self::dfs(&list, data)
+            }
+        }
+    }
+    
+    fn next(&mut self) -> i32 {
+        if let Some(a) = self.data.pop() {
+            return a
+        }
+        panic!["there is no next!"]
+    }
+    
+    fn has_next(&self) -> bool {
+        self.data.is_empty() == false
+    }
+}

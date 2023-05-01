@@ -1,0 +1,22 @@
+// https://leetcode.com/problems/increasing-triplet-subsequence/solutions/628708/idiomatic-rust-solution-using-patience-sort-beats-100-o-n-time-o-1-space/
+impl Solution {
+    pub fn increasing_triplet(nums: Vec<i32>) -> bool {
+        let mut answer = vec![]; // This can have only a maximum of 3 values hence constant space.
+        for num in &nums {
+            match answer.binary_search(num) {
+                Ok(_) => (),
+                Err(x) => {
+                    if x == answer.len() {
+                        answer.push(*num);
+                    } else {
+                        answer[x] = *num;
+                    }
+                    if answer.len() >= 3 {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+}

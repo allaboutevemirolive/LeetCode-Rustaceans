@@ -1,0 +1,16 @@
+// https://leetcode.com/problems/rotate-image/solutions/1546454/rust-simple-solution/
+impl Solution {
+    pub fn rotate(matrix: &mut Vec<Vec<i32>>) {
+        
+        let mut ans = matrix.clone();
+        
+        for i in 0..matrix[0].len() {
+            for j in (0..matrix.len()).rev() {
+                let k = matrix.len() - (j+1);
+                ans[i][k] = matrix[j][i];
+            }
+        }
+        
+        *matrix = ans;
+    }
+}

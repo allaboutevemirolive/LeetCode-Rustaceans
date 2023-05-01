@@ -1,0 +1,23 @@
+// https://leetcode.com/problems/longest-increasing-subsequence/solutions/1667351/rust/
+pub fn length_of_lis(nums: Vec<i32>) -> i32 {
+    let mut dp = vec![1; nums.len()];
+
+    //Mark one pointer at i. 
+    for i in 1..nums.len() {
+        //For each i, start from j=0.
+        for j in 0..i {
+            //It means next number contributes to increasing sequence.
+            if nums[j] < nums[i] {
+                //But increase the value only if it results in a 
+                //larger value of the sequence than T[i]
+                //It is possible that T[i] already has larger value 
+                //from some previous j'th iteration
+                if dp[j] + 1 > dp[i] {
+                    dp[i] = dp[j] + 1;
+                }
+            }
+        }
+    }
+
+    *dp.iter().max().unwrap()
+}

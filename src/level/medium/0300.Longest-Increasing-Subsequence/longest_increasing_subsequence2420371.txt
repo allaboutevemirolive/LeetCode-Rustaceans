@@ -1,0 +1,32 @@
+// https://leetcode.com/problems/longest-increasing-subsequence/solutions/2420371/rust-dp-bianry-search-solutions/
+pub fn length_of_lis(nums: Vec<i32>) -> i32 {
+    let mut cache = vec![0; nums.len()];
+
+    let mut len = 0;
+    for i in 0..nums.len() {
+        // Find the length of the longest increasing 
+        // sub-sequence starting from index `i`
+        len = len.max(dfs(&nums, &mut cache, i));
+    }
+
+    len
+}
+
+fn dfs(nums: &[i32], cache: &mut [i32], idx: usize) -> i32 {
+    // If we have already found out the length of the subsequence
+    // starting at `idx` then avoid recomputing it
+    if cache[idx] != 0 {
+        return cache[idx];
+    }
+
+    let mut count = 0;
+    for pos in idx + 1..nums.len() {
+        if nums[idx] < nums[pos] {
+            count = count.max(dfs(nums, cache, pos));
+        }
+    }
+
+    // `+1` because a subsequence of one element is still a valid subsequence
+    cache[idx] = count + 1;
+    return cache[idx];
+}

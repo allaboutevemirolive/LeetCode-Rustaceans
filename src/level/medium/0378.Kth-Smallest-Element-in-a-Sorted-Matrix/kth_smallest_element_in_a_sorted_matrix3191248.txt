@@ -1,0 +1,25 @@
+// https://leetcode.com/problems/kth-smallest-element-in-a-sorted-matrix/solutions/3191248/rust-solution-with-binary-heap-and-deque/
+impl Solution {
+    pub fn kth_smallest(matrix: Vec<Vec<i32>>, k: i32) -> i32 {
+    use std::collections::{BinaryHeap, VecDeque};
+    use std::cmp::Reverse;
+    let mut heap = matrix
+                        .into_iter()
+                        .map(VecDeque::from)
+                        .map(Reverse)
+                        .collect::<BinaryHeap<_>>();
+    let mut curr_idx = 0 ;
+    while let Some(Reverse(mut item)) = heap.pop() {
+        curr_idx += 1;
+        if curr_idx == k {
+            return  item.pop_front().unwrap();
+        }
+        // pop from the front
+        let _ = item.pop_front();
+        if !item.is_empty() {
+            heap.push(Reverse(item));
+        }
+    }
+    -1
+    }
+}

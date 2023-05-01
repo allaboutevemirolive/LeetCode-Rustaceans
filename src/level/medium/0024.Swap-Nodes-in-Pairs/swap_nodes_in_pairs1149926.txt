@@ -1,0 +1,15 @@
+// https://leetcode.com/problems/swap-nodes-in-pairs/solutions/1149926/rust-recursive-solution/
+fn swap_pairs(head: Option<Box<ListNode>>) -> Option<Box<ListNode>> {
+    match head {
+        None => None,
+        Some(mut head) => {
+            if let Some(mut next) = head.next.clone() {
+                head.next = swap_pairs(next.next);
+                next.next = Some(head);
+                Some(next)
+            } else {
+                Some(head)
+            }
+        }
+    }
+}

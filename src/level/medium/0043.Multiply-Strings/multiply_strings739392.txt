@@ -1,0 +1,30 @@
+// https://leetcode.com/problems/multiply-strings/solutions/739392/rust-cheapest-best/
+impl Solution {
+    pub fn multiply(num1: String, num2: String) -> String {
+        Some(
+            num1.chars()
+                .rev()
+                .map(|c| c.to_digit(10).unwrap())
+                .enumerate()
+                .fold(vec![0; num1.len() + num2.len()], |mut v, (i, a)| {
+                    num2.chars()
+                        .rev()
+                        .map(|c| c.to_digit(10).unwrap())
+                        .enumerate()
+                        .for_each(|(j, b)| {
+                            let product = a * b + v[i + j];
+                            v[i + j] = product % 10;
+                            v[i + j + 1] += product / 10;
+                        });
+                    v
+                })
+                .into_iter()
+                .rev()
+                .map(|d| d.to_string())
+                .skip_while(|c| *c == "0")
+                .collect(),
+        )
+        .map(|s| if s == "" { "0".to_owned() } else { s })
+        .unwrap()
+    }
+}

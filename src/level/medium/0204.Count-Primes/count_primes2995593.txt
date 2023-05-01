@@ -1,0 +1,30 @@
+// https://leetcode.com/problems/count-primes/solutions/2995593/rust-solution/
+
+impl Solution {
+    pub fn count_primes(n: i32) -> i32 {
+        if n <= 2
+        {
+            return 0;
+        }
+        let mut prime = vec![true;(n+1) as usize];
+        prime[0] = false;
+        prime[1] = false;
+        
+        let t = ((n as f64).sqrt() as usize);
+        for i in 2..=t {
+            if prime[i] {
+                for j in (i*i..=(n as usize)).step_by(i)
+                {
+                    prime[j] = false;
+                }
+            }
+        }
+        let mut count = 0;
+        for i in 2..n {
+            if prime[i as usize] {
+                count += 1;
+            }
+        }
+        count
+    }
+} 

@@ -1,0 +1,62 @@
+// https://leetcode.com/problems/range-sum-query-mutable/solutions/2357666/rust-recursive-segment-tree/
+struct NumArray {
+    tree: Vec<i32>,
+}
+
+impl NumArray {
+    fn new(nums: Vec<i32>) -> Self {
+        let mut tree = vec![0; nums.len() << 2];
+        Self::build(&mut tree, &nums, 1, 0, nums.len() - 1);
+        Self { tree }
+    }
+
+    fn build(tree: &mut Vec<i32>, nums: &[i32], i: usize, lo: usize, hi: usize) {
+        if lo == hi {
+            tree[i] = nums[lo];
+        }
+        else {
+            let mid = (lo + hi) >> 1;
+            Self::build(tree, nums, i << 1, lo, mid);
+            Self::build(tree, nums, (i << 1) + 1, mid + 1, hi);
+            tree[i] = tree[i << 1] + tree[(i << 1) + 1];
+        }
+    }
+    
+    fn update(&mut self, index: i32, val: i32) {
+        self.update_range(1, index as usize, val, 0, (self.tree.len() >> 2) - 1);
+    }
+
+    fn update_range(&mut self, i: usize, index: usize, val: i32, lo: usize, hi: usize) {
+        if lo == hi {
+            self.tree[i] = val;
+        }
+        else {
+            let mid = (lo + hi) >> 1;
+            if index <= mid {
+                self.update_range(i << 1, index, val, lo, mid)
+            }
+            else {
+                self.update_range((i << 1) + 1, index, val, mid + 1, hi)
+            }
+            self.tree[i] = self.tree[i << 1] + self.tree[(i << 1) + 1];
+        }
+    }
+    
+    fn sum_range(&self, left: i32, right: i32) -> i32 {
+        self.query(1, left as usize, right as usize, 0, (self.tree.len() >> 2) - 1)
+    }
+    
+    fn query(&self, i: usize, left: usize, right: usize, lo: usize, hi: usize) -> i32 {
+        if left > right {
+            0
+        }
+        else if left == lo && right == hi {
+            self.tree[i]
+        }
+        else {
+            let mid = (lo + hi) >> 1;
+            self.query(i << 1, left, right.min(mid), lo, mid)
+            + self.query((i << 1) + 1, left.max(mid + 1), right, mid + 1, hi)
+        }
+    }
+}

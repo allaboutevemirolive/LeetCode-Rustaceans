@@ -1,0 +1,63 @@
+// https://leetcode.com/problems/pacific-atlantic-water-flow/solutions/2508345/rust-straight-forward-solution/
+impl Solution {
+    pub fn pacific_atlantic(heights: Vec<Vec<i32>>) -> Vec<Vec<i32>> {
+        let mut a = vec![vec![false; heights[0].len()]; heights.len()];
+
+        let mut prev_n = 0;
+        while prev_n == 0 || prev_n != a.iter().flatten().map(|&v| v as i32).sum::<i32>() {
+            prev_n = a.iter().flatten().map(|&v| v as i32).sum::<i32>();
+            for i in 0..a.len() {
+                for j in 0..a[0].len() {
+                    if !a[i][j]
+                        && (i == 0
+                            || j == 0
+                            || (a[i - 1][j] && heights[i - 1][j] <= heights[i][j])
+                            || (i + 1 < a.len()
+                                && a[i + 1][j]
+                                && heights[i + 1][j] <= heights[i][j])
+                            || (j + 1 < a[0].len()
+                                && a[i][j + 1]
+                                && heights[i][j + 1] <= heights[i][j])
+                            || (a[i][j - 1] && heights[i][j - 1] <= heights[i][j]))
+                    {
+                        a[i][j] = true;
+                    }
+                }
+            }
+        }
+
+        let mut b = vec![vec![false; heights[0].len()]; heights.len()];
+        let mut prev_n = 0;
+        while prev_n == 0 || prev_n != b.iter().flatten().map(|&v| v as i32).sum::<i32>() {
+            prev_n = b.iter().flatten().map(|&v| v as i32).sum::<i32>();
+            for i in 0..b.len() {
+                for j in 0..b[0].len() {
+                    if !b[i][j]
+                        && (i == b.len() - 1
+                            || j == b[0].len() - 1
+                            || (i != 0 && b[i - 1][j] && heights[i - 1][j] <= heights[i][j])
+                            || (b[i + 1][j] && heights[i + 1][j] <= heights[i][j])
+                            || (b[i][j + 1] && heights[i][j + 1] <= heights[i][j])
+                            || (j != 0 && b[i][j - 1] && heights[i][j - 1] <= heights[i][j]))
+                    {
+                        b[i][j] = true;
+                    }
+                }
+            }
+        }
+        
+        // println!("{a:?}, {b:?}");
+
+        a.into_iter()
+            .zip(b)
+            .enumerate()
+            .flat_map(|(i, (v1, v2))| {
+                v1.into_iter()
+                    .zip(v2)
+                    .enumerate()
+                    .filter(|&(_, (v1, v2))| v1 && v2)
+                    .map(move |(j, _)| vec![i as i32, j as i32])
+            })
+            .collect()
+    }
+}

@@ -1,0 +1,25 @@
+// https://leetcode.com/problems/zigzag-conversion/solutions/908735/rust-0ms-2-1mb/
+if num_rows == 1 || num_rows >= s.len() as i32 {
+        return s;
+    }
+
+    let mut result = String::with_capacity(s.len());
+    let input_slice = &s[0..s.len()];
+    let segment_length = 2 * num_rows - 2;
+
+    for row in 0..num_rows {
+       let mut index = row;
+
+        while index < s.len() as i32 {
+            result.push(s.as_bytes()[index as usize] as char);
+            if row != 0 && row != num_rows - 1 {
+                let next_index = (index + segment_length - 2 * row) as usize;
+                if next_index < s.len() {
+                    result.push(s.as_bytes()[next_index] as char);
+                }
+            }
+            index += segment_length;
+        }
+    }
+
+    result

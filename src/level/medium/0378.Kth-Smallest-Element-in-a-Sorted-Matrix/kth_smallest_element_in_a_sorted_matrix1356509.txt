@@ -1,0 +1,30 @@
+// https://leetcode.com/problems/kth-smallest-element-in-a-sorted-matrix/solutions/1356509/rust-binary-search/
+impl Solution {
+    pub fn kth_smallest(matrix: Vec<Vec<i32>>, k: i32) -> i32 {
+        let n: usize = matrix.len();
+
+        let mut low: i32 = matrix[0][0];
+        let mut high: i32 = matrix[n - 1][n - 1];
+
+        while low < high {
+            let mut count: usize = 0;
+            let m: i32 = (low + high) / 2;
+
+            let mut j: usize = n;
+            for i in 0..n {
+                while j > 0 && matrix[i][j - 1] > m {
+                    j -= 1;
+                }
+                count += j;
+            }
+
+            if count < k as usize {
+                low = m + 1;
+            } else {
+                high = m;
+            }
+        }
+
+        low
+    }
+}

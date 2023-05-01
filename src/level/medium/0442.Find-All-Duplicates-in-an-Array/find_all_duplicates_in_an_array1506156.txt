@@ -1,0 +1,19 @@
+// https://leetcode.com/problems/find-all-duplicates-in-an-array/solutions/1506156/rust-solution/
+impl Solution {
+    pub fn find_duplicates(mut nums: Vec<i32>) -> Vec<i32> {
+        let mut result: Vec<i32> = Vec::new();
+        let mut index: i32;
+        
+        for i in 0..nums.len() {
+            index = nums[i].abs() - 1;
+            
+            if nums[index as usize] < 0 {
+                result.push(index + 1);
+            } else {
+                nums[index as usize] *= -1;
+            }
+        }
+        
+        result
+    }
+}

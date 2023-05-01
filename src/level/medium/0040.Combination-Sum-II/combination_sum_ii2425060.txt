@@ -1,0 +1,43 @@
+// https://leetcode.com/problems/combination-sum-ii/solutions/2425060/rust-bottom-up-solution/
+use std::collections::HashMap;
+
+impl Solution {
+    pub fn combination_sum2(mut candidates: Vec<i32>, target: i32) -> Vec<Vec<i32>> {
+        candidates.sort();
+
+        let mut targets_combs = HashMap::new();
+        targets_combs.insert(0, vec![Vec::new()]);
+        let mut iter = candidates.into_iter();
+        let mut cand = iter.next();
+        while cand.is_some() {
+            let mut new_targets_combs: HashMap<i32, Vec<Vec<i32>>> = HashMap::new();
+            for i in 1.. {
+                let cand_unwrapped = cand.unwrap();
+                for (t, old_combs) in targets_combs.iter() {
+                    let new_target = t + cand_unwrapped * i;
+                    if new_target <= target {
+                        let mut new_combs: Vec<Vec<i32>> = old_combs.clone();
+                        for comb in new_combs.iter_mut() {
+                            for _ in 0..i {
+                                comb.push(cand_unwrapped);
+                            }
+                        }
+                        new_targets_combs
+                            .entry(new_target)
+                            .or_default()
+                            .append(&mut new_combs);
+                    }
+                }
+                let old_cand = cand;
+                cand = iter.next();
+                if old_cand != cand {
+                    break;
+                }
+            }
+            for (t, mut new_combs) in new_targets_combs.into_iter() {
+                targets_combs.entry(t).or_default().append(&mut new_combs);
+            }
+        }
+        targets_combs.remove(&target).unwrap_or_default()
+    }
+}

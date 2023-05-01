@@ -1,0 +1,11 @@
+// https://leetcode.com/problems/house-robber/solutions/224675/rust-0-ms/
+impl Solution {
+    pub fn rob(nums: Vec<i32>) -> i32 {
+
+        nums.into_iter()
+        .fold((0, 0), |(prev_prev, prev), x| {
+            ((prev, prev.max(prev_prev + x)))         
+        })
+        .1
+    }
+}

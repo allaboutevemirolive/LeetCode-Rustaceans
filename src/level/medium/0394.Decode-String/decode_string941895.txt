@@ -1,0 +1,44 @@
+// https://leetcode.com/problems/decode-string/solutions/941895/rust-scary-looking-recursive-solution/
+use std::collections::HashSet;
+impl Solution {
+    pub fn decode_string(s: String) -> String {
+        let mut string: Vec<char> = vec![
+            "1".chars().next().unwrap(), 
+            "[".chars().next().unwrap()
+        ];
+        string.extend(s.chars().collect::<Vec<char>>());
+        string.push("]".chars().next().unwrap());
+        let nums = String::from("1234567890").chars().collect::<HashSet<char>>();
+        fn decode(string: &Vec<char>, digits: &HashSet<char>, idx: usize) -> (Vec<char>, usize) {
+            let close = "]".chars().next().unwrap();
+            let mut output = vec![];
+            let mut buffer = vec![];
+            let mut i = idx;
+            let mut n = String::new();
+            while digits.contains(&string[i]) {
+                n.push(string[i]);
+                i += 1
+            }
+            let k = n.parse::<i32>().unwrap();
+            i += 1; // skip "["
+            loop {
+                if digits.contains(&string[i]) {
+                    let (parsed, new_i) = decode(string, digits, i);
+                    buffer.extend(parsed);
+                    i = new_i+1;
+                } else if string[i] == close {
+                    break
+                } else {
+                    buffer.push(string[i]);
+                    i += 1;
+                }
+            }
+            for _ in 0..k {
+                output.extend(buffer.clone());
+            }
+            (output, i)
+        }
+        let (out, _) = decode(&string, &nums, 0);
+        out.into_iter().collect()
+    }
+}

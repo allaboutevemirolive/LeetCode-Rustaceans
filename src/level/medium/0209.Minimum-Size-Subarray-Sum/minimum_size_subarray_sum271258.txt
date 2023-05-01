@@ -1,0 +1,32 @@
+// https://leetcode.com/problems/minimum-size-subarray-sum/solutions/271258/rust-solution-in-0ms/
+use std::cmp;
+
+impl Solution {
+    pub fn min_sub_array_len(s: i32, nums: Vec<i32>) -> i32 {
+        if nums.len() == 0 {
+            return 0;
+        }
+        let mut left: usize = 0;
+        let mut right: usize = 1;
+        let mut sum = nums[0];
+        let mut min: usize = nums.len() + 1;
+        while right <= nums.len() && left < right {
+            if sum >= s {
+                min = cmp::min(min, right - left);
+                sum -= nums[left];
+                left += 1;
+            } else {
+                right += 1;
+                if right > nums.len() {
+                    break;
+                }
+                sum += nums[right-1];
+            }
+        }
+        if min > nums.len() {
+            0 as i32
+        } else {
+            min as i32
+        }
+    }
+}

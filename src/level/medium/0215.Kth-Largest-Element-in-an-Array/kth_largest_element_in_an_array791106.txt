@@ -1,0 +1,31 @@
+// https://leetcode.com/problems/kth-largest-element-in-an-array/solutions/791106/rust-implementing-quick-sort-solution/
+impl Solution {
+    pub fn find_kth_largest(nums: Vec<i32>, k: i32) -> i32 {
+        fn qSort(nums: &mut [i32]) {
+            if nums.len() <= 1 {
+                return;
+            }
+            
+            let mid = nums.len()/2;
+            let (mut left, right) = (0, nums.len()-1);
+            nums.swap(mid, right);
+            
+            let mut i = 0;
+            while i < nums.len() {
+                if nums[i] < nums[right] {
+                    nums.swap(i, left);
+                    left += 1;
+                }
+                i += 1;
+            }
+            
+            nums.swap(left, right);
+            qSort(&mut nums[0..left]);
+            qSort(&mut nums[left+1..=right]);
+        }
+
+        let mut nums = nums;
+        qSort(&mut nums);
+        nums[nums.len() - k as usize]
+    }
+}

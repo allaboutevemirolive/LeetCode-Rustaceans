@@ -1,0 +1,15 @@
+// https://leetcode.com/problems/unique-paths/solutions/942373/rust-cheapest-best/
+impl Solution {
+    pub fn unique_paths(m: i32, n: i32) -> i32 {
+        let (m, n) = (m as usize, n as usize);
+        let mut dp = vec![vec![1; n]; m];
+
+        for i in (0..m - 1).rev() {
+            for j in (0..n - 1).rev() {
+                dp[i][j] = dp[i + 1][j] + dp[i][j + 1];
+            }
+        }
+
+        dp[0][0]
+    }
+}

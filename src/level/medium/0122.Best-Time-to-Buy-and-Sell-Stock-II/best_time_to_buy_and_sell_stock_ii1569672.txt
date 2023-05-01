@@ -1,0 +1,12 @@
+// https://leetcode.com/problems/best-time-to-buy-and-sell-stock-ii/solutions/1569672/rust-solution/
+impl Solution {
+    pub fn max_profit(prices: Vec<i32>) -> i32 {
+        prices
+            .into_iter()
+            .fold((0, i32::MIN), |(a, b), x| {
+                let b = (a - x).max(b);
+                (a.max(b + x), b)
+            })
+            .0
+    }
+}

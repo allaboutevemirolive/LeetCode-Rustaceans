@@ -1,0 +1,43 @@
+// https://leetcode.com/problems/search-in-rotated-sorted-array-ii/solutions/1412651/rust-solution/
+impl Solution {
+    pub fn search(nums: Vec<i32>, target: i32) -> bool {
+        if nums.is_empty() {
+            return false;
+        }
+
+        let mut low = 0;
+        let mut high = nums.len() - 1;
+        let mut mid;
+
+        while low <= high && high < nums.len() {
+            mid = low + (high - low) / 2;
+
+            if nums[mid] == target {
+                return true;
+            }
+
+            if nums[mid] > nums[low] {
+                if nums[mid] > target && nums[low] <= target {
+                    high = mid;
+                } else {
+                    low = mid + 1;
+                }
+            } else if nums[mid] < nums[high] {
+                if nums[mid] < target && nums[high] >= target {
+                    low = mid + 1;
+                } else {
+                    high = mid - 1;
+                }
+            } else {
+                if nums[low] == nums[mid] {
+                    low += 1;
+                }
+                if nums[high] == nums[mid] {
+                    high -= 1;
+                }
+            }
+        }
+
+        false
+    }
+}

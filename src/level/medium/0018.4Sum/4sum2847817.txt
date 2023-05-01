@@ -1,0 +1,43 @@
+// https://leetcode.com/problems/4sum/solutions/2847817/rust-4-indices-w-binary-search/
+impl Solution {
+    pub fn four_sum(mut nums: Vec<i32>, target: i32) -> Vec<Vec<i32>> {
+        let mut result = vec![];
+
+        nums.sort();
+        
+        for g in 0..nums.len() {
+            if g > 0 && nums[g] == nums[g - 1] {
+                continue;
+            }
+            for h in g + 1..nums.len() {
+                if h > g + 1 && nums[h] == nums[h - 1] {
+                    continue;
+                }
+                let mut i = h + 1;
+                let mut j = nums.len() - 1;
+                while i < j {
+                    let diff = target.checked_sub(nums[g])
+                                     .and_then(|n| n.checked_sub(nums[h]))
+                                     .and_then(|n| n.checked_sub(nums[i]));
+                    if let Some(diff) = diff {
+                        match nums[i + 1..=j].bisect_left(diff) {
+                            Ok(k) => {
+                                j = i + k + 1;
+                                result.push(vec![nums[g], nums[h], 
+                                                 nums[i], nums[j]]);
+                                j -= 1;
+                            },
+                            Err(k) => {
+                                j = i + k;
+                            }
+                        }
+                    }
+                    match nums[i + 1..=j].bisect_right(nums[i]) {
+                        Ok(k) | Err(k) => { i += k + 1; }
+                    }
+                }
+            }
+        }
+        result
+    }
+}

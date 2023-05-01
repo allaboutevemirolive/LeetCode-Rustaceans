@@ -1,0 +1,14 @@
+// https://leetcode.com/problems/combination-sum-iv/solutions/2383156/rust-bottom-up-dp-simple/
+impl Solution {
+    pub fn combination_sum4(nums: Vec<i32>, target: i32) -> i32 {
+        let mut dp = [0; 1001];
+        dp[0] = 1;
+        for i in 1..=target {
+            dp[i as usize] = nums
+                .iter()
+                .map(|x| if i >= *x { dp[(i - x) as usize] } else { 0 })
+                .sum();
+        }
+        dp[target as usize]
+    }
+}

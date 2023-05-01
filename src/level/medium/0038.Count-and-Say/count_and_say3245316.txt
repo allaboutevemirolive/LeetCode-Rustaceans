@@ -1,0 +1,21 @@
+// https://leetcode.com/problems/count-and-say/solutions/3245316/rust-elegant-100-solution/
+impl Solution {
+    pub fn count_and_say(n: i32) -> String {
+        let mut start = vec![b'1'];
+        for _ in 1..n {
+            let mut new_string = vec![];
+            let (res_val, amount) = start.iter().skip(1).fold((start[0], 1), |(cur_val, amount), &val| {
+                if cur_val != val {
+                    new_string.push(amount + b'0');
+                    new_string.push(cur_val);
+                    return (val, 1);
+                }
+                (cur_val, amount + 1)
+            });
+            new_string.push(amount + b'0');
+            new_string.push(res_val);
+            start = new_string;
+        }
+        String::from_utf8(start).unwrap()
+    }
+}

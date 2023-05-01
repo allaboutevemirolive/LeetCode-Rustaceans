@@ -1,0 +1,57 @@
+// https://leetcode.com/problems/recover-binary-search-tree/solutions/605020/rust-solution-using-raw-pointer-both-100/
+// Definition for a binary tree node.
+// #[derive(Debug, PartialEq, Eq)]
+// pub struct TreeNode {
+//   pub val: i32,
+//   pub left: Option<Rc<RefCell<TreeNode>>>,
+//   pub right: Option<Rc<RefCell<TreeNode>>>,
+// }
+//
+// impl TreeNode {
+//   #[inline]
+//   pub fn new(val: i32) -> Self {
+//     TreeNode {
+//       val,
+//       left: None,
+//       right: None
+//     }
+//   }
+// }
+use std::rc::Rc;
+use std::cell::RefCell;
+impl Solution {
+    pub fn recover_tree(root: &mut Option<Rc<RefCell<TreeNode>>>) {
+        let mut two_element_ptrs = [0 as *mut TreeNode, 0 as *mut TreeNode];
+        let mut prev_ptr = 0 as *mut TreeNode;
+
+        Solution::in_order(root.as_mut(), &mut two_element_ptrs, &mut prev_ptr);
+
+        unsafe {
+            let tmp = (&*two_element_ptrs[0]).val;
+            (&mut *two_element_ptrs[0]).val = (&*two_element_ptrs[1]).val;
+            (&mut *two_element_ptrs[1]).val = tmp;
+        }
+    }
+
+    fn in_order(root: Option<&mut Rc<RefCell<TreeNode>>>,two_ptrs: &mut [*mut TreeNode; 2], prev_ptr: &mut *mut TreeNode) {
+        if let Some(root_rc) = root {
+            let root_ptr = root_rc.as_ptr();
+            let mut root_bm = root_rc.borrow_mut();
+
+            Solution::in_order(root_bm.left.as_mut(), two_ptrs, prev_ptr);
+
+            // find two target nodes that don't meet the monotonically increasing rule
+            let prev_node = unsafe { &**prev_ptr };
+            if *prev_ptr as usize != 0 && prev_node.val > root_bm.val {
+                if two_ptrs[0] as usize == 0 {
+                    two_ptrs[0] = *prev_ptr;
+                }
+
+                two_ptrs[1] = root_ptr;
+            }
+
+            *prev_ptr = root_ptr;
+            Solution::in_order(root_bm.right.as_mut(), two_ptrs, prev_ptr);
+        }
+    }
+}

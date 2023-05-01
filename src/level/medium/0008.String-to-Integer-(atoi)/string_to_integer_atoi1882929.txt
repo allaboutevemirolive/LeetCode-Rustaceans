@@ -1,0 +1,16 @@
+// https://leetcode.com/problems/string-to-integer-atoi/solutions/1882929/rust/
+fn my_atoi(s: String) -> i32 {
+	let mut iter = s.chars().skip_while(|&ch| ch == ' ').peekable();
+
+	let sign = if let Some(s @ '+') | Some(s @ '-') = iter.peek().cloned() {
+		iter.next();
+		if s == '-' { -1 } else { 1 }
+	} else {
+		1
+	};
+
+	iter
+		.take_while(|ch| ch.is_digit(10))
+		.map(|ch| ch as i32 - '0' as i32)
+		.fold(0, |acc, d| acc.saturating_mul(10).saturating_add(d.saturating_mul(sign)))
+}

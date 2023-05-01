@@ -1,0 +1,27 @@
+// https://leetcode.com/problems/partition-equal-subset-sum/solutions/2472812/rust-solution-using-dp/
+impl Solution {
+    pub fn can_partition(nums: Vec<i32>) -> bool {
+        let tot = nums.iter().sum::<i32>() as usize;
+        if tot % 2 == 1 {
+            return false;
+        }
+        let half = tot/2;
+
+        let mut memo = vec![false;half+1];
+        memo[0] = true;
+        for v in nums {
+            let mut new_memo = memo.clone();
+            for i in 0..half {
+                if memo[i] {
+                    let ni = i+v as usize;
+                    if ni <= half {
+                        new_memo[ni] = true;
+                    }
+                }
+            }
+            memo = new_memo;
+        }
+
+        memo[half]
+    }
+}

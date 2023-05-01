@@ -1,0 +1,35 @@
+// https://leetcode.com/problems/restore-ip-addresses/solutions/3079322/rust-c-backtrack/
+impl Solution {
+    pub fn restore_ip_addresses(s: String) -> Vec<String> {
+        let mut ret = vec![];
+        let mut t = vec![0; 4];
+        Self::foo(0, &mut ret, &mut t, 0, &s);
+        ret
+    }
+
+    fn foo(i: usize, ret: &mut Vec<String>, t: &mut Vec<u8>, count: usize, s: &str) {
+        if i == s.len() {
+            if count == 4 {
+                ret.push(format!("{}.{}.{}.{}", t[0], t[1], t[2], t[3]));
+            }
+            return;
+        }
+        if count >= 4 {
+            return;
+        }
+
+        if s.as_bytes()[i] == b'0' {
+            t[count] = 0;
+            Self::foo(i + 1, ret, t, count + 1, s);
+        } else {
+            for j in i..s.len() {
+                if let Ok(v) = s[i..=j].parse::<u8>() {
+                    t[count] = v;
+                    Self::foo(j + 1, ret, t, count + 1, s);
+                } else {
+                    break;
+                }
+            }
+        }
+    }
+}

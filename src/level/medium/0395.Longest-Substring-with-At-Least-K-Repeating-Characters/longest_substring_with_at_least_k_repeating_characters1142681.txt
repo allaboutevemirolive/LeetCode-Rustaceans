@@ -1,0 +1,34 @@
+// https://leetcode.com/problems/longest-substring-with-at-least-k-repeating-characters/solutions/1142681/rust-dfs/
+use std::cmp;
+
+impl Solution {
+    pub fn longest_substring(s: String, k: i32) -> i32 {
+        let mut map:Vec<i32> = vec![0; 256];
+        for c in s.chars() {
+            map[c as usize] += 1;
+        }
+        let len = s.len();
+        for mut i in 0..len {
+            let mut idx = s.chars().nth(i).unwrap() as usize;
+            if map[idx] > 0 && map[idx] < k {
+                let left_s:String = String::from(&s[..i]);
+                let left:i32 = Self::longest_substring(left_s, k);
+                i += 1;
+                if i < len {
+                    idx = s.chars().nth(i).unwrap() as usize;
+                    while i < len && map[idx] > 0 && map[idx] < k {
+                        i += 1;
+                        if i >= len {
+                            break;
+                        }
+                        idx = s.chars().nth(i).unwrap() as usize;
+                    }
+                }
+                let right_s:String = String::from(&s[i..]);
+                let right:i32 = Self::longest_substring(right_s, k);
+                return cmp::max(left, right);
+            }
+        }
+        len as i32
+    }
+}

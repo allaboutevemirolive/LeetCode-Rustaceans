@@ -1,0 +1,15 @@
+// https://leetcode.com/problems/valid-sudoku/solutions/1602917/rust-rust-rust/
+pub fn is_valid_sudoku(board: Vec<Vec<char>>) -> bool {
+	let mult = |x| 3 - (x % 3);
+	for y in 0..9 {
+		for x in 0..9 {
+			if board[y][x] != '.' && (&board[y][(x+1)..9]).contains(&board[y][x]) 
+			|| board[y][x] != '.' && (&board[(y+1)..9]).iter().any(|arr| arr[x] == board[y][x])
+			|| board[y][x] != '.' && (&board[(y+1)..(mult(y) + y)])
+			.iter().any(|e| e[((mult(x) + x) - 3)..(mult(x) + x)].iter().any(|z| z == &board[y][x])) {
+				return false;
+			}
+		}
+	}
+	true
+}

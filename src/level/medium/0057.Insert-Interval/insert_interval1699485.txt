@@ -1,0 +1,70 @@
+// https://leetcode.com/problems/insert-interval/solutions/1699485/two-rust-solutions/
+    // Solution 1: simple to come up with but has many ifs and corner cases
+	//
+    pub fn insert_1(intervals: Vec<Vec<i32>>, new_interval: Vec<i32>) -> Vec<Vec<i32>> {
+        let start = new_interval[0];
+        let end = new_interval[1];
+        
+        let n: usize = intervals.len();
+        let mut i: usize = 0;
+        let mut res: Vec<Vec<i32>> = Vec::new();
+        
+        while i < n && intervals[i][1] < start {
+            res.push(intervals[i].clone());
+            i += 1;
+        }
+        
+        if i < n {
+            let mut new_el: Vec<i32> = Vec::new();
+            new_el.push(cmp::min(start, intervals[i][0]));
+            
+            while i < n && intervals[i][0] <= end {
+                i += 1;
+            }
+
+            if i != 0 {
+                new_el.push(cmp::max(intervals[i-1][1], end));
+            } else {
+                new_el.push(end);
+            }
+            res.push(new_el);
+            while i < n {
+                res.push(intervals[i].clone());
+                i += 1;
+            }
+        } else {
+            res.push(new_interval);
+        }
+        
+        return res;
+    }
+    
+    // Solution 2: more elegant 
+    //
+    fn intersect(l: &Vec<i32>, r: &Vec<i32>) -> bool {
+        if l[0] > r[0] {
+            return Self::intersect(r, l);
+        }
+        return l[0] <= r[0] && r[0] <= l[1];
+    }
+    
+    pub fn insert(intervals: Vec<Vec<i32>>, new_interval: Vec<i32>) -> Vec<Vec<i32>> {
+        let mut newInt = new_interval.clone();
+        let mut res: Vec<Vec<i32>> = Vec::new();
+
+        for cur in &intervals {
+            if Self::intersect(cur, &new_interval) {
+                newInt[0] = cmp::min(newInt[0], cur[0]);
+                newInt[1] = cmp::max(newInt[1], cur[1]);
+            } else {
+                res.push(cur.clone());
+            }
+        }
+        res.push(newInt);
+        res.sort_by( |l, r| {
+            return l[0].cmp(&r[0]);
+        });
+        
+        return res;
+        
+    }

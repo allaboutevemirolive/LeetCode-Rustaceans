@@ -1,0 +1,99 @@
+// https://leetcode.com/problems/combination-sum-iii/solutions/509428/rust-with-combination-iterator/
+struct Combination {
+    choices: Vec<i32>,
+    maxV: i32,
+    maxL: i32,
+}
+
+impl Combination {
+    fn new(maxL: i32, maxV: i32) -> Combination {
+        Combination {
+            choices: vec![0],
+            maxL: maxL,
+            maxV: maxV,
+        }
+    }
+
+    fn overflow (&mut self) -> bool {
+        let c = &self.choices;
+        let x = c.len() - 1;
+
+        c[x] > self.maxV
+    }
+
+    fn incr (&mut self) {
+        let mut c = &mut self.choices;
+        let x = c.len() - 1;
+
+        c[x] += 1;
+    }
+
+    fn has_more (&mut self) -> bool {
+        let c = &self.choices;
+
+        c.len() > 0
+    }
+
+    fn backtrack (&mut self) {
+        self.choices.pop();
+    }
+
+    fn complete (&mut self) -> bool {
+        let c = &self.choices;
+
+        (c.len() as i32) == self.maxL
+    }
+
+    fn skip (&mut self) -> bool {
+        let c = &self.choices;
+        let x = c.len() - 1;
+
+        x > 0 && c[x] <= c[x-1]
+    }
+
+    fn append (&mut self) {
+        let mut c = &mut self.choices;
+        let x = c.len() - 1;
+
+        if (x == 0) {
+            c.push(0);
+        } else {
+            c.push(c[x-1]);
+        }
+    }
+}
+
+impl Iterator for Combination {
+    type Item = Vec<i32>;
+
+    fn next (&mut self) -> Option<Self::Item> {
+        while self.has_more() {
+            self.incr();
+
+            if self.overflow() {
+                self.backtrack();
+                continue;
+            }
+
+            if self.skip() {
+                continue;
+            }
+
+            if self.complete() {
+                return Some(self.choices.to_vec());
+            } else {
+                self.append();
+            }
+        }
+
+        None
+    }
+}
+
+impl Solution {
+    pub fn combination_sum3(k: i32, n: i32) -> Vec<Vec<i32>> {
+        Combination::new(k, 9)
+            .filter(|x| x.iter().sum::<i32>() == n)
+            .collect::<Vec<Vec<i32>>>()
+    }
+}

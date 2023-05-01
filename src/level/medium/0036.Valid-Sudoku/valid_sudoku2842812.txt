@@ -1,0 +1,42 @@
+// https://leetcode.com/problems/valid-sudoku/solutions/2842812/rust-bit-manipulation/
+impl Solution {
+    pub fn is_valid_sudoku(board: Vec<Vec<char>>) -> bool {
+
+        if board.iter().any(|r| Self::is_valid(r)) ||
+            board.iter()
+                .fold(vec![vec![]; 9], |mut board, row| {
+                    row.iter() 
+                        .enumerate()
+                        .for_each(|(i, &c)| board[i].push(c));
+                    board
+                }).iter().any(|r| Self::is_valid(r)) ||
+            board.iter()
+                .enumerate()
+                .fold(vec![vec![]; 9], |mut board, (i, row)| {
+                    row.iter()
+                        .enumerate()
+                        .for_each(|(j, &c)| 
+                            board[(i / 3) * 3 + j / 3].push(c)
+                        );
+                    board
+                }).iter().any(|r| Self::is_valid(r)) 
+        {
+            return false
+        }
+        
+        return true
+    }
+
+    fn is_valid(digits: &Vec<char>) -> bool {
+        let mut m = 0;
+        for d in digits {
+            if let Some(d) = d.to_digit(10) {
+                if 1 & (m >> d) == 1 {
+                    return true
+                }
+                m |= 1 << d
+            }
+        }
+        return false
+    }
+}

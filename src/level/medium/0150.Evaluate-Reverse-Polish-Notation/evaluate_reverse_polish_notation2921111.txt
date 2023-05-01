@@ -1,0 +1,26 @@
+// https://leetcode.com/problems/evaluate-reverse-polish-notation/solutions/2921111/rust-stack-100/
+impl Solution {
+    pub fn eval_rpn(tokens: Vec<String>) -> i32 {
+        let mut stack = Vec::new();
+
+        for token in tokens {
+            if let Ok(num) = token.parse::<i32>() {
+                stack.push(num);
+            } else {
+                let second = stack.pop().unwrap();
+                let first = stack.pop().unwrap();
+                if token == "+" {
+                        stack.push(first + second);
+                } else if token == "-" {
+                        stack.push(first - second);
+                } else if token == "*" {
+                        stack.push(first * second);
+                } else if token == "/" {
+                        stack.push(first / second);
+                }
+            }
+        }
+
+        stack.pop().unwrap()
+    }
+}

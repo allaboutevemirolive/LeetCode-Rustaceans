@@ -1,0 +1,30 @@
+// https://leetcode.com/problems/add-two-numbers/solutions/733419/rust-cheapest-best/
+impl Solution {
+    pub fn add_two_numbers(
+        l1: Option<Box<ListNode>>,
+        l2: Option<Box<ListNode>>,
+    ) -> Option<Box<ListNode>> {
+        Self::go(&l1, &l2, 0)
+    }
+
+    fn go(
+        l1: &Option<Box<ListNode>>,
+        l2: &Option<Box<ListNode>>,
+        mut carry: i32,
+    ) -> Option<Box<ListNode>> {
+        if l1.is_none() && l2.is_none() && carry == 0 {
+            return None;
+        }
+        let val = [l1, l2].iter().fold(carry, |acc, cur| {
+            acc + cur.as_ref().map(|n| n.val).unwrap_or(0)
+        });
+        Some(Box::new(ListNode {
+            val: val % 10,
+            next: Self::go(
+                l1.as_ref().map(|n| &n.next).unwrap_or(&None),
+                l2.as_ref().map(|n| &n.next).unwrap_or(&None),
+                (val - (val % 10)) / 10,
+            ),
+        }))
+    }
+}

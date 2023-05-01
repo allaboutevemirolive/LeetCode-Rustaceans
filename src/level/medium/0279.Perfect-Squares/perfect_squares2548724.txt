@@ -1,0 +1,37 @@
+// https://leetcode.com/problems/perfect-squares/solutions/2548724/rust-recursion-with-memoization-easy-to-understand/
+pub fn num_squares(n: i32) -> i32 {
+    assert!(n >= 1);
+    let n = n as usize;
+
+    let mut cache = vec![0; n + 1];
+    for x in 1..cache.len() {
+        if x * x >= cache.len() {
+            break;
+        }
+
+        cache[x * x] = 1;
+    }
+
+    compute(&mut cache, n)
+}
+
+fn compute(cache: &mut [i32], n: usize) -> i32 {
+    if n == 0 || cache[n] > 0 {
+        return cache[n];
+    }
+
+    let mut sum = i32::MAX;
+    for x in 1..n {
+        if x * x > n {
+            break;
+        }
+
+        let cnt = compute(cache, n - x * x);
+
+        // +1, because of x*x which is a perfect square in itself
+        sum = sum.min(cnt + 1);
+    }
+
+    cache[n] = sum;
+    sum
+}

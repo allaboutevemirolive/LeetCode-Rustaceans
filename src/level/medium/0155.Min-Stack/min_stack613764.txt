@@ -1,0 +1,41 @@
+// https://leetcode.com/problems/min-stack/solutions/613764/rust-solution-with-two-vec/
+struct MinStack {
+    values: Vec<i32>,
+    mins: Vec<i32>,
+}
+
+/**
+ * `&self` means the method takes an immutable reference.
+ * If you need a mutable reference, change it to `&mut self` instead.
+ */
+impl MinStack {
+    /** initialize your data structure here. */
+    fn new() -> Self {
+        Self {
+            mins: vec![],
+            values: vec![],
+        }
+    }
+
+    fn push(&mut self, x: i32) {
+        self.values.push(x);
+        match self.mins.last() {
+            Some(&a) => self.mins.push(std::cmp::min(a, x)),
+            None => self.mins.push(x),
+        }
+    }
+
+    fn pop(&mut self) {
+        self.values.pop();
+        self.mins.pop();
+    }
+
+    fn top(&self) -> i32 {
+        *self.values.last().unwrap()
+        // self.stack.last()
+    }
+
+    fn get_min(&self) -> i32 {
+        *self.mins.last().unwrap()
+    }
+}

@@ -1,0 +1,15 @@
+// https://leetcode.com/problems/maximum-product-subarray/solutions/1112982/rust-cheapest-best/
+impl Solution {
+  pub fn max_product(nums: Vec<i32>) -> i32 {
+        let mut dp = vec![(1, 1)];
+        for i in 0..nums.len() {
+            let products = [nums[i], nums[i] * dp[i].0, nums[i] * dp[i].1];
+            dp.push((
+                *products.iter().max().unwrap(),
+                *products.iter().min().unwrap(),
+            ));
+        }
+
+        dp.into_iter().skip(1).map(|(a, b)| a.max(b)).max().unwrap()
+    }
+}

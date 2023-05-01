@@ -1,0 +1,35 @@
+// https://leetcode.com/problems/valid-sudoku/solutions/346953/rust-solution/
+use std::collections::HashSet;
+impl Solution {
+    pub fn is_valid_sudoku(board: Vec<Vec<char>>) -> bool {
+        for i in 0..9 {
+            let mut row = HashSet::new();
+            let mut column = HashSet::new();
+            let mut cube = HashSet::new();
+            for j in 0..9 {
+                if board[i][j] != '.' {
+                    if row.contains(&(board[i][j])) {
+                        return false;
+                    }
+                    row.insert(board[i][j]);
+                }
+
+                if board[j][i] != '.' {
+                    if column.contains(&(board[j][i])) {
+                        return false;
+                    }
+                    column.insert(board[j][i]);
+                }
+                let row_idx = 3 * (i / 3) + j / 3;
+                let col_idx = 3 * (i % 3) + j % 3;
+                if board[row_idx][col_idx] != '.' {
+                    if cube.contains(&(board[row_idx][col_idx])) {
+                        return false;
+                    }
+                    cube.insert(board[row_idx][col_idx]);
+                }
+            }
+        }
+        true
+    }
+}

@@ -1,0 +1,26 @@
+// https://leetcode.com/problems/valid-sudoku/solutions/1415666/rust-solution/
+impl Solution {
+    pub fn is_valid_sudoku(board: Vec<Vec<char>>) -> bool {
+        (0..9).all(|i| {
+            [
+                (0..9).map(|j| board[i][j] as u8).collect::<Vec<_>>(),
+                (0..9).map(|j| board[j][i] as u8).collect::<Vec<_>>(),
+                (0..9)
+                    .map(|j| board[i / 3 * 3 + j / 3][(i % 3) * 3 + j % 3] as u8)
+                    .collect::<Vec<_>>(),
+            ]
+            .iter()
+            .all(|v| {
+                v.iter()
+                    .fold([0; 9], |mut acc, &u| {
+                        if u != b'.' {
+                            acc[(u - b'1') as usize] += 1;
+                        }
+                        acc
+                    })
+                    .iter()
+                    .all(|&n| n < 2)
+            })
+        })
+    }
+}

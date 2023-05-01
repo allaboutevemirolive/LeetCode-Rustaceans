@@ -1,0 +1,41 @@
+// https://leetcode.com/problems/sort-characters-by-frequency/solutions/1534866/rust-0ms-with-explainations/
+impl Solution {
+    pub fn frequency_sort(s: String) -> String {
+        // count the char
+        let mut counter = vec![0; u8::MAX as usize];
+        for &char in s.as_bytes() {
+            counter[char as usize] += 1;
+        }
+        // find char with non-zero count
+        let char_with_cnt = counter.iter().enumerate()
+            .filter(|(_, &cnt)| {
+                cnt > 0
+            })
+            .map(|(index, &cnt)| {
+                (index as u8, cnt)
+            });
+        // sort by count
+        let mut vec1 = char_with_cnt.collect::<Vec<_>>();
+        vec1.sort_by(|a, b| b.1.cmp(&a.1));
+        // reconstruct the string
+        let mut result = Vec::with_capacity(s.len());
+        for (char, cnt) in vec1 {
+            for _ in 0..cnt {
+                result.push(char);
+            }
+        }
+        String::from_utf8(result).unwrap()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::Solution;
+
+    #[test]
+    fn it_works() {
+        assert_eq!(Solution::frequency_sort("tree".into()), "eert");
+        assert_eq!(Solution::frequency_sort("cccaaa".into()), "aaaccc");
+        assert_eq!(Solution::frequency_sort("Aabb".into()), "bbAa");
+    }
+}

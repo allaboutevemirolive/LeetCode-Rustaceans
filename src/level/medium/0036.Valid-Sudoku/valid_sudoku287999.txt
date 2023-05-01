@@ -1,0 +1,62 @@
+// https://leetcode.com/problems/valid-sudoku/solutions/287999/simple-rust/
+impl Solution {
+pub fn is_valid_sudoku(board: Vec<Vec<char>>) -> bool {
+    let partbox = vec![
+        vec![0, 0],
+        vec![0, 3],
+        vec![0, 6],
+        vec![3, 0],
+        vec![3, 3],
+        vec![3, 6],
+        vec![6, 0],
+        vec![6, 3],
+        vec![6, 6],
+    ];
+    let mut re = true;
+
+    for i in 0..9 {
+        let mut xcc = board[i]
+            .clone()
+            .into_iter()
+            .filter(|x| *x != '.')
+            .collect::<Vec<char>>();
+        let mut ycc = board
+            .clone()
+            .into_iter()
+            .map(|a| a[i])
+            .filter(|x| *x != '.')
+            .collect::<Vec<char>>();
+        xcc.sort();
+        ycc.sort();
+        let xst: String = xcc.clone().into_iter().collect();
+        let yst: String = ycc.clone().into_iter().collect();
+        xcc.dedup();
+        ycc.dedup();
+        let xdest: String = xcc.into_iter().collect();
+        let ydest: String = ycc.into_iter().collect();
+        if xst != xdest || yst != ydest {
+            re = false;
+        }
+    }
+    let boxa = partbox.into_iter().map(|a| {
+        let mut vb = vec![];
+        for yi in 0..3 {
+            for xi in 0..3 {
+                let o = board[a[0] + yi][a[1] + xi];
+                if o != '.' {
+                    vb.push(o);
+                }
+            }
+        }
+        vb.sort();
+        let mut c = vb.clone();
+        c.dedup();
+        if vb.into_iter().collect::<String>() != c.into_iter().collect::<String>() {
+            return false;
+        } else {
+            return true;
+        }
+    });
+    re && !boxa.into_iter().any(|a| a == false)
+}
+}

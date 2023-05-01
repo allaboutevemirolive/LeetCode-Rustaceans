@@ -1,0 +1,8 @@
+// https://leetcode.com/problems/best-time-to-buy-and-sell-stock-ii/solutions/1779264/rust-fold/
+impl Solution {
+    pub fn max_profit(prices: Vec<i32>) -> i32 {
+        prices.as_slice()
+		      .windows(2)
+			  .fold(0, |acc, x| if x[0] < x[1] {x[1] - x[0] + acc} else {acc})
+    }
+}

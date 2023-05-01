@@ -1,0 +1,40 @@
+// https://leetcode.com/problems/string-to-integer-atoi/solutions/1163441/rust/
+impl Solution {
+    pub fn my_atoi(s: String) -> i32 {
+         let mut neg = false;
+         let mut result_str = String::new();
+         let mut started = false;
+         let mut count:u8 = 0;
+         for &v in s.as_bytes() {
+            
+            if !started && v == 45 { 
+                count += 1;
+                neg = true;
+                continue;
+            }
+            else if !started &&  v == 43 {
+                count +=1;
+                continue;
+            }
+            
+            if count > 1 {return 0}
+            if !started && count ==0 && (v == 32) {continue;}
+            
+            if v < 48 || v > 57 {
+                if !started {return 0}
+                break;
+            }
+            if !started {started = true;}
+            result_str.push(v as char);
+         }
+        if result_str.len() == 0 {return 0;}
+        result_str = if neg { "-".to_owned() + &result_str[..]} else { result_str };
+        
+        let result = match result_str.parse::<i32>(){
+            Ok(val) => val,
+            Err(_) => if neg {std::i32::MIN} else {std::i32::MAX}
+        };
+        
+        result
+    }
+}

@@ -1,0 +1,7 @@
+// https://leetcode.com/problems/search-in-rotated-sorted-array-ii/solutions/1892631/rust-0ms-2-1mb/
+impl Solution {
+    pub fn search(nums: Vec<i32>, target: i32) -> bool {
+        nums.iter().any(|&i| i == target)
+		//nums.contains(&target)
+    }
+}

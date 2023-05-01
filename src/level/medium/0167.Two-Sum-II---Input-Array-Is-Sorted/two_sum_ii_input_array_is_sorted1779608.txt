@@ -1,0 +1,24 @@
+// https://leetcode.com/problems/two-sum-ii-input-array-is-sorted/solutions/1779608/simple-rust-solution/
+impl Solution {
+    pub fn two_sum(numbers: Vec<i32>, target: i32) -> Vec<i32> {
+        let mut ans: Vec<i32> = vec![];
+        let mut beg = 0;
+        let mut end = numbers.len() - 1;
+        
+        while beg < end {
+            let sum = numbers[beg] + numbers[end];
+            if sum == target {
+                ans.push((beg+1) as i32);
+                ans.push((end+1) as i32);
+                return ans;
+            }
+            if sum < target {
+                beg += 1;
+            }
+            if sum > target {
+                end -= 1;
+            }
+        }
+        ans
+    }
+}

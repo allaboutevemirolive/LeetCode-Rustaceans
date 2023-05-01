@@ -1,0 +1,17 @@
+// https://leetcode.com/problems/house-robber-ii/solutions/2153014/rust-dp/
+impl Solution {
+    pub fn rob(nums: Vec<i32>) -> i32 {
+        fn helper(nums: &[i32]) -> i32{
+            let mut rob1 = 0;
+            let mut rob2 = 0;
+            for i in 0..nums.len(){
+                let tmp = rob1; 
+                rob1 = rob1.max(rob2 + nums[i]);
+                rob2 = tmp;
+            }
+            rob1
+        }
+        let res = helper(&nums[1..]).max(helper(&nums[..nums.len()-1]));
+        res.max(nums[0])
+    }
+}

@@ -1,0 +1,28 @@
+// https://leetcode.com/problems/sum-root-to-leaf-numbers/solutions/1556056/rust-dfs-solution/
+use std::rc::Rc;
+use std::cell::RefCell;
+impl Solution {
+    pub fn sum_numbers(root: Option<Rc<RefCell<TreeNode>>>) -> i32 {
+        let mut ans: i32 = 0;
+        Solution::solve(root.as_ref(), &mut ans, &mut 0);
+        ans
+    }
+    
+    fn solve(root: Option<&Rc<RefCell<TreeNode>>>, ans: &mut i32, number: &mut i32) {
+        if let Some(root) = root {
+            let node = root.borrow();
+            *number = *number*10 + node.val;
+            
+            if node.left.is_none() && node.right.is_none() {
+                *ans += *number;
+            } 
+            
+            Solution::solve(node.left.as_ref(), ans, number);
+
+            Solution::solve(node.right.as_ref(), ans, number);
+
+            
+            *number/=10;
+        }
+    }
+}

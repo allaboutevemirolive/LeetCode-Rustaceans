@@ -1,0 +1,18 @@
+// https://leetcode.com/problems/maximum-subarray/solutions/1320081/rust-linear-solution/
+impl Solution {
+    pub fn max_sub_array(nums: Vec<i32>) -> i32 {
+        let (mut max_sum, mut sum) = (nums[0], nums[0]);
+        nums[1..].iter().for_each(|&x| {
+            match sum {
+                _ if sum > 0 => sum += x,
+                _ if x > sum => sum = x,
+                _ => ()
+            };
+
+            if sum > max_sum {
+                max_sum = sum;
+            }
+        });
+        max_sum
+    }
+}

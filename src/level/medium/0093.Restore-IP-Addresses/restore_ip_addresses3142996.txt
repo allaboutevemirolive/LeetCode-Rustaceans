@@ -1,0 +1,53 @@
+// https://leetcode.com/problems/restore-ip-addresses/solutions/3142996/rust-0ms-2-1-mb-backtracking/
+impl Solution {
+    pub fn restore_ip_addresses(s: String) -> Vec<String> {
+        /*
+            1. Generate the base case, ie... 2.5.5.2.5.5
+            2. Set conditions to correct the base until we meet the requirements
+        */
+        let mut res: Vec<String> = vec![];
+        let mut current_res = "".to_string();
+        
+        if s.len() > 12 { 
+            return res
+        }
+        
+        Self::get_addresses(&s, 0, 0, &mut current_res, &mut res);
+
+        return res    
+    }
+    
+    fn get_addresses(
+        s: &String, 
+        parentNode: usize, 
+        mut dots: usize, 
+        mut current_res: &mut String, 
+        mut res: &mut Vec<String>
+    ) { 
+    
+        if dots == 4 && s.len() == parentNode { 
+            println!("{current_res}");
+
+            res.push(current_res[..current_res.len() - 1].to_string());
+            
+            return 
+        }
+        
+        if dots >= 4 { 
+
+            return 
+        }
+        
+        for nextNode in parentNode..s.len() { 
+            let mut val = &s[parentNode..=nextNode];            
+            let val_num = val.to_string().parse::<usize>().unwrap();
+            
+            if val.starts_with("0") && parentNode != nextNode  {continue}
+            
+            if val_num <= 255 { 
+                let mut curr = current_res.clone() + val + ".";
+                Self::get_addresses(s, nextNode + 1, dots + 1, &mut curr, res);
+            }
+        }
+    }
+}

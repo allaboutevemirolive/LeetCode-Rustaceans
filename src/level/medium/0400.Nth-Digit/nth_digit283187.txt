@@ -1,0 +1,46 @@
+// https://leetcode.com/problems/nth-digit/solutions/283187/rust-solution-annotated/
+pub fn find_nth_digit(n: i32) -> i32 {
+        if n < 10 { return n }
+        
+        // find width of numbers that will contain the nth digit
+        // number of digits per each width == 9 * width * 10^(width-1)
+        // if 9 * width * 10^(width-1) > n, then n is contained in (width - 1) numbers
+        // width must be <10 in order to fit in 32 bit int 
+        
+        let mut width = 1; // start with the tens place (width = 1) b/c we early return for n < 10
+        
+        let mut step = 0;
+        
+        let mut next_level = 9;
+        
+        while n - step > next_level && width < 9{
+        
+            width += 1;
+            
+            step += next_level;
+            
+            next_level = 9 * width as i32 * 10i32.pow(width-1);
+        
+        }
+
+        // now find which number in the group of numbers with width == width will contain the nth digit.
+        // n - step -1 == how many digits into the group of numbers with width == width
+        // b/c you get a new number every width digits, (n - step -1) % width gives the position of interest within the target number
+        
+        let place = (n - step - 1) % width as i32;
+        
+        // the target number is going to be the number of digits beyond the lower limit (step) divided by width + the smallest number with the correct number of digits
+        // so 3 digit numbers start with 100, the target number will be (n - step - 1)/width + 10^2
+        
+        let target = 10i32.pow(width-1) + (n - step -1) / width as i32;
+        
+        // converting to string and accessing by index seems the easiest way to get the digit in target at place, but rust does not allow accessing strings by index
+        // so convert to string, then that string to array of bytes, take the place index of the bytes as a char and then convert that char back to a digit. uggh.
+        // this is only acceptable b/c we know our string will only consist of digits and no weird glyphs
+        
+        // let digit = target.to_string().as_bytes()[place as usize] as char;
+        // digit.to_digit(10u32).unwrap() as i32
+        
+        // we can also just math it
+        
+        (target / 10i32.pow(width-1-place as u32)) % 10

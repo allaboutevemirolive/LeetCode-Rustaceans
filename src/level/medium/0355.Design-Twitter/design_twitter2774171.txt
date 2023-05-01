@@ -1,0 +1,91 @@
+// https://leetcode.com/problems/design-twitter/solutions/2774171/overengineered-rust-hashmap-hashset-solution-with-tuples-runtime-1ms-memory-2-1mb/
+use std::collections::{HashMap, HashSet};
+
+#[derive(Default)]
+struct Twitter {
+    /// Automatically incrementing "timestamp" imitation used for
+    /// sorting the tweets.
+    pub stamp: i32,
+    /// Sorting will be done by comparing stamp numbers. Bigger
+    /// stamp means more recent post, smaller number means older
+    /// post.
+    //                                id , stamp
+    pub tweets: HashMap<i32, HashSet<(i32, i32)>>,
+    pub relations: HashMap<i32, HashSet<i32>>,
+}
+
+/**
+ * `&self` means the method takes an immutable reference.
+ * If you need a mutable reference, change it to `&mut self` instead.
+ */
+impl Twitter {
+    fn new() -> Self {
+        Self::default()
+    }
+
+    fn post_tweet(&mut self, user_id: i32, tweet_id: i32) {
+        if let Some(tweets) = self.tweets.get_mut(&user_id) {
+            tweets.insert((tweet_id, self.stamp));
+        } else {
+            let mut tweets = HashSet::default();
+            tweets.insert((tweet_id, self.stamp));
+            self.tweets.insert(user_id, tweets);
+        };
+
+        self.stamp += 1;
+    }
+
+    /// `List<Integer> getNewsFeed(int userId)` Retrieves the `10` most recent tweet
+    /// IDs in the user's news feed. Each item in the news feed must be posted by
+    /// users who the user followed or by the user themself. Tweets must be ordered
+    /// from most recent to least recent.
+    fn get_news_feed(&self, user_id: i32) -> Vec<i32> {
+        let mut unsorted = vec![];
+        if let Some(followees) = self.relations.get(&user_id) {
+            for followee in followees {
+                if let Some(tweets) = self.tweets.get(followee) {
+                    for tweet in tweets {
+                        unsorted.push(*tweet);
+                    }
+                }
+            }
+        }
+
+        if let Some(tweets) = self.tweets.get(&user_id) {
+            for tweet in tweets {
+                unsorted.push(*tweet);
+            }
+        }
+
+        unsorted.sort_by(|(_, a), (_, b)| b.partial_cmp(a).unwrap());
+        let sorted = unsorted
+            .into_iter()
+            .take(10)
+            .map(|(it, _)| it)
+            .collect::<Vec<i32>>();
+
+        sorted
+    }
+
+    fn follow(&mut self, follower_id: i32, followee_id: i32) {
+        if follower_id != followee_id {
+            if let Some(follower) = self.relations.get_mut(&follower_id) {
+                if !follower.contains(&followee_id) {
+                    follower.insert(followee_id);
+                }
+            } else {
+                let mut set = HashSet::default();
+                set.insert(followee_id);
+                self.relations.insert(follower_id, set);
+            }
+        }
+    }
+
+    fn unfollow(&mut self, follower_id: i32, followee_id: i32) {
+        if follower_id != followee_id {
+            if let Some(follower) = self.relations.get_mut(&follower_id) {
+                follower.remove(&followee_id);
+            }
+        }
+    }
+}

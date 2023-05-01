@@ -1,0 +1,32 @@
+// https://leetcode.com/problems/find-the-duplicate-number/solutions/1893344/rust-floyd-s-algorithm-time-o-n-space-o-1/
+impl Solution {
+    pub fn find_duplicate(nums: Vec<i32>) -> i32 {
+        // Helper functions
+        // First element of the nums array (as usize)
+        let first = || nums[0] as usize;
+        // Next element in the list
+        let next = |x: usize| nums[x] as usize;
+
+        // Define our two nodes
+        let mut p1: usize = first();
+        let mut p2: usize = first();
+
+        loop {
+            // Move through the list at different speeds
+            p1 = next(p1);
+            p2 = next(next(p2));
+
+            // If both reach the same element
+            if p1 == p2 {
+                // Reset p1
+                p1 = first();
+                while p1 != p2 {
+                    // Move at same speed
+                    p1 = next(p1);
+                    p2 = next(p2);
+                }
+                return p2 as i32;
+            }
+        }
+    }
+}

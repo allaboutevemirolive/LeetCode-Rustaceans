@@ -1,0 +1,66 @@
+// https://leetcode.com/problems/spiral-matrix-ii/solutions/1408302/rust-clear-solution/
+enum Direction {
+    Right,
+    Left,
+    Up,
+    Down,
+}
+
+impl Solution {
+    pub fn generate_matrix2(n: i32) -> Vec<Vec<i32>> {
+        let total = n * n;
+        let mut up_bound = 0;
+        let mut down_bound = n as usize - 1;
+        let mut right_bound = n as usize - 1;
+        let mut left_bound = 0;
+        let mut direction = Direction::Right;
+        let mut row = 0;
+        let mut column = 0;
+        let mut res = vec![vec![0; n as usize]; n as usize];
+
+        for num in 1..=total {
+            res[row][column] = num;
+
+            match direction {
+                Direction::Right => {
+                    if column == right_bound {
+                        direction = Direction::Down;
+                        row += 1;
+                        up_bound += 1;
+                    } else {
+                        column += 1;
+                    }
+                }
+                Direction::Down => {
+                    if row == down_bound {
+                        direction = Direction::Left;
+                        column -= 1;
+                        right_bound -= 1;
+                    } else {
+                        row += 1;
+                    }
+                }
+                Direction::Left => {
+                    if column == left_bound {
+                        direction = Direction::Up;
+                        row -= 1;
+                        down_bound -= 1;
+                    } else {
+                        column -= 1;
+                    }
+                }
+                Direction::Up => {
+                    if row == up_bound {
+                        direction = Direction::Right;
+                        column += 1;
+                        left_bound += 1;
+                    } else {
+                        row -= 1;
+                    }
+                }
+            }
+        }
+
+        res
+    }
+}

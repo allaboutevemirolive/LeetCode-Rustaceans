@@ -1,0 +1,53 @@
+// https://leetcode.com/problems/next-permutation/solutions/470975/rust-o-n-faster-then-100-0ms-2mb-less-then-100/
+impl Solution {
+    pub fn next_permutation(nums: &mut Vec<i32>) {
+        if nums.len() < 2 {
+            return;
+        }
+        let i = Solution::get_first_point(&nums); 
+        if i as i32 > -1 {
+            let w = Solution::get_next_el_to_exchange(&nums, i+1, nums[i]);
+            let temp = nums[w];
+            nums[w] = nums[i];
+            nums[i] = temp;
+            Solution::reverse_array(nums, i+1);
+        }
+        else {
+            nums.reverse();
+        }
+        //println!("{:?}", &nums);
+    }
+    
+    pub fn reverse_array(nums: &mut Vec<i32>, mut start: usize) {
+        let mut hi = nums.len() - 1;
+        while start < hi && start > 0 && hi > 0 {
+            let temp = nums[hi];
+            nums[hi] = nums[start];
+            nums[start] = temp;
+            hi -= 1;
+            start += 1;
+        }
+    }
+    
+    pub fn get_next_el_to_exchange(nums: &Vec<i32>, start: usize, target: i32) -> usize {
+        let mut end = nums.len() - 1;
+        while end > start {
+            if nums[end] > target {
+                return end;
+            }
+        end -= 1;
+        }
+        end
+    }
+
+
+    pub fn get_first_point(nums: &Vec<i32>) -> usize {     
+        let mut last_seq_at = -1;   
+        for i in 0..nums.len()-1 {
+            if nums[i] < nums[i+1] {
+                last_seq_at = i as i32; 
+           }
+        }
+        last_seq_at as usize
+    }   
+}

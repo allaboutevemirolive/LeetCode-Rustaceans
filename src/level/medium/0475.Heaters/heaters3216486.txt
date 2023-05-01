@@ -1,0 +1,18 @@
+// https://leetcode.com/problems/heaters/solutions/3216486/rust-elixir-2-solutions/
+use std::collections::BTreeSet;
+
+impl Solution {
+    pub fn find_radius(houses: Vec<i32>, heaters: Vec<i32>) -> i32 {
+        let set: BTreeSet<i32> = heaters.into_iter().collect();
+        let min = *set.iter().next().unwrap();
+        let max = *set.iter().rev().next().unwrap();
+        houses.into_iter()
+            .map(|x| {
+                let left = *set.range(..x).last().unwrap_or(&max);
+                let right = *set.range(x..).next().unwrap_or(&min);
+                (x - left).abs()
+                .min((right - x).abs())
+            })
+            .max().unwrap()
+    }
+}

@@ -1,0 +1,54 @@
+// https://leetcode.com/problems/add-two-numbers/solutions/1433177/rust-0ms/
+impl Solution {
+    pub fn add_two_numbers(
+        l1: Option<Box<ListNode>>,
+        l2: Option<Box<ListNode>>,
+    ) -> Option<Box<ListNode>> {
+        let mut head = Some(Box::new(ListNode::new(0)));
+        let mut curr = head.as_mut();
+        let mut list1 = l1.as_ref();
+        let mut list2 = l2.as_ref();
+        let mut ex = 0;
+
+        loop {
+            match (list1, list2) {
+                (Some(node1), Some(node2)) => {
+                    let sum = node1.val + node2.val + ex;
+                    ex = sum / 10;
+                    let val = sum % 10;
+                    curr.as_deref_mut().unwrap().next = Some(Box::new(ListNode::new(val)));
+                    curr = curr.unwrap().next.as_mut();
+                    list1 = node1.next.as_ref();
+                    list2 = node2.next.as_ref();
+                }
+                _ => break,
+            };
+        }
+
+        while list1.is_some() {
+            let node = list1.unwrap();
+            let sum = node.val + ex;
+            ex = sum / 10;
+            let val = sum % 10;
+            curr.as_deref_mut().unwrap().next = Some(Box::new(ListNode::new(val)));
+            curr = curr.unwrap().next.as_mut();
+            list1 = node.next.as_ref();
+        }
+
+        while list2.is_some() {
+            let node = list2.unwrap();
+            let sum = node.val + ex;
+            ex = sum / 10;
+            let val = sum % 10;
+            curr.as_deref_mut().unwrap().next = Some(Box::new(ListNode::new(val)));
+            curr = curr.unwrap().next.as_mut();
+            list2 = node.next.as_ref();
+        }
+
+        if ex != 0 {
+            curr.as_deref_mut().unwrap().next = Some(Box::new(ListNode::new(ex)));
+        }
+
+        head.unwrap().next
+    }
+}

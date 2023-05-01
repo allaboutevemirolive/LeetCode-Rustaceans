@@ -1,0 +1,21 @@
+// https://leetcode.com/problems/find-all-duplicates-in-an-array/solutions/1506681/rust-zero-extra-memory-o-n-time-bitwise-scratch-pad/
+impl Solution {
+    pub fn find_duplicates(mut nums: Vec<i32>) -> Vec<i32> {
+        fn idx(n: i32) -> usize {
+            ((n - 1) & (2_i32.pow(17)-1)) as usize
+        }
+        for i in 0..nums.len() {
+            let j = idx(nums[i]);
+            if nums[j] & 1<<29 == 0 {
+                nums[j] ^= 1<<29;
+            } else {
+                nums[j] ^= 1<<30;
+            }
+        }
+        nums.into_iter()
+            .enumerate()
+            .filter(|(i,n)| (n>>30)&1==1)
+            .map(|(i,_)| (i+1) as i32)
+            .collect()
+    }
+}

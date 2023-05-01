@@ -1,0 +1,27 @@
+// https://leetcode.com/problems/combination-sum-iv/solutions/2381982/rust-and-c-top-down-dp-with-comments/
+impl Solution {
+    pub fn combination_sum4(nums: Vec<i32>, target: i32) -> i32 {
+        // Why oh why do we always get these i32:s that we have to convert to usize?
+        let target = target as usize;
+        let nums = nums.into_iter().map(|num| num as usize).collect::<Vec<_>>();
+        // Initialize DP array - we start with one path in 0
+        let mut dp = vec![0; target + 1];
+        dp[0] = 1;
+        for i in 0..target {
+            let curr = dp[i];
+            // Do we have any paths ending in this DP entry?
+            if curr != 0 {
+                // For each valid jump num, sum the number of paths
+                // ending at i + num
+                for num in nums.iter() {
+                    let j = i + *num;
+                    if j <= target {
+                        dp[j] += curr;
+                    }
+                }
+            }
+        }
+        // Return the number of paths landing at target
+        dp[target]
+    }
+}

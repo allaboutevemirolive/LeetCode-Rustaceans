@@ -1,0 +1,28 @@
+// https://leetcode.com/problems/insert-interval/solutions/2036381/rust-0ms-2-6-mb/
+// REFERENCE: https://leetcode.com/problems/insert-interval/discuss/21622/7%2B-lines-3-easy-solutions
+
+
+//  t: O(n) s: O(n)
+impl Solution {
+    pub fn insert(intervals: Vec<Vec<i32>>, new_interval: Vec<i32>) -> Vec<Vec<i32>> {
+        //  LEFT + NEW INTERVAL + RIGHT
+        let (mut n_start, mut n_end) = (new_interval[0], new_interval[1]);
+        let (mut left, mut right) = (vec![], vec![]);
+        for int in intervals {  
+            let (start, end) = (int[0], int[1]);
+            if end < n_start { 
+                //  Insert the new_interval, since its smaller and it wouldnt overlap
+                left.push(int);                
+            } else if start > n_end { 
+                right.push(int)
+            } else  { 
+                n_start = i32::min(n_start, start);
+                n_end = i32::max(n_end, end);
+            }
+        }
+        //  Left + Interval(n_start, n_end) + right
+        left.push(vec![n_start, n_end]);
+        left.append(&mut right);
+        left
+    }
+}

@@ -1,0 +1,20 @@
+// https://leetcode.com/problems/two-sum-ii-input-array-is-sorted/solutions/1764123/rust-4ms-2-2-mb/
+       
+use std::cmp::Ordering;
+impl Solution {
+    pub fn two_sum(numbers: Vec<i32>, target: i32) -> Vec<i32> {
+        let (mut l, mut r) = (0, numbers.len()-1);
+        while l < r  { 
+            //https://leetcode.com/problems/binary-search/
+            let sum = numbers[l] + numbers[r];
+            match sum.cmp(&target) { 
+                Ordering::Less => {l += 1},
+                Ordering::Equal => {
+                    return vec![(l + 1) as i32, (r + 1) as i32]
+                },
+                Ordering::Greater => {r -= 1}
+            }
+        }
+        vec![]
+    }
+}

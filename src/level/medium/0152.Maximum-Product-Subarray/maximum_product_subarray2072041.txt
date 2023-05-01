@@ -1,0 +1,33 @@
+// https://leetcode.com/problems/maximum-product-subarray/solutions/2072041/rust-o-n-time-o-1-space/
+impl Solution {
+    pub fn max_product(nums: Vec<i32>) -> i32 {
+        let mut max = i32::MIN;
+        let mut product = 1;
+        // We keep part of the product which can allow us to change sign
+        // of the negative product
+        let mut change_sign = 1;
+        for n in nums.into_iter() {
+            product *= n;
+            max = max.max(product);
+
+            // if we encounter negative product
+            // we can try to change its sign by removing part of its subarray
+            // up to the first negative number
+            if product < 0 && change_sign < 0 {
+                max = max.max(product/change_sign);
+            }
+
+            // if our change_sign product was reset
+            // initialize it
+            if n < 0 && change_sign > 0 {
+                change_sign = product;
+            // when we encounter zero
+            // reset everything
+            } else if n == 0 {
+                product = 1;
+                change_sign = 1;
+            }
+        }
+        max
+    }
+}

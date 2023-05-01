@@ -1,0 +1,21 @@
+// https://leetcode.com/problems/gas-station/solutions/1454411/rust-0ms/
+impl Solution {
+    pub fn can_complete_circuit(gas: Vec<i32>, cost: Vec<i32>) -> i32 {
+        let need = gas.iter()
+            .zip(cost.iter())
+            .scan((0, 0), |(last, cur), (&g, &c)| {
+                *last = (*last).min(*cur);
+                *cur += g - c;
+                Some(*last)
+            })
+            .collect::<Vec<_>>();
+        let mut cur_val = 0;
+        for (i, v) in need.into_iter().enumerate().rev() {
+            cur_val += gas[i] - cost[i];
+            if cur_val + v >= 0 {
+                return i as _;
+            }
+        }
+        -1
+    }
+}

@@ -1,0 +1,40 @@
+// https://leetcode.com/problems/remove-duplicate-letters/solutions/890044/rust-stack-solution-0ms/
+#[inline]
+fn index(b: u8) -> usize {
+    (b - b'a') as usize
+}
+
+impl Solution {
+    pub fn remove_duplicate_letters(s: String) -> String {
+        let mut count = [0; 26];
+        let mut visited = [false; 26];
+        
+        for c in s.bytes() {
+            count[index(c)] += 1;
+        }
+        
+        let mut stack = Vec::new();
+        for c in s.bytes() {
+            let idx = index(c);
+            
+            if !visited[idx] {        
+                while let Some(&back) = stack.last() {
+                    let j = index(back);
+                    if back > c && count[j] > 0 {
+                        visited[j] = false;
+                        stack.pop();
+                    } else {
+                        break;
+                    }
+                }
+                
+                stack.push(c);
+                visited[idx] = true;
+            }
+            
+            count[idx] -= 1;
+        }
+        
+        unsafe { String::from_utf8_unchecked(stack) }
+    }
+}

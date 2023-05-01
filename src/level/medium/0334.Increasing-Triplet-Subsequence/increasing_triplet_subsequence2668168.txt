@@ -1,0 +1,18 @@
+// https://leetcode.com/problems/increasing-triplet-subsequence/solutions/2668168/rust-concise-using-option/
+impl Solution {
+    pub fn increasing_triplet(nums: Vec<i32>) -> bool {
+        let mut l1: Option<i32> = None;
+        let mut l2: Option<i32> = None;
+
+        for n in nums {
+            if l1.is_none() || n < l1.unwrap() {
+                l1 = Some(n)
+            } else if n > l1.unwrap() && (l2.is_none() || n < l2.unwrap()) {
+                l2 = Some(n)
+            } else if l2.is_some() && n > l2.unwrap() {
+                return true;
+            }
+        }
+        false
+    }
+}

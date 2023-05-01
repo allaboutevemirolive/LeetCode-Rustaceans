@@ -1,0 +1,35 @@
+// https://leetcode.com/problems/next-permutation/solutions/2366574/rust-0ms/
+impl Solution {
+    pub fn next_permutation(nums: &mut Vec<i32>) {
+        let idx = Self::count_from_end(&nums);
+        if idx == 0 {
+            nums.reverse();
+        } else {
+            let key = nums[idx-1];
+            let next_highest_idx = Self::next_highest_idx(&nums, key, idx);
+            nums[idx-1] = nums[next_highest_idx];
+            nums[next_highest_idx] = key;
+            nums[idx..].sort();
+        }
+    }
+    
+    pub fn next_highest_idx(nums: &&mut Vec<i32>, key: i32, mut idx: usize) -> usize {
+        while idx < nums.len() {
+            if nums[idx] > key {
+                idx+=1;
+            } else {
+                break;
+            }
+        }
+        idx-1
+    }
+    
+    pub fn count_from_end(nums: &&mut Vec<i32>) -> usize {
+        for idx in (0..nums.len()-1).rev() {
+            if nums[idx] < nums[idx+1] {
+                return idx + 1;
+            }
+        }
+        0
+    }
+}

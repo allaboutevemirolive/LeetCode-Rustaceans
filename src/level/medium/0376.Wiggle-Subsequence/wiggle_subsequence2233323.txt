@@ -1,0 +1,16 @@
+// https://leetcode.com/problems/wiggle-subsequence/solutions/2233323/rust-windows-linear-dp-o-n-soln/
+    pub fn wiggle_max_length(nums: Vec<i32>) -> i32 {
+       let (up, down) =
+           nums.windows(2)
+               .map(|win| win[1] - win[0])
+               .fold((1, 1), |(up, down), diff| {
+                   if diff > 0 {
+                       (up, up + 1)
+                   } else if diff < 0 {
+                       (down + 1, down)
+                   } else {
+                       (up, down)
+                   }
+            });
+        up.max(down)
+    }

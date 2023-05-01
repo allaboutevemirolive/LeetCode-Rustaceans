@@ -1,0 +1,24 @@
+// https://leetcode.com/problems/gas-station/solutions/855728/easy-solution-in-rust/
+impl Solution {
+    pub fn can_complete_circuit(gas: Vec<i32>, cost: Vec<i32>) -> i32 {
+        let mut sum_gas = 0;
+        let mut sum_cost = 0;
+        let mut start = 0;
+        let mut tank = 0;
+        for i in 0..gas.len() {
+            sum_gas += gas[i];
+            sum_cost += cost[i];
+            tank += gas[i] - cost[i];
+            if tank < 0 {
+                start = i+1;
+                tank = 0;
+            }
+        }
+
+        if sum_gas < sum_cost {
+            return -1;
+        }
+
+        return start as i32;
+    }
+}

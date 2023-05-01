@@ -1,0 +1,37 @@
+// https://leetcode.com/problems/kth-smallest-element-in-a-bst/solutions/392172/rust-inorder-traversal/
+impl Solution {
+    
+    pub fn kth_smallest(root: Option<Rc<RefCell<TreeNode>>>, k: i32) -> i32 {
+        enum Query {
+            Found(i32),
+            Count(i32)
+        }
+        
+        fn try_kth_smallest(root: &Option<Rc<RefCell<TreeNode>>>, k: i32) -> Query {
+            match root {
+                Some(ref_root) => {
+                    match try_kth_smallest(&ref_root.borrow().left, k) {
+                        Query::Found(val) => Query::Found(val),
+                        Query::Count(size_left) => {
+                            if(size_left + 1 == k) {
+                                Query::Found(ref_root.borrow().val)
+                            }
+                            else {
+                                match try_kth_smallest(&ref_root.borrow().right, k - (size_left + 1)) {
+                                    Query::Found(val) => Query::Found(val),
+                                    Query::Count(size_right) => Query::Count(size_left + size_right + 1)
+                                }
+                            }
+                        }
+                    }
+                },
+                None => Query::Count(0)
+            }
+        }
+        
+        match try_kth_smallest(&root, k) {
+            Query::Found(val) => val,
+            Query::Count(size) => size
+        }
+    }
+}

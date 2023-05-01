@@ -1,0 +1,32 @@
+// https://leetcode.com/problems/count-and-say/solutions/2717246/simple-rust-solution/
+impl Solution {
+    pub fn count_and_say(n: i32) -> String {
+        fn helper(n: i32) -> String {
+            if n == 1 {
+                return "1".to_string();
+            }
+
+            let last: Vec<char> = helper(n - 1).chars().collect::<Vec<char>>();        
+            let (mut ct, mut cur, len): (usize, usize, usize) = (1, 1, last.len());
+            
+            let mut output = vec![];
+            while cur <= len {
+                if cur < len && last[cur] == last[cur - 1] {
+                    ct += 1;
+                    cur += 1;
+                    continue;
+                }
+
+                output.push(char::from_digit(ct as u32, 10).unwrap());
+                output.push(last[cur - 1]);
+
+                cur += 1;
+                ct = 1;
+            }
+
+            output.into_iter().collect::<String>()
+            
+        }
+        helper(n)
+    }
+}

@@ -1,0 +1,54 @@
+// https://leetcode.com/problems/minimum-moves-to-equal-array-elements-ii/solutions/2216635/rust-0ms-quickselect-explained-with-tips-on-implementation/
+use std::cmp::Ordering;
+
+impl Solution {
+    pub fn min_moves2(mut nums: Vec<i32>) -> i32 {
+        let mid = nums.len() / 2;
+        let med = quick_select(&mut nums, mid);
+        
+        nums.iter().fold(0, |a, v| a + (v - med).abs()) 
+    }
+}
+
+fn quick_select(nums: &mut [i32], k: usize) -> i32 {
+    use Ordering::*;
+    let len = nums.len();
+    
+    if len == 1 {
+        nums[0]
+    }
+    else {
+        let     p = nums[len / 2];  // Pivot.
+        let mut h = 0;              // Less-than index.
+        let mut i = 0;              // Equal-to index.
+        let mut j = len;            // Greater-than index.
+
+        // Stop iteration when equal-to and greater-than indices collide.
+        while i < j { 
+            match nums[i].cmp(&p) {
+                Less => {
+                    nums.swap(i, h);
+                    i += 1;
+                    h += 1;
+                },
+                Equal => {
+                    i += 1;
+                },
+                Greater => {
+                    j -= 1;
+                    nums.swap(i, j);
+                },
+            }
+        }
+        if k < h {
+            // Don't create new vectors - use slices.
+            quick_select(&mut nums[0..h], k)
+        } 
+        else if k < i {
+            nums[i - 1]
+        }
+        else {
+            quick_select(&mut nums[j..], k - j)
+        }
+    }
+}

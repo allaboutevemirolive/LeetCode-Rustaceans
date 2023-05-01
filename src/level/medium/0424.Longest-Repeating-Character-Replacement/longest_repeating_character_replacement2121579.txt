@@ -1,0 +1,22 @@
+// https://leetcode.com/problems/longest-repeating-character-replacement/solutions/2121579/rust-sliding-window/
+impl Solution {
+    pub fn character_replacement(s: String, k: i32) -> i32 {
+        use std::collections::HashMap;
+        let mut window = HashMap::new();
+        let mut l = 0;
+        let mut res = 0;
+        let mut maxf = 0;
+        for r in 0..s.len(){
+            let c = s.chars().nth(r).unwrap();
+            *window.entry(c).or_insert(0)+=1;
+            maxf = maxf.max(*window.get(&c).unwrap());
+            while (r-l+1) as i32 - maxf > k{
+                let d = s.chars().nth(l).unwrap();
+                *window.entry(d).or_default() -= 1;
+                l += 1;
+            }
+            res = res.max(r-l+1);
+        }
+        res as i32
+    }
+}

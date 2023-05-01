@@ -1,0 +1,7 @@
+// https://leetcode.com/problems/reverse-words-in-a-string/solutions/2808449/rust-2-lines/
+impl Solution {
+    pub fn reverse_words(s: String) -> String {
+        let mut s: Vec<_> = s.split_whitespace().rev().collect();
+        s.join(" ")
+    }
+}

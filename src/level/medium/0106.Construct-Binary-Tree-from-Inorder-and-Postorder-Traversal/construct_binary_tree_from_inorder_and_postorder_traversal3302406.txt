@@ -1,0 +1,27 @@
+// https://leetcode.com/problems/construct-binary-tree-from-inorder-and-postorder-traversal/solutions/3302406/rust-elixir-with-hashmap/
+use std::rc::Rc;
+use std::cell::RefCell;
+use std::collections::HashMap;
+type OptNode = Option<Rc<RefCell<TreeNode>>>;
+
+impl Solution {
+    pub fn build_tree(inorder: Vec<i32>, postorder: Vec<i32>) -> OptNode {
+        let hash: HashMap<i32, usize> = inorder.iter().enumerate()
+            .map(|(i, &x)| (x, i))
+            .collect();
+        Self::build_node(&postorder, &hash, 0)
+    }
+
+    fn build_node(postorder: &[i32], hash: &HashMap<i32, usize>, offset: usize) -> OptNode {
+        if postorder.is_empty() {
+            return None;
+        }
+        let n = postorder.len();
+        let pos = hash.get(&postorder[n - 1]).unwrap() - offset;
+        Some(Rc::new(RefCell::new(TreeNode{
+            val: postorder[n - 1],
+            left: Self::build_node(&postorder[..pos], hash, offset),
+            right: Self::build_node(&postorder[pos..n - 1], hash, offset + pos + 1),
+        })))
+    }
+}

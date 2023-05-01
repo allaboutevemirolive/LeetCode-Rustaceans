@@ -1,0 +1,28 @@
+// https://leetcode.com/problems/convert-sorted-list-to-binary-search-tree/solutions/3282908/rust-in-order-traversal-recursive-solution/
+use std::rc::Rc;
+use std::cell::RefCell;
+impl Solution {
+    pub fn sorted_list_to_bst(head: Option<Box<ListNode>>) -> Option<Rc<RefCell<TreeNode>>> {
+        fn create_bst(head: &Option<Box<ListNode>>, size: i32) -> (Option<Rc<RefCell<TreeNode>>>, &Option<Box<ListNode>>) {
+            match size {
+                0 => (None, head),
+                _ => {
+                    let half_size = size / 2;
+                    let (left, root) = create_bst(head, half_size);
+                    let &ListNode { ref next, val } = root.as_deref().unwrap();
+                    let (right, next) = create_bst(next, size - half_size - 1);
+
+                    (Some(Rc::new(RefCell::new(TreeNode { val, left, right }))), next)
+                }
+            }
+        }
+
+        let mut size = 0;
+        let mut node = &head;
+        while let Some(ListNode { next, .. }) = node.as_deref() {
+            size += 1;
+            node = next;
+        }
+        create_bst(&head, size).0
+    }
+}

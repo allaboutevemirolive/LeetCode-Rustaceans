@@ -1,0 +1,81 @@
+// https://leetcode.com/problems/longest-absolute-file-path/solutions/899618/rust-simple-solution-using-path-stack-o-n-0-ms-2-mb-100/
+impl Solution {
+    pub fn length_longest_path(input: String) -> i32 {
+        // Current position in input string
+        let mut pos = 0;
+        
+        // List of paths built during the walk
+        let mut paths = Vec::new();
+        
+        // Stack representing the current path
+        let mut path_stack: Vec<String> = Vec::new();
+        
+        // Prepend a new line to correctly compute level for root dir
+        let input: Vec<char> = std::iter::once('\n')
+                                         .chain(input.chars())
+                                         .collect();
+
+        // Tracks the directory level for the current file/iteration
+        let mut curr_level = 1;
+
+        while pos < input.len() {
+            // Find the current filename/dir name
+            let mut end = pos;
+            while end < input.len() && (input[end] != '\n' && input[end] != '\t') {
+                end += 1;
+            }
+            
+            let name = &input[pos..end];
+            let is_file = name.contains(&'.');
+            let name: String = name.iter().collect();
+            
+            // Figure out the next level. This is used to determine how to
+            // manipulate the path stack before the next iteration.
+            let start = end;
+            while end < input.len() && (input[end] == '\n' || input[end] == '\t') {
+                end += 1;
+            }
+
+            let next_level = end - start;
+            
+            // If this is a file, append it to the list
+            if is_file {
+                let file_path = match path_stack.len() {
+                    // For a file under root dir, we don't need any seperators
+                    0 => vec![name.clone()],
+                    _ => [&path_stack[..], &[name.clone()]].concat(),
+                };
+
+                paths.push(file_path.join("/"));
+            }
+            
+            // If we are going deeper down, push this directory to the stack
+            // Otherwise, pop the correct number of entries based on next level
+            if next_level == 0 {
+                // If the next level is 0, that means we've reached the end of the
+                // input string.
+                break;
+            } else if next_level > curr_level {
+                assert!(!is_file); // Input sanity check
+                path_stack.push(name.clone());
+            } else if next_level < curr_level {
+                while path_stack.len() >= next_level {
+                    path_stack.pop();
+                }
+            }
+
+            curr_level = next_level;
+            pos = end;
+        }
+        
+        // Map path list to a list of lengths, then sort it
+        let mut paths: Vec<usize> = paths.iter().map(|s| s.len()).collect();
+        paths.sort();
+
+        if paths.len() > 0 {
+            paths[paths.len()-1] as i32
+        } else {
+            0i32
+        }
+    }
+}

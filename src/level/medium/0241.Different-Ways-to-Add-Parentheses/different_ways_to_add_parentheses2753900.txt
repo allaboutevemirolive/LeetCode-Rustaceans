@@ -1,0 +1,75 @@
+// https://leetcode.com/problems/different-ways-to-add-parentheses/solutions/2753900/rust-tabulation-iterative-faster-than-100/
+enum Operation {
+    Add,
+    Sub,
+    Mul
+}
+
+use Operation::*;
+
+fn en_operate(left: &Vec<i32>, right: &Vec<i32>, op: &Operation) -> Vec<i32> {
+    let mut result = Vec::new();
+    for l in left {
+        for r in right {
+            match op {
+                Mul => result.push(l * r),
+                Add => result.push(l + r),
+                Sub => result.push(l - r),
+            }
+        }
+    }
+        
+    return result;
+}
+
+impl Solution {
+    pub fn diff_ways_to_compute(expression: String) -> Vec<i32> {
+        let mut nums: Vec<i32> = Vec::new();
+        let mut ops: Vec<Operation> = Vec::new();
+        let mut last_digit = -1;
+        let newex = expression + "+";
+        for c in newex.chars() {
+            match c {
+                '0'..='9' => {
+                    if last_digit == -1 {
+                        last_digit = ((c as u8) - ('0' as u8)) as i32;
+                    } else {
+                        last_digit *= 10;
+                        last_digit += ((c as u8) - ('0' as u8)) as i32;
+                        nums.push(last_digit);
+                        last_digit = -1;
+                    }
+                },
+                '+' | '-' | '*' => {
+                    if last_digit != -1 {
+                        nums.push(last_digit);
+                        last_digit = -1;
+                    }
+                    match c {
+                        '+' => ops.push(Add),
+                        '-' => ops.push(Sub),
+                        '*' => ops.push(Mul),
+                        _ => println!("This should be absolutely impossible"),
+                    }
+                },
+                _ => println!("Somethin ain't right here"),
+            }
+        }
+
+        let len = nums.len();
+        let mut dp = vec![vec![Vec::<i32>::new(); len]; len];
+        for r in 0..len {
+            dp[r][0].push(nums[r]);
+            for c in 1..=r {
+                let mut dp_r_c = Vec::new();
+                for lc in 0..c {
+                    let x = lc + 1;
+                    let dp_r_lc = en_operate(&dp[r - x][c - x], &dp[r][lc], &ops[r - x]);
+                    dp_r_c.extend_from_slice(dp_r_lc.as_slice());
+                }
+                dp[r][c] = dp_r_c;
+            }
+        }
+        return dp[len - 1][len - 1].to_owned();
+    }
+}

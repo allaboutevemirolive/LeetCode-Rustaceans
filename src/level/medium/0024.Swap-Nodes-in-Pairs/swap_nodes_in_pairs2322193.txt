@@ -1,0 +1,22 @@
+// https://leetcode.com/problems/swap-nodes-in-pairs/solutions/2322193/rust-0ms-100-simple-solution/
+impl Solution {
+    pub fn swap_pairs(head: Option<Box<ListNode>>) -> Option<Box<ListNode>> {
+        if head.is_none() {
+            return None;
+        }
+        let mut head = head;
+        let mut cur = &mut head;
+
+        while cur.is_some() && cur.as_mut().unwrap().next.is_some() {
+            let cur_node = cur.as_mut().unwrap();
+            let next_node = cur_node.next.as_mut().unwrap();
+            let tmp = cur_node.val;
+            cur_node.val = next_node.val;
+            next_node.val = tmp;
+            cur = &mut next_node.next;
+        }
+
+        head
+        
+    }
+}

@@ -1,0 +1,6 @@
+// https://leetcode.com/problems/reverse-words-in-a-string/solutions/2813010/rust-minimal-in-place-examples/
+impl Solution {
+    pub fn reverse_words(s: String) -> String {
+        s.split_whitespace().rev().collect::<Vec<_>>().join(" ")
+    }
+}

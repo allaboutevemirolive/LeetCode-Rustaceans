@@ -1,0 +1,45 @@
+// https://leetcode.com/problems/binary-tree-zigzag-level-order-traversal/solutions/861676/rust-bfs-iteration-method/
+use std::rc::Rc;
+use std::cell::RefCell;
+impl Solution {
+    pub fn zigzag_level_order(root: Option<Rc<RefCell<TreeNode>>>) -> Vec<Vec<i32>> {
+        let mut res: Vec<Vec<i32>> = Vec::new();
+        let mut stack: Vec< Option<Rc<RefCell<TreeNode>>> > = vec![root];
+        let mut level = 0;
+        
+        loop {
+            if (stack.len() < 1) {break;}
+            let mut new_stack: Vec< Option<Rc<RefCell<TreeNode>>> > = Vec::new();
+            for i in 0..stack.len() {
+                match &stack[i] {
+                    Some(rc) => {
+                        if level == res.len() {
+                            res.resize(level + 1, vec![]);
+                        }
+                        
+                        let node = rc.borrow();
+                        res[level].push(node.val);
+                        if node.left.is_some() {
+                            new_stack.push(node.left.clone());
+                        }
+                        if node.right.is_some()  {
+                            new_stack.push(node.right.clone());
+                        }
+                    },
+                    None => {}
+                };
+            }
+            stack = new_stack;
+            
+            if level % 2 == 1 {
+                if let Some(vec_mut) = res.get_mut(level) {
+                    vec_mut.reverse();
+                }
+            }
+            
+            level += 1;     
+        }
+        
+        res
+    }
+}

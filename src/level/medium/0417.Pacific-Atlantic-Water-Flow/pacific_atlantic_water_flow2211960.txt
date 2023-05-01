@@ -1,0 +1,59 @@
+// https://leetcode.com/problems/pacific-atlantic-water-flow/solutions/2211960/rust-dfs-clean-code/
+use std::collections::HashSet;
+
+impl Solution {
+    pub fn pacific_atlantic(mut heights: Vec<Vec<i32>>) -> Vec<Vec<i32>> {
+        fn dfs(
+            set: &mut HashSet<(i32, i32)>,
+            arr: &mut Vec<Vec<i32>>,
+            r: usize,
+            c: usize,
+            prev_height: i32,
+        ) {
+            if prev_height <= arr[r][c] && set.insert((r as i32, c as i32)) {
+                // Up
+                if r > 0 {
+                    dfs(set, arr, r - 1, c, arr[r][c]);
+                }
+                // Down
+                if r < arr.len() - 1 {
+                    dfs(set, arr, r + 1, c, arr[r][c]);
+                }
+                // Left
+                if c > 0 {
+                    dfs(set, arr, r, c - 1, arr[r][c]);
+                }
+                // Right
+                if c < arr[r].len() - 1 {
+                    dfs(set, arr, r, c + 1, arr[r][c]);
+                }
+            }
+        }
+
+        let mut set_pacific = HashSet::default();
+        let mut set_atlantic = HashSet::default();
+
+        let num_rows = heights.len() - 1;
+        let num_cols = heights[0].len() - 1;
+
+        // We only check for heights on the outer bounds of the `heights` grid
+        for c in 0..=num_cols {
+            let h_pacific = heights[0][c];
+            let h_atlantic = heights[num_rows][c];
+            dfs(&mut set_pacific, &mut heights, 0, c, h_pacific);
+            dfs(&mut set_atlantic, &mut heights, num_rows, c, h_atlantic);
+        }
+        for r in 0..=num_rows {
+            let h_pacific = heights[r][0];
+            let h_atlantic = heights[r][num_cols];
+            dfs(&mut set_pacific, &mut heights, r, 0, h_pacific);
+            dfs(&mut set_atlantic, &mut heights, r, num_cols, h_atlantic);
+        }
+
+        set_atlantic
+            .intersection(&set_pacific)
+            .into_iter()
+            .map(|&(r, c)| vec![r, c])
+            .collect()
+    }
+}

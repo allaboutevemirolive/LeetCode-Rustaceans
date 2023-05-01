@@ -1,0 +1,68 @@
+// https://leetcode.com/problems/valid-sudoku/solutions/1208927/rust-solution/
+impl Solution {
+    pub fn is_valid_sudoku(board: Vec<Vec<char>>) -> bool {
+        for line in &board {
+            if !Self::is_valid_line(line) {
+                return false;
+            }
+        }
+        
+        for line in &Self::transpose(&board) {
+            if !Self::is_valid_line(line) {
+                return false;
+            }
+        }
+        
+        for line in (0..9).step_by(3) {
+            for col in (0..9).step_by(3) {
+                let mut square: Vec<Vec<char>> = 
+                    vec![
+                        board[line]  [col..col+3].to_vec(),
+                        board[line+1][col..col+3].to_vec(),
+                        board[line+2][col..col+3].to_vec(),
+                    ];
+                if !Self::is_valid_square(&square) {
+                    return false;
+                }
+            }
+        }
+        
+        true
+    }
+    
+    fn transpose(board: &Vec<Vec<char>>) -> Vec<Vec<char>> {
+        let mut retVec = vec![vec!['.'; 9]; 9];
+        for (i, row) in board.iter().enumerate() {
+            for (j, cell) in row.iter().enumerate() {
+                retVec[j][i] = *cell;
+            }
+        }
+        retVec
+    }
+    
+    fn is_valid_line(line: &Vec<char>) -> bool {
+        let mut set = HashSet::with_capacity(9);
+        for elem in line {
+            if *elem == '.' { continue; }
+            if set.contains(&elem) {
+                return false;
+            }
+            set.insert(elem);
+        }
+        true
+    }
+    
+    fn is_valid_square(square: &Vec<Vec<char>>) -> bool {
+        let mut set = HashSet::with_capacity(9);
+        for line in square {
+            for elem in line {
+                if *elem == '.' { continue; }
+                if set.contains(&elem) {
+                    return false;
+                }
+                set.insert(elem);
+            }
+        }
+        true
+    }
+}

@@ -1,0 +1,30 @@
+// https://leetcode.com/problems/string-compression/solutions/2937748/rust-solution/
+pub fn compress(chars: &mut Vec<char>) -> i32 {
+	let (mut left, mut right) = (0, 1);
+
+	while right <= chars.len() {
+		let mut count = 1;
+
+		while right < chars.len() && chars[left] == chars[right] {
+			count += 1;
+			right += 1;
+		}
+
+		if count > 1 {
+			chars.drain(left..right - 1);
+
+			let mut i = left + 1;
+			for ch in count.to_string().chars() {
+				chars.insert(i, ch);
+				i += 1;
+			}
+
+			right = i;
+		}
+
+		left = right;
+		right += 1;
+	}
+
+	chars.len() as _
+}

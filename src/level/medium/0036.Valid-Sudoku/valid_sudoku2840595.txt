@@ -1,0 +1,20 @@
+// https://leetcode.com/problems/valid-sudoku/solutions/2840595/rust-with-closures/
+use std::collections::HashSet;
+
+impl Solution {
+    pub fn is_valid_sudoku(board: Vec<Vec<char>>) -> bool {
+        let mut hash = HashSet::new();
+        let mut is_valid = |f: &dyn Fn(usize, usize) -> (usize, usize)|
+            (0..9).all(|i| {
+                hash.clear();
+                (0..9).map(|j| f(i, j))
+                    .map(|(x, y)| board[x][y])
+                    .filter(|&ch| ch != '.')
+                    .all(|ch| hash.insert(ch))
+            });
+
+        is_valid(&|i, j| (i, j))
+        && is_valid(&|i, j| (j, i))
+        && is_valid(&|i, j| (i / 3 * 3 + j / 3, i % 3 * 3 + j % 3))
+    }
+}

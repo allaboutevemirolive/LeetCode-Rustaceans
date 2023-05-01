@@ -1,0 +1,39 @@
+// https://leetcode.com/problems/partition-equal-subset-sum/solutions/3297466/rust-2-0-1-knapsack-approaches/
+impl Solution {
+    pub fn can_partition(nums: Vec<i32>) -> bool {
+        fn classic_knapsack(nums: Vec<i32>) -> bool {
+            let mut sum = nums.iter().sum::<i32>() as usize;
+            if sum % 2 == 1 {
+                return false;
+            }
+            sum /= 2;
+            let mut dp = vec![vec![false; sum + 1]; nums.len() + 1];
+            dp[0][0] = true;
+
+            for i in 1..=nums.len() {
+                for j in 1..=sum {
+                    dp[i][j] |= dp[i - 1][j];
+                    if j >= nums[i - 1] as usize {
+                        dp[i][j] |= dp[i - 1][j - nums[i - 1] as usize];
+                    }
+                }
+            }
+            dp[nums.len()][sum]
+        }
+        fn mem_optimized_knapsack(nums: Vec<i32>) -> bool {
+            let mut sum = nums.iter().copied().sum::<i32>() as usize;
+            if sum % 2 == 1 {
+                return false;
+            }
+            let mut dp = vec![false; sum + 1];
+            dp[0] = true;
+            for i in 0..nums.len() {
+                for j in (0..=sum - nums[i] as usize).rev() {
+                    dp[j + nums[i] as usize] |= dp[j];
+                }
+            }
+            dp[sum / 2]
+        }
+        mem_optimized_knapsack(nums)
+    }
+}

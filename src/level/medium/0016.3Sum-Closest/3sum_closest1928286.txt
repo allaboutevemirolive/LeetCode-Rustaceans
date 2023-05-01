@@ -1,0 +1,34 @@
+// https://leetcode.com/problems/3sum-closest/solutions/1928286/rust-0ms/
+impl Solution {
+    pub fn three_sum_closest(mut nums: Vec<i32>, target: i32) -> i32 {
+        nums.sort_unstable();
+        
+        let mut closest: Option<i32> = None; 
+        
+        for (start, &a) in nums.iter().enumerate() {
+            let mut i = start + 1;
+            let mut j = nums.len() - 1;   
+            
+            while i < j {
+                let sum = nums[i] + nums[j] + a;
+                
+                if sum == target {
+                    return target;
+                } else if sum < target {
+                    i += 1;
+                } else {
+                    j -= 1;
+                }
+                
+                if let Some(val) = closest {
+                    if (target - sum).abs() < (target - val).abs() {
+                        closest = Some(sum);
+                    }
+                } else {
+                    closest = Some(sum);
+                }
+            }
+        }
+        closest.unwrap()
+    }
+}

@@ -1,0 +1,11 @@
+// https://leetcode.com/problems/insert-delete-getrandom-o1/solutions/1366004/rust-c-with-explanation-complexity-done-faster-than-80/
+4,9,1,5
+  unordered_map 
+    key=element              5      4     1      9
+    ----------------------|------|-----|------|----
+    value=index_in_vector    3      0     2     1
+  
+vector <int>
+    element   4    9    1    5
+    --------|---|----|----|-----|
+    index     0    1    2    3

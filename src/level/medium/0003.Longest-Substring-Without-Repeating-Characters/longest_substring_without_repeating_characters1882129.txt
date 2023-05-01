@@ -1,0 +1,21 @@
+// https://leetcode.com/problems/longest-substring-without-repeating-characters/solutions/1882129/rust-vecdeque/
+fn length_of_longest_substring(s: String) -> i32 {
+	let (max, _) = s.chars().fold(
+		(0, VecDeque::with_capacity(s.len())),
+		|(max, mut substring), ch| {
+			// If we've already seen this character,
+			// remove all characters from the beginning of the substring including
+			// the seen character
+			if substring.contains(&ch) {
+				while substring.pop_front() != Some(ch) {}
+			}
+
+			substring.push_back(ch);
+			(
+				max.max(substring.len()),
+				substring
+			)
+		}
+	);
+	max as _
+}

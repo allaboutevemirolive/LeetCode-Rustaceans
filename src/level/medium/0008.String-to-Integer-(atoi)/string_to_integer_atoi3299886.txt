@@ -1,0 +1,36 @@
+// https://leetcode.com/problems/string-to-integer-atoi/solutions/3299886/rust-solution/
+impl Solution {
+    pub fn my_atoi(s: String) -> i32 {
+        let s = s.trim();
+        let mut num = 0;
+        let mut sign = 1;
+        let mut sign_seen = false;
+
+        for ch in s.chars() {
+            match ch {
+                _ if ch.is_ascii_digit() => {
+                    sign_seen = true;
+                    let digit = ch as i32 - 48;
+                    if num > i32::MAX / 10 {
+                        return if sign < 0 { i32::MIN } else { i32::MAX };
+                    }
+                    if num * sign == i32::MAX / 10 && digit > i32::MAX % 10 {
+                        return i32::MAX;
+                    } else if num * sign == i32::MIN / 10 && digit >= -(i32::MIN % 10) {
+                        return i32::MIN;
+                    }
+                    num = num * 10 + digit;
+                }
+                '+' if !sign_seen => {
+                    sign_seen = true;
+                }
+                '-' if !sign_seen => {
+                    sign_seen = true;
+                    sign *= -1;
+                }
+                _ => break,
+            }
+        }
+        num * sign     
+    }
+}

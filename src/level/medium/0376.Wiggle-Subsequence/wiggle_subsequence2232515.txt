@@ -1,0 +1,13 @@
+// https://leetcode.com/problems/wiggle-subsequence/solutions/2232515/rust-solution/
+pub fn wiggle_max_length(nums: Vec<i32>) -> i32 {
+        let mut len = 1;
+        let mut last_d = 0;
+        for i in 1..nums.len() {
+            let d = nums[i] - nums[i - 1];
+            if d != 0 && (last_d == 0 || d ^ last_d < 0) {
+                len = len + 1;
+                last_d = d;
+            }
+        }
+        return len;
+    }

@@ -1,0 +1,28 @@
+// https://leetcode.com/problems/matchsticks-to-square/solutions/1274939/rust-backtracking/
+impl Solution {
+    fn backtrack(matches: &mut [i32], matchsticks: &[i32], match_index: usize) -> bool {
+        if match_index == matchsticks.len() {
+            return matches.iter().all(|m| *m == 0);
+        }
+        for j in 0..4 {
+            if matches[j] - matchsticks[match_index] >= 0 {
+                matches[j] -= matchsticks[match_index];
+                if Solution::backtrack(matches, matchsticks, match_index + 1) {
+                    return true;
+                }
+                matches[j] += matchsticks[match_index];
+            }
+        }
+        false
+    }
+    pub fn makesquare(matchsticks: Vec<i32>) -> bool {
+        let sum = matchsticks.iter().sum::<i32>();
+        if sum % 4 != 0 {
+            return false;
+        }
+
+        let avg = sum / 4;
+        let mut matches = vec![avg; 4];
+        Solution::backtrack(&mut matches, &matchsticks, 0)
+    }
+}

@@ -1,0 +1,25 @@
+// https://leetcode.com/problems/sum-of-two-integers/solutions/1779254/rust-2ms-1-9mb-box-solution-closure-functors/
+use std::boxed::Box;
+impl Solution {
+    pub fn get_sum(a: i32, b: i32) -> i32 {
+        fn add(x: i32) -> Box<Fn(i32) -> i32> {
+            Box::new(move |y: i32| { 
+                x + y
+            })
+        }
+        add(a)(b)
+        
+        // Solution 2
+        // let mut sum =0;
+        // for _ in vec![a, b].into_iter().map(|x| { 
+        //     sum +=x;
+        //     sum
+        // }){};
+        // sum
+		
+		// Solution 3
+		//let sum = |a: i32, b: i32 | -> i32 {  a + b };
+       // sum(a, b)
+        
+    }
+}

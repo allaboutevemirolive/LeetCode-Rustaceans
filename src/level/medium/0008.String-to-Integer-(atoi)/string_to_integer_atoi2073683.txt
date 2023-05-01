@@ -1,0 +1,53 @@
+// https://leetcode.com/problems/string-to-integer-atoi/solutions/2073683/rust-100/
+impl Solution {
+    pub fn my_atoi(s: String) -> i32 {
+        let mut num : i32 = 0;
+        let observed : u8;
+        let ( mut signed, mut sign_observed, mut overflow ) : (bool, bool, bool) = ( false, false, false );
+        for &c in s.as_bytes() {
+            match c as char {
+                '0'..='9' => {
+                    let diff = c as i32 - 48;
+                    if num != (num*10 + diff)/10 {
+                        println!("Overflow detected");
+                        overflow = true;
+                        break;
+                    }
+                    num = num*10 + diff;
+                    sign_observed = true;
+                },
+                '-' => {
+                    if sign_observed {
+                        break;
+                    }
+                    signed = true;
+                    sign_observed = true;
+                },
+                '+' => {
+                    if sign_observed {
+                        break;
+                    }
+                    sign_observed = true;
+                },
+                ' ' => {
+                    if sign_observed {
+                        break;
+                    }
+                },
+                _ => {
+                    break
+                },
+            };
+        }
+        if overflow {
+            if signed {
+                return i32::MIN ;
+            }
+            return i32::MAX ;
+        }
+        if signed {
+            return -num;
+        }
+       num
+    }
+}

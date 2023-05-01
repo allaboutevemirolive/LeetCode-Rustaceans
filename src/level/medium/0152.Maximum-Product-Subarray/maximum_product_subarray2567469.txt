@@ -1,0 +1,18 @@
+// https://leetcode.com/problems/maximum-product-subarray/solutions/2567469/rust-solution/
+impl Solution {
+    pub fn max_product(nums: Vec<i32>) -> i32 {
+        let mut min: i32 = 1;
+        let mut max: i32 = 1;
+        let mut answer: i32 = -32000;
+
+        nums.iter().enumerate().for_each(|(inx, num)| {
+            let n = *num;
+            let compute_vec = vec![n, n * min, n * max];
+            let iter_vec = compute_vec.iter();
+            min = *iter_vec.clone().min().unwrap();
+            max = *iter_vec.max().unwrap();
+            answer = cmp::max(answer, max);
+        });
+        answer
+    }
+}

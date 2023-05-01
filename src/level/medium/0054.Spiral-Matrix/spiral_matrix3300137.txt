@@ -1,0 +1,56 @@
+// https://leetcode.com/problems/spiral-matrix/solutions/3300137/rust-dfs/
+impl Solution {
+    pub fn spiral_order(matrix: Vec<Vec<i32>>) -> Vec<i32> {
+        const DIRS: [(i32, i32); 4] = [(0, 1), (1, 0), (0, -1), (-1, 0)];
+
+        let mut path = vec![];
+        let mut row = (0_i32, matrix.len() as i32 - 1);
+        let mut col = (0_i32, matrix[0].len() as i32 - 1);
+
+        fn dfs(
+            matrix: &Vec<Vec<i32>>,
+            coord: (i32, i32),
+            dir_idx: &mut usize,
+            row: &mut (i32, i32),
+            col: &mut (i32, i32),
+            path: &mut Vec<i32>,
+        ) {
+            if coord.1 == col.1 && (*dir_idx % 4) == 0 {
+                *col = (col.0, col.1 - 1);
+                *dir_idx += 1;
+            }
+            if coord.1 == col.0 && (*dir_idx % 4) == 2 {
+                *col = (col.0 + 1, col.1);
+                *dir_idx += 1;
+            }
+            if coord.0 == row.1 && (*dir_idx % 4) == 1 {
+                *row = (row.0 + 1, row.1);
+                *dir_idx += 1;
+            }
+            if coord.0 == row.0 && (*dir_idx % 4) == 3 {
+                *row = (row.0, row.1 - 1);
+                *dir_idx += 1;
+            }
+
+            path.push(matrix[coord.0 as usize][coord.1 as usize]);
+
+            if path.len() == matrix[0].len() * matrix.len() {
+                return;
+            }
+
+            let dir = DIRS[*dir_idx % 4];
+
+            dfs(
+                matrix,
+                (coord.0 + dir.0, coord.1 + dir.1),
+                dir_idx,
+                row,
+                col,
+                path,
+            );
+        }
+
+        dfs(&matrix, (0, 0), &mut 0, &mut row, &mut col, &mut path);
+        path        
+    }
+}

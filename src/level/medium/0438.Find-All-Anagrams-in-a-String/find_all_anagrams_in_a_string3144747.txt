@@ -1,0 +1,33 @@
+// https://leetcode.com/problems/find-all-anagrams-in-a-string/solutions/3144747/rust-sliding-window-solution/
+impl Solution {
+    pub fn find_anagrams(s: String, p: String) -> Vec<i32> {
+        let s = s.as_bytes();
+        let p = p.as_bytes();
+        let s_len = s.len();
+        let p_len = p.len();
+        let mut p_count = [0; 26];
+        let mut s_count = [0; 26];
+        for &b in p {
+            p_count[(b - b'a') as usize] += 1;
+        }
+        for &b in s.iter().take(p_len) {
+            s_count[(b - b'a') as usize] += 1;
+        }
+        let mut result = vec![];
+        let mut left = 0;
+        let mut right = p_len;
+        while right < s_len {
+            if s_count == p_count {
+                result.push(left as i32);
+            }
+            s_count[(s[left] - b'a') as usize] -= 1;
+            left += 1;
+            s_count[(s[right] - b'a') as usize] += 1;
+            right += 1;
+        }
+        if s_count == p_count {
+            result.push(left as i32);
+        }
+        result
+    }
+}

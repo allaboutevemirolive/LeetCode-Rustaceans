@@ -1,0 +1,33 @@
+// https://leetcode.com/problems/longest-consecutive-sequence/solutions/2061589/rust-solution-using-hashset/
+ use std::collections::HashSet;
+impl Solution {
+    pub fn longest_consecutive(nums: Vec<i32>) -> i32 {
+  let mut hashset = HashSet::new();
+    for num in nums{
+        hashset.insert(num);
+    }
+    let mut max = 0;
+    for i in &hashset{
+       if !hashset.contains(&(i-1)){
+       
+            let mut j = 0;
+            while hashset.contains(&(i+j)){
+                j+=1;
+              
+            }
+            
+            if max< j{
+                max = max.max(j)
+            };
+                
+       
+        if !hashset.contains(&(i+1)){
+            max = max.max(1);
+        }
+
+       }
+    }
+    max
+        
+    }
+}

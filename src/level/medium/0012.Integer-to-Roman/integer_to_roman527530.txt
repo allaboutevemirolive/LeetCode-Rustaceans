@@ -1,0 +1,57 @@
+// https://leetcode.com/problems/integer-to-roman/solutions/527530/rust-both-100/
+impl Solution {
+    pub fn int_to_roman(num: i32) -> String {
+        let nums: Vec<i32> = vec![
+            1000, 900, 800, 600, 500, 400, 300, 200, 100, 
+            90, 80, 70, 60, 50, 40, 30, 20, 10,
+            9, 8, 7, 6, 5, 4, 3, 2, 1
+        ];
+        
+        let mut v = num;
+        let mut res = String::from("");
+        while v > 0 {
+            for n in nums.iter() {
+                if v - n >= 0 {
+                    v -= n;
+                    res.push_str(&Solution::roman(*n));
+                    break;
+                }
+            }
+        }
+        res
+    }
+    
+    pub fn roman(val: i32) -> String {
+        match val {
+            1000 => String::from("M"),
+            900 => String::from("CM"),
+            800 => String::from("DCCC"),
+            700 => String::from("DCC"),
+            600 => String::from("DC"),
+            500 => String::from("D"),
+            400 => String::from("CD"),
+            300 => String::from("CCC"),
+            200 => String::from("CC"),
+            100 => String::from("C"),
+            90 => String::from("XC"),
+            80 => String::from("LXXX"),
+            70 => String::from("LXX"),
+            60 => String::from("LX"),
+            50 => String::from("L"),
+            40 => String::from("XL"),
+            30 => String::from("XXX"),
+            20 => String::from("XX"),
+            10 => String::from("X"),
+            9 => String::from("IX"),
+            8 => String::from("VIII"),
+            7 => String::from("VII"),
+            6 => String::from("VI"),
+            5 => String::from("V"),
+            4 => String::from("IV"),
+            3 => String::from("III"),
+            2 => String::from("II"),
+            1 => String::from("I"),
+            _ => String::from("")
+        }
+    }
+}

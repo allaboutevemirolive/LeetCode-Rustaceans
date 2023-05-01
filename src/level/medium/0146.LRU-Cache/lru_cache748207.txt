@@ -1,0 +1,54 @@
+// https://leetcode.com/problems/lru-cache/solutions/748207/rust-deque/
+use std::collections::VecDeque;
+use std::collections::HashMap;
+
+struct LRUCache {
+    dq: VecDeque<i32>,
+    m: HashMap<i32, i32>,
+    capacity: i32,
+}
+
+
+/** 
+ * `&self` means the method takes an immutable reference.
+ * If you need a mutable reference, change it to `&mut self` instead.
+ */
+impl LRUCache {
+
+    fn new(capacity: i32) -> Self {
+        Self
+        {
+            dq: VecDeque::new(),
+            m: HashMap::new(),
+            capacity: capacity,
+        }
+    }
+    
+    fn get(&mut self, key: i32) -> i32 {
+        if self.m.contains_key(&key)
+        {
+            self.dq.retain(|&x| x != key);
+            self.dq.push_front(key);
+            return self.m[&key];
+        }
+        return -1;
+    }
+    
+    fn put(&mut self, key: i32, value: i32) {
+        if self.m.contains_key(&key)
+        {
+            self.dq.retain(|&x| x != key);
+            self.dq.push_front(key);
+            self.m.insert(key, value);
+        }
+        else
+        {
+            if(self.dq.len() == self.capacity as usize)
+            {
+                self.m.remove(&self.dq.pop_back().unwrap());
+            }
+            self.m.insert(key, value);
+            self.dq.push_front(key);
+        }
+    }
+}

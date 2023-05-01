@@ -1,0 +1,18 @@
+// https://leetcode.com/problems/increasing-triplet-subsequence/solutions/2688548/rust-easy-to-understand-one-pass/
+impl Solution {
+    pub fn increasing_triplet(nums: Vec<i32>) -> bool {
+      let (mut first, mut second) = (i32::MAX, i32::MAX);
+      for n in nums {
+          if n < first {
+              first = n;
+              continue;
+          }
+          if n < second && first < n {
+              second = n;
+              continue;
+          }
+          if n > second { return true; }
+      }
+      false
+    }
+}

@@ -1,0 +1,15 @@
+// https://leetcode.com/problems/find-all-duplicates-in-an-array/solutions/1505997/rust-another-solution-with-sign-play-8-ms/
+impl Solution {
+    pub fn find_duplicates(mut nums: Vec<i32>) -> Vec<i32> {
+        let mut result = Vec::with_capacity(nums.len());
+        for i in 0..nums.len() {
+            let abs_val = nums[i].abs();
+            let ref_val = &mut nums[(abs_val - 1) as usize];
+            match *ref_val < 0 {
+                true => result.push(abs_val),
+                false => *ref_val *= -1,
+            }
+        }
+        result
+    }
+}

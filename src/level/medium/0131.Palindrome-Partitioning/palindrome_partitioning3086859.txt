@@ -1,0 +1,61 @@
+// https://leetcode.com/problems/palindrome-partitioning/solutions/3086859/rust-backtracking-dp-solution/
+impl Solution {
+    pub fn is_palindrome(s: &[u8]) -> bool {
+        let s_len = s.len();
+        if s_len <= 1 {
+            return true;
+        }
+        unsafe {
+            let first = s.first().unwrap_unchecked();
+            let last = s.last().unwrap_unchecked();
+            if first == last {
+                Self::is_palindrome(&s[1..s_len-1])
+            } else {
+                false
+            }
+        }
+    }
+
+    pub fn get_all_palindrome_substr_partitions<'a>(slice: &'a [u8], pd_seq: &mut Vec<&'a [u8]>, pd_map: &mut Vec<Vec<Option<bool>>>, pd_seqs: &mut Vec<Vec<String>>) {
+        let slice_len = slice.len();
+        if slice_len == 0 {
+            let mut pd_seq_str = vec![];
+            for &seq_byte in pd_seq.iter().rev() {
+                pd_seq_str.push(unsafe { String::from(
+                    std::str::from_utf8_unchecked(seq_byte)
+                )});
+            }
+            pd_seqs.push(pd_seq_str);
+            return;
+        }
+
+        for i in (0..slice_len).rev() {
+            let (slice_front, slice_back) = slice.split_at(i);
+
+            let is_pd = match pd_map[slice_len - 1][slice_len - i - 1] {
+                Some(is_pd) => {
+                    is_pd
+                },
+                None => {
+                    let is_pd = Self::is_palindrome(slice_back);
+                    pd_map[slice_len - 1][slice_len - i - 1] = Some(is_pd);
+                    is_pd
+                }
+            };
+
+            if is_pd {
+                pd_seq.push(slice_back);
+                Self::get_all_palindrome_substr_partitions(
+                    slice_front, pd_seq, pd_map, pd_seqs);
+                pd_seq.pop();
+            }
+        }
+    }
+
+    pub fn partition(s: String) -> Vec<Vec<String>> {
+        let mut pseqs = vec![];
+        let mut is_pd = vec![vec![None; s.len()]; s.len()];
+        Self::get_all_palindrome_substr_partitions(s.as_bytes(), &mut vec![], &mut is_pd, &mut pseqs);
+        pseqs
+    }
+}

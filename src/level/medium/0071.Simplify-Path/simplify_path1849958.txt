@@ -1,0 +1,17 @@
+// https://leetcode.com/problems/simplify-path/solutions/1849958/rust-0ms-2-3mb/
+impl Solution {
+    pub fn simplify_path(path: String) -> String {
+        let mut res = vec![];
+
+        for ch in path.split("/").collect::<Vec<_>>() { 
+            match ch { 
+                "" | "." => {continue;},
+                ".." => {res.pop();}
+                _ => res.push(ch)
+            }
+        }
+        format!("/{}", res.join("/"))
+    }
+}
+                    
+        

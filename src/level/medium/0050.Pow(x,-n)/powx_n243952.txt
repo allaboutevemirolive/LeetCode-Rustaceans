@@ -1,0 +1,21 @@
+// https://leetcode.com/problems/powx-n/solutions/243952/rust-tricky-solution/
+impl Solution {
+    pub fn my_pow(x: f64, n: i32) -> f64 {
+        let mut ans = 1f64;
+        let mut lx = x;
+        let mut ln = n as i64;
+        if ln < 0 {
+            ln = -ln;
+            lx = 1f64 / lx;
+        }
+        while ln > 0 {
+            if ln & 1 == 1 {
+                ans *= lx;
+            }
+            lx *= lx;
+            ln >>= 1;
+        }
+        let result = format!("{:.5}", ans);
+        return result.trim_end_matches("0").parse::<f64>().unwrap();
+    }
+}

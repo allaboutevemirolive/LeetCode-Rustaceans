@@ -1,0 +1,15 @@
+// https://leetcode.com/problems/maximum-subarray/solutions/2144586/rust-solution/
+
+impl Solution {
+    pub fn max_sub_array(el: Vec<i32>) -> i32 {
+        if el.len() == 0 {
+            return 0;
+        }
+        let (mut max_sum, mut cur_sum) = (el[0], el[0]);
+        for i in 1..el.len() {
+            cur_sum = (cur_sum + el[i]).max(el[i]);
+            max_sum = max_sum.max(cur_sum);
+        }
+        max_sum
+    }
+}

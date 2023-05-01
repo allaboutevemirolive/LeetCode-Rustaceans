@@ -1,0 +1,35 @@
+// https://leetcode.com/problems/reconstruct-original-digits-from-english/solutions/1682779/rust/
+    pub fn original_digits(s: String) -> String {
+        use std::collections::HashMap;
+        use std::char;
+        //build frequency
+        let mut frequencies = HashMap::new();
+        for c in s.chars() {
+            let count = frequencies.entry(c).or_insert(0);
+            *count += 1;
+        }
+
+        let mut result = [0; 10];
+
+        result[0] = *frequencies.get(&'z').unwrap_or(&0);
+        result[2] = *frequencies.get(&'w').unwrap_or(&0);
+        result[4] = *frequencies.get(&'u').unwrap_or(&0);
+        result[6] = *frequencies.get(&'x').unwrap_or(&0);
+        result[8] = *frequencies.get(&'g').unwrap_or(&0);
+        result[7] = *frequencies.get(&'s').unwrap_or(&0) - result[6];
+        result[5] = *frequencies.get(&'v').unwrap_or(&0) - result[7];
+        result[3] = *frequencies.get(&'r').unwrap_or(&0) - (result[0] + result[4]);
+        result[1] = *frequencies.get(&'o').unwrap_or(&0) - (result[0] + result[2] + result[4]);
+        result[9] = *frequencies.get(&'i').unwrap_or(&0) - (result[5] + result[6] + result[8]);
+
+        let mut temp = String::new();
+
+        for (idx, &count) in result.iter().enumerate() {
+            if count > 0 {
+                for _ in 0..count {
+                    temp.push(char::from_digit(idx as u32, 10).expect("invalid"))
+                }
+            }
+        }
+        temp
+    }

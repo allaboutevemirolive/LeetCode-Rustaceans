@@ -1,0 +1,20 @@
+// https://leetcode.com/problems/find-minimum-in-rotated-sorted-array/solutions/324713/rust-0ms-binary-search/
+impl Solution {
+    pub fn find_min(nums: Vec<i32>) -> i32 {
+        if nums.is_empty() {
+				return 0;
+        }
+
+		// invariant : min_val is in [left, right]
+        let (mut l, mut r) = (0, nums.len() - 1);
+        while l < r {
+            let mid = l + ((r - l) >> 1);
+            if nums[mid] > nums[r] {
+					l = mid + 1;   // ① may break the invariant
+            } else {
+                r = mid;
+            }
+        }
+        nums[l]
+    }
+}

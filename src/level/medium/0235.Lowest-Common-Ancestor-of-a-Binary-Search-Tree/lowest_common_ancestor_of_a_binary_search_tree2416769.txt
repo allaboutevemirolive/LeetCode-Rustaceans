@@ -1,0 +1,24 @@
+// https://leetcode.com/problems/lowest-common-ancestor-of-a-binary-search-tree/solutions/2416769/rust-intuitive-fast-solution/
+use std::cell::RefCell;
+use std::rc::Rc;
+type Node = Option<Rc<RefCell<TreeNode>>>;
+
+impl Solution {
+    pub fn lowest_common_ancestor(mut root: Node, p: Node, q: Node) -> Node {
+        let (p, q) = match (p.unwrap().borrow().val, q.unwrap().borrow().val) {
+            (p, q) if p > q => (q, p),
+            t => t,
+        };
+
+        loop {
+            let expected = root.as_ref().unwrap().borrow().val;
+            if p <= expected && expected <= q {
+                return root;
+            }
+            root = match q < expected {
+                true => root.unwrap().borrow().left.clone(),
+                _ => root.unwrap().borrow().right.clone(),
+            };
+        }
+    }
+}

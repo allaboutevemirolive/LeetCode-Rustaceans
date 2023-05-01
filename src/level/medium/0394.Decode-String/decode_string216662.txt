@@ -1,0 +1,25 @@
+// https://leetcode.com/problems/decode-string/solutions/216662/rust-solution-with-stack/
+impl Solution {
+    pub fn decode_string(s: String) -> String {
+        let mut stack = vec![];
+        let mut cur_num: u32 = 0;
+        let mut cur_str = String::new();
+        
+        for c in s.chars() {
+            if c == '[' {
+                stack.push((cur_num, cur_str));
+                cur_num = 0;
+                cur_str = String::new();    
+            } else if c == ']' {
+                let r = stack.pop().unwrap();
+                cur_str = format!("{}{}", r.1, cur_str.repeat(r.0 as usize));
+            } else if let Some(d) = c.to_digit(10) {
+                cur_num = cur_num * 10 + d;
+            } else {
+                cur_str = format!("{}{}", cur_str, c);
+            }
+        }
+        
+        return cur_str;
+    }
+}

@@ -1,0 +1,9 @@
+// https://leetcode.com/problems/find-minimum-in-rotated-sorted-array/solutions/1660559/rust-heap-100-2-1/
+use std::collections::BinaryHeap;
+impl Solution {
+    pub fn find_min(nums: Vec<i32>) -> i32 {
+        let mut maxheap = BinaryHeap::from(nums);
+        let mut max = maxheap.into_sorted_vec();
+        max[0]
+    }
+}

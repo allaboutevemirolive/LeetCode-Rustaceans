@@ -1,0 +1,33 @@
+// https://leetcode.com/problems/bulls-and-cows/solutions/1351556/two-pass-rust-solution-2ms/
+impl Solution {
+    pub fn get_hint(secret: String, guess: String) -> String {
+        let mut sec_count = [0usize; 128];
+        let mut guess_count = [0usize; 128];
+        let mut bull_count = 0usize;
+        let mut cow_count = 0usize;
+        let (s, g) = (secret.as_bytes(), guess.as_bytes());
+        for ch in s {
+            sec_count[*ch as usize] += 1;
+        }
+        for ch in g {
+            if (sec_count[*ch as usize] > 0) {
+                guess_count[*ch as usize] = std::cmp::min(sec_count[*ch as usize], guess_count[*ch as usize] + 1);
+            }
+        }
+        
+        // count bulls
+        let n = s.len();
+        for i in 0..n {
+            if (s[i] == g[i]) {
+                sec_count[s[i] as usize] -= 1;
+                guess_count[s[i] as usize] -= 1;
+                bull_count += 1;
+            }
+        }
+        
+        for i in 0..128 {
+            cow_count += guess_count[i] as usize;
+        }
+        
+        format!("{}A{}B", bull_count, cow_count)
+    }

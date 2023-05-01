@@ -1,0 +1,59 @@
+// https://leetcode.com/problems/insert-delete-getrandom-o1/solutions/683348/rust-code/
+use rand::prelude::*;
+use std::collections::HashMap;
+
+#[derive(Debug)]
+struct RandomizedSet {
+    rng: ThreadRng,
+    numbers: Vec<i32>,
+    map: HashMap<i32, i32>,
+
+}
+
+
+/**
+ * `&self` means the method takes an immutable reference.
+ * If you need a mutable reference, change it to `&mut self` instead.
+ */
+impl RandomizedSet {
+    /** Initialize your data structure here. */
+    fn new() -> Self {
+        RandomizedSet {
+            rng: Default::default(),
+            numbers: vec![],
+            map: Default::default(),
+        }
+    }
+
+    /** Inserts a value to the set. Returns true if the set did not already contain the specified element. */
+    fn insert(&mut self, val: i32) -> bool {
+        return if self.map.contains_key(&val) { false } else {
+            self.map.insert(val, self.numbers.len() as i32);
+            self.numbers.push(val);
+            true
+        }
+    }
+
+    /** Removes a value from the set. Returns true if the set contained the specified element. */
+    fn remove(&mut self, val: i32) -> bool {
+        return match self.map.get_mut(&val) {
+            None => { false },
+            Some(&mut x) => {
+                let len = self.numbers.len();
+                if x < (len - 1) as i32 {
+                    let last_one = self.numbers[len - 1];
+                    self.numbers[x as usize] = last_one;
+                    self.map.insert(last_one, x);
+                }
+                self.map.remove(&val);
+                self.numbers.pop();
+                true
+            }
+        }
+    }
+
+    /** Get a random element from the set. */
+    fn get_random(&mut self) -> i32 {
+        self.numbers[self.rng.gen_range(0, self.numbers.len())]
+    }
+}

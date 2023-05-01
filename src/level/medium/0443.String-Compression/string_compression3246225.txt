@@ -1,0 +1,26 @@
+// https://leetcode.com/problems/string-compression/solutions/3246225/rust-straightforward-0ms/
+impl Solution {
+    pub fn compress(chars: &mut Vec<char>) -> i32 {
+        let n = chars.len();
+
+        let mut i = 0;
+        let mut j = 0;
+        let mut k = 0;
+        
+        while i < n {
+            while i < n && chars[i] == chars[j] { i += 1; }
+
+            chars[k] = chars[i - 1];
+            k += 1;
+
+            if i > j + 1 {
+                for c in (i - j).to_string().chars() {
+                    chars[k] = c;
+                    k += 1;
+                }
+            }
+            j = i;
+        }
+        k as i32
+    }
+}

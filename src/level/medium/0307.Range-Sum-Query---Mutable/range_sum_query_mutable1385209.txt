@@ -1,0 +1,49 @@
+// https://leetcode.com/problems/range-sum-query-mutable/solutions/1385209/rust-clean-binary-index-tree/
+struct NumArray {
+    n: usize,
+    tree: Vec<i32>,
+}
+
+impl NumArray {
+    fn new(nums: Vec<i32>) -> Self {
+        let n: usize = nums.len();
+        // one-based
+        let mut res = NumArray {
+            n: n + 1,
+            tree: vec![0; n + 1],
+        };
+        for i in 0..n {
+            res.update(i as i32, nums[i]);
+        }
+        res
+    }
+    
+    fn update(&mut self, index: i32, val: i32) {
+        // increment one since the tree vec is one-based(since leaving a front zero)
+        let mut index: usize = index as usize + 1;
+		// remove the previous value by updating the difference of them
+        let prev: i32 = self.query(index) - self.query(index - 1);
+        let diff: i32 = val - prev;
+        while index < self.n {
+            self.tree[index] += diff;
+            // increase the least significant bit
+            index = (index | (index - 1)) + 1;
+        }
+    }
+    
+    fn sum_range(&self, left: i32, right: i32) -> i32 {
+        // right + 1, since the querying index is excluded
+        self.query(right as usize + 1) - self.query(left as usize)
+    }
+    
+    // returns the sum of nums[..i]
+    fn query(&self, mut i: usize) -> i32 {
+        let mut sum: i32 = 0;
+        while i > 0 {
+            sum += self.tree[i];
+            // remove the least significant bit
+            i &= i - 1;
+        }
+        sum
+    }
+}

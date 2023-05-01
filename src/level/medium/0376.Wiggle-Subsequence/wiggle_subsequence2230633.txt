@@ -1,0 +1,29 @@
+// https://leetcode.com/problems/wiggle-subsequence/solutions/2230633/rust-solution-with-detailed-explanation/
+impl Solution {
+    /*Objective -> To, obtain the length of longest wiggle sub-sequence
+     *
+     *Wiggle sequence => A wiggle sequence is a sequence, in which the difference of the numbers in the array strictly alternates between positive and negative, so, if visualised it would look like this /\/\/\/\/\/ or /\/\/\/\/\. Thus there are two ways this sequence can be created one ending in down and one in up
+     *
+     *Subsequence => A subsequence is obtained by deleting some elements (possibly zero) from the original sequence, leaving the remaining elements in their original order. Note that retaining the original order of the original sequence is important.
+    */
+    pub fn wiggle_max_length(nums: Vec<i32>) -> i32 {
+        let mut up : u16 = 1;//the up sequence counter /\/\/\/
+        let mut down : u16 = 1;//the down sequence counter /\/\/\
+        
+        nums
+        .windows(2)
+        .for_each(
+            |window| {
+                if window[1] > window[0] {
+                    down = up + 1//if next number is smaller than current one, it's a down sequence, and down sequence should be preceded by an up sequence, in order for this to be a wiggle subsequence, so, we take the length of last up sequence, and add 1 to it, to get the length of our current down sequence.This way if previous sequence were to be a down sequence, it will not affect our current down sequence, i.e. it will be skipped.
+                } else if window[0] > window[1] {
+                    up = down + 1//if next number is larger than current one, it's an up sequence, and an up sequence should be preceded by a down sequence, in order for this to be a wiggle subsequence, so, we take the length of last down sequence, and add 1 to it, to get the length of our current up sequence.This way if previous sequence were to be an up sequence, it will not affect our current up sequence, i.e. it will be skipped.
+                } else {
+                    ()//if the elments are equal, we skip it, because the difference is zero and it must strictly alternate between positive and negative.
+                }
+            }
+        );
+        
+        up.max(down) as i32//we return the longest subsequnce's length
+    }
+}

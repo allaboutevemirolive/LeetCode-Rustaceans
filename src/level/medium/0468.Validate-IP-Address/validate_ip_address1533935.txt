@@ -1,0 +1,53 @@
+// https://leetcode.com/problems/validate-ip-address/solutions/1533935/rust-fail-fast/
+enum IPAddressType {
+    IPv4,
+    IPv6,
+    Neither
+}
+
+fn _check_ip_address(ip: String) -> IPAddressType {
+    if ip.len() < 7 || ip.len() > 39 {
+        IPAddressType::Neither
+    } else if ip.chars().filter(|&x| x == '.').count() == 3 {
+        if ip.chars().any(|x| !(x.is_digit(10) || x == '.')) || ip.len() > 15 {
+            IPAddressType::Neither
+        } else {
+            for segment in ip.split('.') {
+                if segment.len() == 0 || segment.len() > 3 || (segment.len() >= 2 && segment.chars().nth(0).unwrap() == '0') {
+                    return IPAddressType::Neither;
+                }
+                if segment.parse::<u8>().is_err() {
+                    return IPAddressType::Neither;
+                }
+            }
+            IPAddressType::IPv4
+        }
+    } else if ip.chars().filter(|&x| x == ':').count() == 7 {
+        if ip.chars().any(|x| !(x.is_digit(16) || x == ':')) || ip.len() < 15 {
+            IPAddressType::Neither
+        } else {
+            for segment in ip.split(':') {
+                if segment.len() == 0 || segment.len() > 4 {
+                    return IPAddressType::Neither;
+                }
+                if u16::from_str_radix(segment, 16).is_err() {
+                    return IPAddressType::Neither;
+                }
+            }
+            IPAddressType::IPv6
+        }
+    } else {
+        IPAddressType::Neither
+    }
+    
+}
+
+impl Solution {
+    pub fn valid_ip_address(ip: String) -> String {
+        match _check_ip_address(ip) {
+            IPAddressType::IPv4 => String::from("IPv4"),
+            IPAddressType::IPv6 => String::from("IPv6"),
+            IPAddressType::Neither => String::from("Neither"),
+        }
+    }
+}

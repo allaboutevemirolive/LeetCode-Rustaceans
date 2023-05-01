@@ -1,0 +1,19 @@
+// https://leetcode.com/problems/perfect-squares/solutions/2016028/rust-bfs/
+use std::collections::VecDeque;
+
+pub fn num_squares(n: i32) -> i32 {
+    let root = (n as f32).sqrt().floor() as i32;
+    let mut queue = VecDeque::new();
+    queue.push_back((n, root,1));
+    while let Some((num, max_root, level)) = queue.pop_front() {
+        if max_root.pow(2) == num {
+            return level;
+        }
+        for i in (1..=max_root).rev() {
+            let new_num = num-i.pow(2);
+            let curr_root = (new_num as f32).sqrt().floor() as i32;
+            queue.push_back((new_num, curr_root, level+1));
+        }
+    }
+    unreachable!("wrong implementation");
+}

@@ -1,0 +1,35 @@
+// https://leetcode.com/problems/perfect-squares/solutions/490791/rust-bfs-solution/
+use std::collections::HashSet;
+use std::collections::VecDeque;
+
+impl Solution {
+	pub fn num_squares(n: i32) -> i32 {
+		let mut queue: VecDeque<i32> = VecDeque::new();
+		let mut visited: HashSet<i32> = HashSet::new();
+
+		let mut depth = 0;
+
+		queue.push_back(0);
+		visited.insert(0);
+		while !queue.is_empty() {
+			depth += 1;
+			for _ in 0..queue.len() {
+				let val = queue.pop_front().unwrap();
+				let mut i = 1;
+				while val + i * i < n {
+					let neighbor = val + i * i;
+					if !visited.contains(&neighbor) {
+						queue.push_back(neighbor);
+						visited.insert(neighbor);
+					}
+					i += 1;
+				}
+				if val + i * i == n {
+					return depth;
+				}
+			}
+		}
+
+		depth
+	}
+}

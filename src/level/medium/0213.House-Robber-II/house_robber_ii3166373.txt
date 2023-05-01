@@ -1,0 +1,33 @@
+// https://leetcode.com/problems/house-robber-ii/solutions/3166373/rust-dp-solution/
+impl Solution {
+    pub fn rob(nums: Vec<i32>) -> i32 {
+        let n = nums.len();
+
+        if n == 1 {
+            return nums[0];
+        }
+
+        let first = Solution::helper(&nums, 0, n - 2);
+        let second = Solution::helper(&nums, 1, n - 1);
+
+        first.max(second)
+    }
+
+    fn helper(nums: &Vec<i32>, i: usize, j: usize) -> i32 {
+        if i == j {
+            return nums[i];
+        }
+        
+        let n = nums.len();
+        let mut f = vec![0; n];
+
+        f[i] = nums[i];
+        f[i + 1] = nums[i].max(nums[i + 1]);
+
+        for k in i + 2..j + 1 {
+            f[k] = (nums[k] + f[k - 2]).max(f[k - 1]);
+        }
+
+        f[j]
+    }
+}

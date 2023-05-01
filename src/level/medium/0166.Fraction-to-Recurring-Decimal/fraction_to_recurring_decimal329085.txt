@@ -1,0 +1,35 @@
+// https://leetcode.com/problems/fraction-to-recurring-decimal/solutions/329085/rust-0ms-hashmap/
+impl Solution {
+    if numerator == 0 {return "0".to_string();}
+	
+    pub fn fraction_to_decimal(numerator: i32, denominator: i32) -> String {
+        let is_neg = (numerator < 0) ^ (denominator < 0);
+        let mut ret = if is_neg { // ①
+            "-".to_string()
+        } else {
+            "".to_string()
+        };
+        let (n, d) = ((numerator as i64).abs(), (denominator as i64).abs());
+        let mut r = n % d;
+        ret += &(n / d).to_string();
+        if r == 0 {
+            return ret;    //  ②
+        }
+
+        ret += &".";
+        let mut indices = HashMap::new();
+        while r != 0 {
+            if indices.contains_key(&r) {
+                ret.insert(indices[&r], '(');
+                ret += &")";
+                return ret;
+            } else {
+                indices.insert(r, ret.len());    // ③
+                r *= 10;
+                ret += &(r / d).to_string();
+                r %= d;
+            }
+        }
+        ret
+    }
+}

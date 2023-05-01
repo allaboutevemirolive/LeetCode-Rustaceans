@@ -1,0 +1,13 @@
+// https://leetcode.com/problems/rotate-array/solutions/1534821/rust-simple/
+    pub fn rotate(mut nums: &mut Vec<i32>, k: i32) {
+    
+        let res = nums.clone();
+        
+        let len = nums.len();
+        
+        for (i, val) in res.iter().enumerate() {
+            let new_idx = (i + k as usize) % len;
+            nums[new_idx] = *val;
+        }
+    }
+}

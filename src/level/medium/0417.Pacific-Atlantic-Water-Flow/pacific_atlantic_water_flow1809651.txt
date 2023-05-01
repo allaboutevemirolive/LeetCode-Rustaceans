@@ -1,0 +1,53 @@
+// https://leetcode.com/problems/pacific-atlantic-water-flow/solutions/1809651/rust-clean-dfs-solution/
+pub fn pacific_atlantic(heights: Vec<Vec<i32>>) -> Vec<Vec<i32>> {
+    let mut grid = vec![vec![0u8; heights[0].len()]; heights.len()];
+
+    for c in 0..heights[0].len() {
+        mark(&mut grid, &heights, 0, c, 0);
+    }
+
+    for c in 0..heights[0].len() {
+        mark(&mut grid, &heights, heights.len() - 1, c, 1);
+    }
+    for r in 0..heights.len() {
+        mark(&mut grid, &heights, r, 0, 0);
+    }
+
+    for r in 0..heights.len() {
+        mark(&mut grid, &heights, r, heights[r].len() - 1, 1);
+    }
+
+    let mut solution = vec![];
+    for r in 0..grid.len() {
+        for c in 0..grid[r].len() {
+            if grid[r][c] == (1 | 1 << 1) {
+                solution.push(vec![r as i32, c as i32]);
+            }
+        }
+    }
+    solution
+}
+
+fn mark(grid: &mut Vec<Vec<u8>>, heights: &Vec<Vec<i32>>, r: usize, c: usize, bit: u32) {
+    if grid[r][c] & (1 << bit) != 0 {
+        return;
+    }
+
+    grid[r][c] |= 1 << bit;
+
+    if r > 0 && heights[r - 1][c] >= heights[r][c] {
+        mark(grid, heights, r - 1, c, bit);
+    }
+
+    if c > 0 && heights[r][c - 1] >= heights[r][c] {
+        mark(grid, heights, r, c - 1, bit);
+    }
+
+    if c < heights[0].len() - 1 && heights[r][c + 1] >= heights[r][c] {
+        mark(grid, heights, r, c + 1, bit);
+    }
+
+    if r < heights.len() - 1 && heights[r + 1][c] >= heights[r][c] {
+        mark(grid, heights, r + 1, c, bit);
+    }
+}

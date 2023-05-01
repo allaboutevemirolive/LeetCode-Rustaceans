@@ -1,0 +1,54 @@
+// https://leetcode.com/problems/jump-game/solutions/3296563/rust-greedy/
+impl Solution {
+    /*
+        This actually is not a DP problem, it needs a greedy algorithm
+    */
+    pub fn can_jump(nums: Vec<i32>) -> bool {
+        let mut index = nums.len() - 1;
+        let mut remaining_distance = 1;
+
+        while index > 0 {
+            let left_index = index - 1;
+            if nums[left_index] >= remaining_distance {
+                remaining_distance = 1;
+            } else {
+                remaining_distance += 1;
+            }
+            index = left_index;
+        }
+
+        remaining_distance == 1
+    }
+    
+    /*
+        BFS with cahced doesnt work.
+    */
+    pub fn can_jump_bfs(nums: Vec<i32>) -> bool {
+        use std::collections::{HashSet, VecDeque};
+
+        let mut pending_positions = VecDeque::new();
+        let mut visited = HashSet::new();
+        let target_index = nums.len() - 1;
+
+        pending_positions.push_back(0);
+        visited.insert(0);
+
+        while !pending_positions.is_empty() {
+            if let Some(index) = pending_positions.pop_front() {
+                if index == target_index {
+                    return true;
+                }
+
+                for steps in 1..=nums[index] {
+                    let next_index = index + steps as usize;
+                    if next_index <= target_index && !visited.contains(&next_index) {
+                        pending_positions.push_back(next_index);
+                        visited.insert(next_index);
+                    }
+                }
+            }
+        }
+
+        return false;
+    }
+}

@@ -1,0 +1,13 @@
+// https://leetcode.com/problems/verify-preorder-serialization-of-a-binary-tree/solutions/1427143/rust-solution/
+impl Solution {
+    pub fn is_valid_serialization(preorder: String) -> bool {
+        preorder.split(",").try_fold(vec![false], |mut st, x| {
+            let sharp = x == "#";
+            if sharp {
+                while st.pop()? {}
+            }
+            st.push(sharp);
+            Some(st)
+        }) == Some(vec![true])
+    }
+}

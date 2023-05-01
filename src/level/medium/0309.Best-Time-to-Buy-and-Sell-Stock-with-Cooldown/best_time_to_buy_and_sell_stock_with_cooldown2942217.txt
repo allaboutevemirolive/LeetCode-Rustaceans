@@ -1,0 +1,14 @@
+// https://leetcode.com/problems/best-time-to-buy-and-sell-stock-with-cooldown/solutions/2942217/simple-rust-o-n-solution-using-dp/
+impl Solution {
+    pub fn max_profit(prices: Vec<i32>) -> i32 {
+        let n = prices.len();
+        let mut sell = vec![0; n + 1];
+        let mut buy = vec![0; n + 1];
+        buy[1] = -prices[0];
+        for i in 1..n {
+            sell[i + 1] = sell[i].max(buy[i] + prices[i]);
+            buy[i + 1] = buy[i].max(sell[i - 1] - prices[i]);
+        }
+        sell[n]
+    }
+}

@@ -1,0 +1,15 @@
+// https://leetcode.com/problems/product-of-array-except-self/solutions/1598363/rust-solution/
+impl Solution {
+    pub fn product_except_self(nums: Vec<i32>) -> Vec<i32> {
+        let mut ans: Vec<_> = nums
+            .iter()
+            .scan(1, |s, x| Some(std::mem::replace(s, *s * x)))
+            .collect();
+        nums.iter()
+            .rev()
+            .scan(1, |s, x| Some(std::mem::replace(s, *s * x)))
+            .zip(ans.iter_mut().rev())
+            .for_each(|(a, b)| *b *= a);
+        ans
+    }
+}

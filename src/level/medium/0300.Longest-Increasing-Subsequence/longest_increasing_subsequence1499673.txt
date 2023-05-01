@@ -1,0 +1,27 @@
+// https://leetcode.com/problems/longest-increasing-subsequence/solutions/1499673/rust-notes/
+impl Solution {
+    pub fn length_of_lis(nums: Vec<i32>) -> i32 {
+        let mut new_set = Vec::new();
+        
+        for &i in nums.iter() { 
+            //  To separate the num in increasing order, we have to sort 
+            if let Err(index) = new_set.binary_search(&i) { 
+                if index >= new_set.len() {
+                    //  Push the num to the piles 
+                    //  LHS being a priority 
+                    new_set.push(i);
+                    // [10]
+                    // [2, 5]
+                    // [2, 3, 7]
+                    // [2, 3, 7, 101]
+
+                } else { 
+                    //  a new set
+                    new_set[index] = i;
+                   //  9, 2, 3, 18, 
+                }
+            } 
+        }
+        new_set.len() as i32
+    }
+}

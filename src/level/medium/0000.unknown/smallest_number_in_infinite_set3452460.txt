@@ -1,0 +1,49 @@
+// https://leetcode.com/problems/smallest-number-in-infinite-set/solutions/3452460/rust-binaryheap-and-hashset/
+use std::collections::{BinaryHeap, HashSet};
+
+struct SmallestInfiniteSet {
+    present: HashSet<i32>,
+    added: BinaryHeap<i32>,
+    smallest: i32,
+}
+
+
+/** 
+ * `&self` means the method takes an immutable reference.
+ * If you need a mutable reference, change it to `&mut self` instead.
+ */
+impl SmallestInfiniteSet {
+
+    fn new() -> Self {
+        SmallestInfiniteSet{
+            present: HashSet::new(),
+            added: BinaryHeap::new(),
+            smallest: 1,
+        }
+    }
+    
+    fn pop_smallest(&mut self) -> i32 {
+        if self.added.len() > 0 {
+            let ans = self.added.pop().unwrap();
+            self.present.remove(&ans);
+            return -ans;
+        } else {
+            let ans = self.smallest;
+            self.smallest += 1;
+            return ans;
+        }
+        
+    }
+    
+    fn add_back(&mut self, num: i32) {
+        if self.smallest <= num || self.present.contains(&(-num)) {
+            return;
+        }
+        
+        self.added.push(-num);
+        self.present.insert(-num);
+    }
+}
+
+
+

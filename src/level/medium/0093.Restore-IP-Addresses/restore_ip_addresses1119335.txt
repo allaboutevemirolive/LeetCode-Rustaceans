@@ -1,0 +1,47 @@
+// https://leetcode.com/problems/restore-ip-addresses/solutions/1119335/rust-cheapest-best/
+impl Solution {
+    pub fn restore_ip_addresses(s: String) -> Vec<String> {
+        let digits = s
+            .chars()
+            .map(|c| c.to_digit(10).unwrap())
+            .collect::<Vec<u32>>();
+
+        Self::go(&digits, 4)
+            .into_iter()
+            .map(|v| {
+                v.into_iter()
+                    .map(|d| format!("{}", d))
+                    .collect::<Vec<String>>()
+                    .join(".")
+            })
+            .collect()
+    }
+
+    fn go(digits: &[u32], k: usize) -> Vec<Vec<u32>> {
+        match (k, digits.len()) {
+            (_, 0) => vec![],
+            (1, l) => {
+                if l == 1 || (l < 4 && digits[0] != 0) {
+                    let n = digits.iter().fold(0u32, |acc, cur| acc * 10 + cur);
+                    if n <= 255 {
+                        return vec![vec![n]]
+                    }
+                }
+                vec![]
+            }
+            (_, l) => {
+                let mut result = vec![];
+                for i in 1..4.min(l) {
+                    if let Some(seed) = Self::go(&digits[0..i], 1).pop() {
+                        for rest in Self::go(&digits[i..], k - 1) {
+                            let mut new = seed.clone();
+                            new.extend(rest);
+                            result.push(new);
+                        }
+                    }
+                }
+                result
+            }
+        }
+    }
+}

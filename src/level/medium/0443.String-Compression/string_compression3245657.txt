@@ -1,0 +1,33 @@
+// https://leetcode.com/problems/string-compression/solutions/3245657/rust-write-out-constant-space/
+impl Solution {
+    pub fn compress(chars: &mut Vec<char>) -> i32 {
+        fn write_out(prev: char, count: i32, index: &mut usize, arr: &mut Vec<char>) {
+            if prev != '\0' {
+                arr[*index] = prev;
+                *index += 1;
+            }
+
+            if count > 1 {
+                for l in count.to_string().chars() {
+                    arr[*index] = l;
+                    *index += 1;
+                }
+            }
+        }
+
+        let n = chars.len();
+        let (mut prev, mut count, mut index) = ('\0', 0, 0);
+
+        for i in 0..n {
+            if prev == chars[i] { count += 1 }
+            else {
+                write_out(prev, count, &mut index, chars);
+                prev = chars[i];
+                count = 1;
+            }
+        }
+
+        write_out(prev, count, &mut index, chars);
+        index as _
+    }
+}

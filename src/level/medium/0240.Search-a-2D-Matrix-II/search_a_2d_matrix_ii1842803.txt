@@ -1,0 +1,17 @@
+// https://leetcode.com/problems/search-a-2d-matrix-ii/solutions/1842803/rust-top-right-binary-search/
+impl Solution {
+    pub fn search_matrix(matrix: Vec<Vec<i32>>, target: i32) -> bool {
+        use std::cmp::Ordering::*;
+        let mut x = 0i32;
+        let mut y = (matrix[0].len() - 1) as i32;
+        let row = (matrix.len() - 1) as i32;
+        while x <= row && y >= 0 {
+            match matrix[x as usize][y as usize].cmp(&target) {
+                Equal => return true,
+                Less => x += 1,
+                Greater => y -= 1,
+            }
+        }
+        false
+    }
+}

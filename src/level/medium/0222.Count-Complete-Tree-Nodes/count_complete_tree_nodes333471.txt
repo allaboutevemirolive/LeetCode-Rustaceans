@@ -1,0 +1,22 @@
+// https://leetcode.com/problems/count-complete-tree-nodes/solutions/333471/4ms-rust-solution/
+use std::rc::Rc;
+use std::cell::RefCell;
+impl Solution {
+    pub fn count_nodes(root: Option<Rc<RefCell<TreeNode>>>) -> i32 {
+        fn count_helper(cnt: &mut i32, node: &Option<Rc<RefCell<TreeNode>>>) {
+            if node.is_none() {
+                return;
+            }
+            
+            let node_ref = node.as_ref().unwrap();
+            
+            count_helper(cnt, &node_ref.borrow().left);
+            *cnt += 1;
+            count_helper(cnt, &node_ref.borrow().right);
+        }
+        
+        let mut cnt = 0;
+        count_helper(&mut cnt, &root);
+        cnt
+    }
+}

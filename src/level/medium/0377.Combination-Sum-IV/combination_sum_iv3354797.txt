@@ -1,0 +1,16 @@
+// https://leetcode.com/problems/combination-sum-iv/solutions/3354797/rust-solution/
+impl Solution {
+    pub fn combination_sum4(nums: Vec<i32>, target: i32) -> i32 {
+        const MAX_SUM: usize = 1000 * 200 + 1;
+        let mut dp = vec![0; MAX_SUM];
+        dp[0] = 1;
+        for i in 0..=target as usize {
+            for j in 0..nums.len() {
+                if i as i32 >= nums[j] {
+                    dp[i] += dp[i - nums[j] as usize];
+                }
+            }
+        }
+        dp[target as usize]        
+    }
+}

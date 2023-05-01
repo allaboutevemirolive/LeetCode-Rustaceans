@@ -1,0 +1,44 @@
+// https://leetcode.com/problems/random-pick-index/solutions/839826/rust-translated-12ms-100/
+use rand::prelude::*;
+
+#[derive(Debug)]
+struct Solution {
+    rng: ThreadRng,
+    nums: Vec<i32>,
+}
+
+impl Solution {
+    fn new(nums: Vec<i32>) -> Self {
+        Solution {
+            rng: Default::default(),
+            nums,
+        }
+    }
+
+    fn pick(&mut self, target: i32) -> i32 {
+        let mut ans = -1;
+        let mut count = 0;
+        for i in 0..self.nums.len() {
+            if self.nums[i] != target {
+                continue;
+            }
+            count += 1;
+            if self.rng.gen_range(0, count) == 0 {
+                ans = i as i32
+            }
+        }
+        ans
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_pick() {
+        let mut solution = Solution::new(vec![1, 2, 3, 3, 3]);
+        assert_eq!(solution.pick(3), 2);
+        assert_eq!(solution.pick(1), 0);
+    }
+}

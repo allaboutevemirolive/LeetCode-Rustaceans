@@ -1,0 +1,26 @@
+// https://leetcode.com/problems/decode-ways/solutions/3272048/rust-soution-using-dynamic-programing/
+impl Solution {
+  pub fn num_decodings(s: String) -> i32 {
+    let n = s.len();
+    let s = s.chars().map(|v| v as u8 - '0' as u8).collect::<Vec<u8>>();
+    if s[0] == 0 {
+      return 0
+    }
+    
+    let mut memo = vec![0;n+1];
+    memo[0] = 1;
+    memo[1] = 1;
+    for i in 1..n {
+      if s[i-1] == 1 {
+        memo[i+1] += memo[i-1];
+      } else if s[i-1] == 2 && s[i] <= 6 {
+        memo[i+1] += memo[i-1];
+      }
+
+      if s[i] != 0 {
+        memo[i+1] += memo[i];
+      }
+    }
+    memo[n]
+  }
+}

@@ -1,0 +1,23 @@
+// https://leetcode.com/problems/longest-substring-without-repeating-characters/solutions/1660864/rust/
+    pub fn length_of_longest_substring(s: String) -> i32 {
+        use std::collections::HashMap;
+
+        let len = s.len();
+        let mut max_len = 0_i32;
+        let mut seen = HashMap::new();
+        let mut start = 0_usize;
+
+        for (idx, c) in s.char_indices() {
+            match seen.insert(c, idx) {
+                Some(existing_idx) if existing_idx >= start => {
+                    max_len = std::cmp::max(max_len, start as i32 - existing_idx as i32);
+                    start = existing_idx + 1;
+                }
+                _ => {
+                    max_len = std::cmp::max(max_len, idx as i32 - start as i32 + 1);
+                }
+            }
+        }
+
+        max_len
+    }

@@ -1,0 +1,14 @@
+// https://leetcode.com/problems/swap-nodes-in-pairs/solutions/818251/rust-recursion-0ms-2-1mb/
+pub fn swap_pairs_r(head: Option<Box<ListNode>>) -> Option<Box<ListNode>> {
+        if head.is_none() || head.as_ref().unwrap().next.is_none() {
+            return head;
+        }
+
+        let mut firstnode = head;
+        let mut secondnode = firstnode.as_mut().unwrap().next.take();
+
+        firstnode.as_mut().unwrap().next =
+            Solution::swap_pairs_r(secondnode.as_mut().unwrap().next.take());
+        secondnode.as_mut().unwrap().next = firstnode;
+        secondnode
+    }

@@ -1,0 +1,17 @@
+// https://leetcode.com/problems/longest-increasing-subsequence/solutions/2399598/rust-patience-sort-faster-than-87/
+impl Solution {
+    pub fn length_of_lis(nums: Vec<i32>) -> i32 {
+        let mut stack = vec![];
+
+        for i in nums {
+            let index = stack.partition_point(|&x| x < i);
+            if index == stack.len() {
+                stack.push(i);
+            } else {
+                stack[index] = i;
+            }
+        }
+
+        stack.len() as i32
+    }
+}

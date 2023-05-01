@@ -1,0 +1,14 @@
+// https://leetcode.com/problems/minimum-moves-to-equal-array-elements-ii/solutions/1179302/c-rust-o-nlgn/
+class Solution {
+public:
+    int minMoves2(vector<int>& nums) {
+        int sum = accumulate(nums.begin(), nums.end(), 0);
+        sort(nums.begin(), nums.end());
+        int mid = nums[nums.size() >> 1];
+        int ans = 0;
+        for (auto &n : nums) {
+            ans += abs(mid - n);
+        }
+        return ans;
+    }
+};

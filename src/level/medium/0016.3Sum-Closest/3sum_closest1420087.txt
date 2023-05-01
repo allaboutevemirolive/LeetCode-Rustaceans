@@ -1,0 +1,43 @@
+// https://leetcode.com/problems/3sum-closest/solutions/1420087/rust-three-index-method-o-nums-len-2/
+impl Solution {
+    pub fn three_sum_closest(nums: Vec<i32>, target: i32) -> i32 {
+        let mut nums = nums;
+        nums.sort(); // O(log(len) * len)
+        
+        let mut diff = i64::MAX;
+        let mut answer = None;
+        
+        // Use three pointers, front, between, and back.  
+        'outer: for front in 0..(nums.len() - 2) { // O(len * O(len)) == O(len^2)
+            let mut back = nums.len() -1;
+            let mut between = front + 1;
+            
+            while (between < back) { // This loop is O(len);
+                let sum = nums[front] + nums[between] + nums[back];
+                let current_diff = |sum, target| -> i64 {
+                    (sum as i64 - target as i64).abs()
+                };
+                
+                if current_diff(sum, target) < diff {
+                    diff = current_diff(sum, target);
+                    answer = Some(sum);
+                    // Early out
+                    if diff == 0 {
+                        break 'outer;
+                    }
+                }
+                
+                // Move pointers.  If sum was greater than target, move
+                // back pointer to a smaller number (sorted array, so decremement index);
+                // If less than target, increment between pointer
+                if sum > target {
+                    back -= 1;
+                } else {
+                    between += 1;
+                }
+            }
+        }
+        answer.expect("No solution found")
+        
+    }
+}

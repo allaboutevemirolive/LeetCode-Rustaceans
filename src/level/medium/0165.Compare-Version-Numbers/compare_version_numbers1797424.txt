@@ -1,0 +1,17 @@
+// https://leetcode.com/problems/compare-version-numbers/solutions/1797424/rust-recursive/
+pub fn compare_version(version1: String, version2: String) -> i32 {
+	Self::compare(&version1, &version2)
+}
+
+fn compare(v1: &str, v2: &str) -> i32 {
+	if v1 == v2 {
+		return 0;
+	}
+	let v1split = v1.split_once('.').unwrap_or((v1,"0"));
+	let v2split = v2.split_once('.').unwrap_or((v2,"0"));
+	match v1split.0.parse::<i32>().unwrap().cmp(&v2split.0.parse::<i32>().unwrap()) {
+		std::cmp::Ordering::Greater => 1,
+		std::cmp::Ordering::Less => -1,
+		_ => Self::compare(v1split.1, v2split.1),
+	}
+}

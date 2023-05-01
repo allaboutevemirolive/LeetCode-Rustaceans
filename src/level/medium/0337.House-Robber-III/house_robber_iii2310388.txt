@@ -1,0 +1,19 @@
+// https://leetcode.com/problems/house-robber-iii/solutions/2310388/c-rust-dfs-simple/
+struct ans{
+	int inc;  //include
+	int exc; // exclude
+};
+class Solution {
+public:
+	ans f(TreeNode* root){
+		if(!root)return ans{inc:0,exc:0} ; if node is null we cant make anything hence return both 0
+		ans l = f(root->left);
+		ans r = f(root->right);
+		return ans{inc: root->val+l.exc+r.exc,  // add the value of cur node in the previous excluded value 
+				   exc: max(l.inc,l.exc)+max(r.inc,r.exc)}; // if we dont add the cur node then simply take the max of left and right 
+	}
+	int rob(TreeNode* root) {
+		ans _ans = f(root);
+		return max(_ans.inc,_ans.exc);
+	}
+};

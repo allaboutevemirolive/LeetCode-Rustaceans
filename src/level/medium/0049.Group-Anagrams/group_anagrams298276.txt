@@ -1,0 +1,21 @@
+// https://leetcode.com/problems/group-anagrams/solutions/298276/rust-solution/
+use std::collections::HashMap;
+
+
+impl Solution {
+    pub fn group_anagrams(strs: Vec<String>) -> Vec<Vec<String>> {
+        let mut res = vec![];
+        let mut m: HashMap<String, Vec<String>> = HashMap::new();
+        for s in strs {
+            let mut v: Vec<char> = s.chars().collect();
+            v.sort();
+            let s_after_sort = v.iter().collect::<String>();
+            let e = m.entry(s_after_sort).or_insert(vec![]);
+            e.push(s)
+        }
+        for v in m.values() {
+            res.push(v.to_owned());
+        }
+        res        
+    }
+}

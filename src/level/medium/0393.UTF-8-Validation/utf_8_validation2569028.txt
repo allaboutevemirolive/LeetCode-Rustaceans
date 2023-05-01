@@ -1,0 +1,40 @@
+// https://leetcode.com/problems/utf-8-validation/solutions/2569028/rust-straightforward-state-machine-without-string-from-utf8/
+impl Solution {
+    pub fn valid_utf8(data: Vec<i32>) -> bool {
+        // Using `String::from_utf8().is_ok()` fails LeetCode's tests.
+        // The below implements LeetCode's algorithm from the Description panel.
+        let mut remaining = 0;
+        for d in data {
+            let b = (d & 0xFF) as u8;
+            // if has leading zero
+            if b & 0x80 == 0 {
+                if remaining != 0 {
+                    return false;
+                }
+                continue;
+            }
+            // if 10xx xxxx
+            if b & 0xC0 == 0x80 {
+                if remaining == 0 {
+                    return false;
+                }
+                remaining -= 1;
+                continue;
+            }
+            if remaining != 0 {
+                return false;
+            }
+            // if start of a two-long sequence
+            if b & 0xE0 == 0xC0 {
+                remaining = 1;
+            } else if b & 0xF0 == 0xE0 {  // three-long
+                remaining = 2;
+            } else if b & 0xF8 == 0xF0 {  // four-long
+                remaining = 3;
+            } else {
+                return false;
+            }
+        }
+        remaining == 0
+    }
+}

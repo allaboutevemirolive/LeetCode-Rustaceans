@@ -1,0 +1,38 @@
+// https://leetcode.com/problems/coin-change/solutions/2061349/rust-bfs/
+use std::collections::VecDeque;
+
+pub fn coin_change(coins: Vec<i32>, amount: i32) -> i32 {
+    assert!(amount >= 0);
+    assert!(coins.len() > 0);
+
+    if amount == 0 {
+        return 0;
+    }
+
+    let mut visited = vec![0; (amount + 1) as usize];
+    let mut queue = VecDeque::new();
+    queue.push_back(0);
+
+    while let Some(value) = queue.pop_front() {
+        if value == amount {
+            return visited[value as usize];
+        }
+
+        for c in coins.iter().copied() {
+            let sum = match value.checked_add(c) {
+                None => continue,
+                Some(x) if x > amount => continue,
+                Some(x) => x,
+            };
+
+            if visited[sum as usize] != 0 {
+                continue;
+            }
+
+            queue.push_back(sum);
+            visited[sum as usize] = visited[value as usize] + 1;
+        }
+    }
+
+    -1
+}

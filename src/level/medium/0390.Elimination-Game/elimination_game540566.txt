@@ -1,0 +1,23 @@
+// https://leetcode.com/problems/elimination-game/solutions/540566/rust-o-log-n-solution-with-explanation-100-time-and-100-space/
+impl Solution {
+    pub fn last_remaining(n: i32) -> i32 {
+        return Solution::find(n, true);
+    }
+    
+    fn find(n: i32, left: bool) -> i32 {
+        if n == 1 {
+            return 1;
+        }
+        
+        if left {
+            return Solution::find(n / 2, false) * 2;
+        } else {
+            if n % 2 == 0 {
+                return Solution::find(n / 2, true) * 2 - 1;
+            }
+            else {
+                return Solution::find(n / 2, true) * 2;
+            }
+        }
+    }
+}

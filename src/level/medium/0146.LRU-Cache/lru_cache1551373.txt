@@ -1,0 +1,84 @@
+// https://leetcode.com/problems/lru-cache/solutions/1551373/rust-3-hashmaps-approach/
+use std::collections::HashMap;
+
+#[derive(Debug)]
+struct LRUCache {
+    capacity: usize,
+    n_elements: usize,
+    // Mapping from keys to values
+    data: HashMap<i32, i32>,
+    // Mapping from key to priority
+    key_to_priority: HashMap<i32, usize>,
+    // Mapping from priority to key
+    priority_to_key: HashMap<usize, i32>,
+    current_priority: usize,
+    min_priority: usize,
+}
+
+impl LRUCache {
+    fn next_priority(&mut self) -> usize {
+        let ret = self.current_priority;
+        self.current_priority += 1;
+        ret
+    }
+    fn update_priority(&mut self, key: i32) {
+        if let Some(old_priority) = self.key_to_priority.remove(&key) {
+            self.priority_to_key.remove(&old_priority);
+            if old_priority == self.min_priority {
+                while self.priority_to_key.get(&self.min_priority).is_none()
+                    && self.min_priority < self.current_priority
+                {
+                    self.min_priority += 1;
+                }
+            }
+        }
+        let prio = self.next_priority();
+        self.priority_to_key.insert(prio, key);
+        self.key_to_priority.insert(key, prio);
+    }
+    fn remove_lru_entry(&mut self) {
+        if let Some(lru_key) = self.priority_to_key.remove(&self.min_priority) {
+            self.data.remove(&lru_key);
+            self.key_to_priority.remove(&lru_key).unwrap();
+            while self.priority_to_key.get(&self.min_priority).is_none()
+                && self.min_priority < self.current_priority
+            {
+                self.min_priority += 1;
+            }
+        }
+    }
+    fn new(capacity: i32) -> Self {
+        Self {
+            capacity: capacity as usize,
+            n_elements: 0,
+            current_priority: 0,
+            min_priority: 0,
+            data: HashMap::new(),
+            key_to_priority: HashMap::new(),
+            priority_to_key: HashMap::new(),
+        }
+    }
+
+    fn get(&mut self, key: i32) -> i32 {
+        if let Some(val) = self.data.get(&key).cloned() {
+            self.update_priority(key);
+            val
+        } else {
+            -1
+        }
+    }
+    fn put(&mut self, key: i32, value: i32) {
+        self.update_priority(key);
+
+        // If it would take extra space
+        if self.data.get(&key).is_none() {
+            // If at capacity, make space
+            if self.n_elements >= self.capacity {
+                self.remove_lru_entry();
+            }
+            // Count new space used
+            self.n_elements += 1;
+        }
+        self.data.insert(key, value);
+    }
+}

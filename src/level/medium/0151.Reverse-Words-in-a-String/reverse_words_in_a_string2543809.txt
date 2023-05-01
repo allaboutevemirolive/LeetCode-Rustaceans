@@ -1,0 +1,10 @@
+// https://leetcode.com/problems/reverse-words-in-a-string/solutions/2543809/rust-fold/
+impl Solution {
+    pub fn reverse_words(s: String) -> String {
+        s.split_whitespace()
+            .rev()
+            .fold("".to_string(), |out, word| { out + &word + " " })
+            .trim()
+            .to_string()
+    }
+}

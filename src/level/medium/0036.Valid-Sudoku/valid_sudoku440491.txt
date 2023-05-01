@@ -1,0 +1,17 @@
+// https://leetcode.com/problems/valid-sudoku/solutions/440491/rust/
+    pub fn is_valid_sudoku(board: Vec<Vec<char>>) -> bool {
+        let mut sub = vec![vec![vec![false;9]; 3]; 3];
+        let (mut row, mut col) = (vec![vec![false; 9]; 9], vec![vec![false; 9]; 9]);
+
+        for (i, line) in board.iter().enumerate() {
+            for (j, n) in line.iter().enumerate()
+                .filter(|(i, n)| n.is_digit(10))
+                .map(|(i, n)| (i, n.to_digit(10).unwrap() as usize - 1)) {
+                    let (subi, subj) = (i/3, j/3);
+                    sub[subi][subj][n] = if sub[subi][subj][n] { return false; } else { true };
+                    row[i][n] = if row[i][n] { return false; } else { true };
+                    col[j][n] = if col[j][n] { return false; } else { true };
+            }
+        }
+        true
+    }

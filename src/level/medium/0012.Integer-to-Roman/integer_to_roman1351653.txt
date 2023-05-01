@@ -1,0 +1,76 @@
+// https://leetcode.com/problems/integer-to-roman/solutions/1351653/rust-recursive-solution/
+#[derive(Clone, Copy)]
+enum Tokens {
+    Full(u32),
+    Half(u32),
+}
+
+impl Into<char> for Tokens {
+    fn into(self) -> char {
+        match self {
+            Tokens::Full(order) => {
+                let t = match order {
+                    0 => 'I',
+                    1 => 'X',
+                    2 => 'C',
+                    _ => 'M',
+                };
+                t
+            }
+            Tokens::Half(order) => {
+                let t = match order {
+                    0 => panic!("shoud not display this!!!"),
+                    1 => 'V',
+                    2 => 'L',
+                    _ => 'D',
+                };
+                t
+            }
+        }
+    }
+}
+
+impl Tokens {
+    fn exhaust(self, mut input: i32, mut tokens: String) -> String {
+        match self {
+            Tokens::Full(order) => {
+                let n = input / (10_i32.pow(order));
+                tokens.extend((0..n).map(|_| -> char { self.into() }));
+                input %= 10_i32.pow(order);
+
+                if input > 0 {
+                    Tokens::Half(order).exhaust(input, tokens)
+                } else {
+                    tokens
+                }
+            }
+            Tokens::Half(order) => {
+                let threshold = 10_i32.pow(order - 1);
+                if input >= (10_i32.pow(order)) - threshold {
+                    tokens.push(Tokens::Full(order - 1).into());
+                    tokens.push(Tokens::Full(order).into());
+                    input -= (10 - 1) * threshold;
+                } else if input >= 5 * threshold {
+                    tokens.push(self.into());
+                    input -= 5 * threshold;
+                } else if input >= 4 * threshold {
+                    tokens.push(Tokens::Full(order - 1).into());
+                    tokens.push(self.into());
+                    input -= (5 - 1) * threshold;
+                }
+
+                if input > 0 {
+                    Tokens::Full(order - 1).exhaust(input, tokens)
+                } else {
+                    tokens
+                }
+            }
+        }
+    }
+}
+
+impl Solution {
+    pub fn int_to_roman(num: i32) -> String {
+        Tokens::Full(3).exhaust(num, String::new())
+    }
+}

@@ -1,0 +1,12 @@
+// https://leetcode.com/problems/h-index/solutions/750274/rust-cheapest-best/
+impl Solution {
+    pub fn h_index(mut citations: Vec<i32>) -> i32 {
+        citations.sort_unstable_by(|a, b| b.cmp(a));
+        for (i, n) in citations.iter().enumerate() {
+            if i as i32 >= *n {
+                return i as i32;
+            }
+        }
+        citations.len() as i32
+    }
+}

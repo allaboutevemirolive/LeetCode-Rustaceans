@@ -1,0 +1,25 @@
+// https://leetcode.com/problems/count-primes/solutions/838721/rust-0ms-with-halved-table/
+impl Solution {
+    pub fn count_primes(n: i32) -> i32 {
+        if n - 1 < 2 {
+            return 0;
+        }
+        let n = n as usize;
+        let nn = n / 2;
+        let mut sieve = vec![true; nn+1];
+        let b = (n as f32).sqrt() as usize;
+        for i in 1..=(b+1)/2 {
+            if !sieve[i] {
+                continue
+            }
+            let i = i * 2 + 1;
+            let mut j = i*i / 2;
+            while j < nn {
+                sieve[j] = false;
+                j += i;
+            }
+        }
+        // println!("{:?}", &sieve);
+        sieve[..nn].into_iter().filter(|t| **t).count() as i32
+    }
+}

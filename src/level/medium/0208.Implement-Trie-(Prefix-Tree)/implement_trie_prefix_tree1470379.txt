@@ -1,0 +1,46 @@
+// https://leetcode.com/problems/implement-trie-prefix-tree/solutions/1470379/rust-trie-implementation/
+use std::collections::HashMap;
+
+#[derive(Default)]
+struct Trie {
+    children: HashMap<char, Box<Trie>>,
+    end: bool,
+}
+
+impl Trie {
+    fn new() -> Self {
+        Default::default()
+    }
+
+    fn insert(&mut self, word: String) {
+        let mut p = self;
+        for c in word.chars() {
+            p = p.children.entry(c).or_insert(Default::default());
+        }
+        p.end = true;
+    }
+
+    fn search(&self, word: String) -> bool {
+        let mut p = self;
+        for c in word.chars() {
+            if let Some(next) = p.children.get(&c) {
+                p = next;
+            } else {
+                return false;
+            }
+        }
+        p.end
+    }
+
+    fn starts_with(&self, prefix: String) -> bool {
+        let mut p = self;
+        for c in prefix.chars() {
+            if let Some(next) = p.children.get(&c) {
+                p = next;
+            } else {
+                return false;
+            }
+        }
+        true
+    }
+}

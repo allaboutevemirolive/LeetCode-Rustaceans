@@ -1,0 +1,19 @@
+// https://leetcode.com/problems/increasing-triplet-subsequence/solutions/2688422/rust-greedy-approach-some-thoughts/
+impl Solution {
+    pub fn increasing_triplet(nums: Vec<i32>) -> bool {
+        let mut i = i32::MAX;
+        let mut j = i32::MAX;
+        for &x in nums.iter() {
+            if x > j {
+                return true;
+            }
+            else if x > i {
+                j = x;
+            }
+            else {
+                i = x;
+            }
+        }
+        false
+    }
+}

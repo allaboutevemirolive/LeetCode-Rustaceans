@@ -1,0 +1,28 @@
+// https://leetcode.com/problems/combination-sum-iii/solutions/418506/rust-100-no-backtracking/
+impl Solution {
+    fn combination_sum3(k: i32, n: i32) -> Vec<Vec<i32>> {
+        let mut ret = Vec::new();
+        go(k, n, vec![], &mut ret);
+        ret
+    }
+}
+
+fn go(k: i32, n: i32, mut nums: Vec<i32>, ret: &mut Vec<Vec<i32>>) {
+    if n == 0 && k == 0 {
+        ret.push(nums);
+        return;
+    }
+    if n < 0 || k < 0 {
+        return;
+    }
+    let start = if nums.is_empty() {
+        1
+    } else {
+        nums.last().unwrap() + 1
+    };
+    for i in start..=9 {
+        let mut xs = nums.clone();
+        xs.push(i);
+        go(k - 1, n - i, xs, ret);
+    }
+}

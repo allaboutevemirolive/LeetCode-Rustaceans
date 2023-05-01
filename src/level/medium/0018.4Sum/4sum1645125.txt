@@ -1,0 +1,53 @@
+// https://leetcode.com/problems/4sum/solutions/1645125/rust-re-uses-an-adapted-version-of-the-3sum-solution-89-faster-4ms/
+impl Solution {
+    pub fn four_sum(nums: Vec<i32>, target: i32) -> Vec<Vec<i32>> {
+        let mut result: Vec<Vec<i32>> = Vec::new();
+        if nums.len() < 4 { return result }
+
+        let mut nums = nums;
+        nums.sort();  // we need a sorted list for the algorithm to work
+
+        for i in 0..nums.len()-3 {
+            if i > 0 && nums[i-1] == nums[i] { continue; } // skip duplicates
+
+            let mut three_sums = three_sum(&nums, target - nums[i], i + 1);
+            three_sums.into_iter().for_each(|mut three_sum| {
+                three_sum.insert(0, nums[i]);
+                result.push(three_sum);
+            });
+        }
+
+        result
+    }
+}
+
+fn three_sum(nums: &Vec<i32>, target: i32, start_at: usize) -> Vec<Vec<i32>> {
+    let mut result: Vec<Vec<i32>> = Vec::new();
+
+    for i in start_at..nums.len()-2 {
+        if i > start_at && nums[i-1] == nums[i] { continue; } // skip duplicates
+
+        let val = nums[i];
+
+        let compliment = target - val;
+        let mut left_ptr = i + 1;
+        let mut right_ptr = nums.len() - 1;
+
+        // traverse the list with two pointers
+        while left_ptr < right_ptr {
+            let partial_sum = nums[left_ptr] + nums[right_ptr];
+            match compliment.cmp(&partial_sum) {
+                std::cmp::Ordering::Less => right_ptr -= 1,
+                std::cmp::Ordering::Greater => left_ptr += 1,
+                _ => {
+                    result.push(vec![val, nums[left_ptr], nums[right_ptr]]);
+                    let curr_left_val = nums[left_ptr];
+                    while left_ptr < nums.len() && curr_left_val == nums[left_ptr] {
+                        left_ptr += 1;
+                    }
+                }
+            }
+        }
+    }
+    result
+}

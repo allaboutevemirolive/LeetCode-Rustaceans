@@ -1,0 +1,15 @@
+// https://leetcode.com/problems/longest-substring-without-repeating-characters/solutions/1334517/rust/
+impl Solution {
+    pub fn length_of_longest_substring(s: String) -> i32 {
+        let mut current: Vec<char> = Vec::new();
+        let mut max_length = 0;
+        s.chars().for_each(|c| {
+            if let Some(i) = current.iter().position(|&x| x == c) {
+                current.drain(0..i+1);
+            }
+            current.push(c);
+            max_length = max(current.len(), max_length);
+        });
+        max_length as i32
+    }
+}

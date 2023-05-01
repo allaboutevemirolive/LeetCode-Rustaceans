@@ -1,0 +1,103 @@
+// https://leetcode.com/problems/132-pattern/solutions/2415695/rust-solution-using-segmenttree-and-compress/
+use std::collections::*;
+
+fn compress<T: std::cmp::Eq + std::cmp::Ord + std::hash::Hash + Copy >(arr:&Vec<T>) -> HashMap<T, usize> {
+    let mut set = HashSet::new();
+        for &v in arr {
+            set.insert(v);
+        }
+        let mut arr = set.into_iter().collect::<Vec<T>>();
+        arr.sort();
+
+        let mut map = HashMap::new();
+        for i in 0..arr.len() {
+            map.insert(arr[i], i+1);
+        }
+    map
+}
+
+type TreeType = i32;
+pub struct SegmentTree {
+    n: usize,
+    arr: Vec<TreeType>,
+    e: TreeType
+}
+impl SegmentTree {
+    pub fn new(n: usize, e:TreeType) -> Self {
+        let mut x = 1;
+        while x < n {
+            x *= 2;
+        }
+        SegmentTree {
+            n:x,
+            arr:vec![e;x*2],
+            e
+        }
+    }
+    
+    pub fn update(&mut self, mut i: usize, val: TreeType) {
+        i += self.n-1;
+        self.arr[i] = val;
+        while 0 < i {
+            i = (i-1) / 2;
+            self.arr[i] = std::cmp::max(self.arr[i*2+1], self.arr[i*2+2]);
+        }
+    }
+    
+    fn query(&self, a:usize, b:usize) -> TreeType {
+        self.query_sub(a, b, 0, 0, self.n)
+    }
+    
+    fn query_sub(
+        &self, a:usize, b:usize,
+        k:usize, l:usize, r:usize
+    ) -> TreeType { 
+        if r <= a || b <= l {
+            self.e
+        } else if a <= l && r <= b {
+            self.arr[k]
+        } else {
+            let vl = self.query_sub(a, b, k*2+1, l, (l+r)/2);
+            let vr = self.query_sub(a, b, k*2+2, (l+r)/2, r);
+            std::cmp::max(vl,  vr)
+        }
+    }
+}
+
+impl Solution {
+    pub fn find132pattern(nums: Vec<i32>) -> bool {
+        let n = nums.len();
+        let mut dict = compress(&nums);
+        let min_value = i32::min_value();
+        dict.insert(min_value, 0);
+
+        let len = dict.keys().len();
+        let mut counts = vec![0;len];
+        let mut stree = SegmentTree::new(len+10, min_value);
+        let mut btreeset = BTreeSet::new();
+        btreeset.insert(*dict.get(&nums[0]).unwrap() as i32);
+
+        for i in 1..n {
+            let val_index = *dict.get(&nums[i]).unwrap();
+            counts[val_index] += 1;
+            stree.update(val_index, val_index as i32);
+        }
+        
+        for i in 1..n-1 {
+            let three = *dict.get(&nums[i]).unwrap();
+            let i32_three = three as i32;
+            counts[three] -= 1;
+            if counts[three] == 0 {
+                stree.update(three, min_value);
+            }
+            let two = stree.query(0, three);
+            let one = *btreeset.iter().next().unwrap();
+            if one < two && one < i32_three {
+                return true
+            }
+            btreeset.insert(i32_three);
+        }
+
+        false
+    }
+}

@@ -1,0 +1,37 @@
+// https://leetcode.com/problems/design-twitter/solutions/1494244/rust-0ms-simple/
+use std::collections::HashSet;
+
+type User = i32;
+type Tweet = i32;
+
+#[derive(Debug, Clone, Default)]
+pub struct Twitter {
+    tweets: Vec<(Tweet, User)>,
+    follows: HashSet<(User, User)>,
+}
+
+impl Twitter {
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    pub fn post_tweet(&mut self, user: User, tweet: Tweet) {
+        self.tweets.push((tweet, user));
+    }
+
+    pub fn get_news_feed(&self, user: User) -> Vec<Tweet> {
+        self.tweets.iter().rev()
+            .filter(|&&(_, author)| user == author || self.follows.contains(&(user, author)))
+            .map(|&(tweet, _)| tweet)
+            .take(10)
+            .collect()
+    }
+
+    pub fn follow(&mut self, user: User, follows: User) {
+        self.follows.insert((user, follows));
+    }
+
+    pub fn unfollow(&mut self, user: User, follows: User) {
+        self.follows.remove(&(user, follows));
+    }
+}

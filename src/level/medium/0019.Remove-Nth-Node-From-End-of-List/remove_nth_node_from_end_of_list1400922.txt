@@ -1,0 +1,31 @@
+// https://leetcode.com/problems/remove-nth-node-from-end-of-list/solutions/1400922/rust-two-pointer-solution/
+impl Solution {
+    pub fn remove_nth_from_end(head: Option<Box<ListNode>>, n: i32) -> Option<Box<ListNode>> {
+        let mut head = head.unwrap();
+        let mut fast = head.clone();
+        let mut slow = head.as_mut();
+
+        let mut meet_end = false;
+        for _ in 0..n {
+            if fast.next.is_none() {
+                meet_end = true;
+                break;
+            }
+            fast = fast.next.unwrap();
+        }
+
+        if meet_end {
+            if n == 1 {
+                return None;
+            }
+            return head.next;
+        }
+        while let Some(node) = fast.next {
+            slow = slow.next.as_mut().unwrap();
+            fast = node;
+        }
+
+        slow.next = slow.next.as_mut().unwrap().next.clone();
+        Some(head)
+    }
+}

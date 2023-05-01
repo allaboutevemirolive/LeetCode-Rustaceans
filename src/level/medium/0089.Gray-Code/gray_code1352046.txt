@@ -1,0 +1,15 @@
+// https://leetcode.com/problems/gray-code/solutions/1352046/rust-solution-no-extra-space/
+impl Solution {
+    pub fn gray_code(n: i32) -> Vec<i32> {
+        let mut result = vec![0, 1];
+        let mut set_bit = 1;
+        while set_bit < n {
+            let l = result.len();
+            for i in (0..l).rev() {
+                result.push(result[i] | (1 << set_bit));
+            }
+            set_bit += 1;
+        }
+        result
+    }
+}

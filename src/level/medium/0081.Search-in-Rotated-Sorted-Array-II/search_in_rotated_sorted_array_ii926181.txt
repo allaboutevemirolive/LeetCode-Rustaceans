@@ -1,0 +1,20 @@
+// https://leetcode.com/problems/search-in-rotated-sorted-array-ii/solutions/926181/find-the-smallest-divisor-given-a-threshold-rust-time-o-n-log-m-8-ms-space-o-1-2-6-mb/
+impl Solution {
+    pub fn smallest_divisor(nums: Vec<i32>, threshold: i32) -> i32 {
+        let mut min_divisor = 0;
+        let max_divisor = 10i32.pow(6);
+        'outer: for divisor in 1..max_divisor {
+            let mut sum = 0;
+            for num in nums.iter() {
+                // divide and round up (ceiling)
+                let quotient_rounded_up = (num + divisor - 1) / divisor;
+                sum += quotient_rounded_up;
+            }
+            if sum <= threshold {
+                min_divisor = divisor;
+                break 'outer;
+            }
+        }
+        min_divisor
+    }
+}

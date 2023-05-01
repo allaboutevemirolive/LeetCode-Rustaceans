@@ -1,0 +1,18 @@
+// https://leetcode.com/problems/ones-and-zeroes/solutions/2065350/rust-dp-solution-100-100/
+impl Solution {
+    pub fn find_max_form(strs: Vec<String>, mut m: i32, mut n: i32) -> i32 {
+        let len = strs.len();
+        let mut dp = vec![vec![0;n as usize+1];m as usize +1];
+        
+        for i in 0..len {
+            let &(z, o) = &strs[i].chars().fold((0, 0), |res, c| if c == '0' {(res.0 + 1, res.1)} else {(res.0, res.1+1)});
+			// the idea to iterate from z and o is from: https://leetcode.com/problems/ones-and-zeroes/discuss/744393/Rust-Dynamic-Programming
+            for j in (z..=m as usize).rev() {
+                for k in (o..=n as usize).rev() {
+                    dp[j][k] = (dp[j-z as usize][k-o as usize] + 1).max(dp[j][k]);
+                }
+            }
+        }
+        dp[m as usize][n as usize]
+    }
+}

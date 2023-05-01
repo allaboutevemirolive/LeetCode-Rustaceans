@@ -1,0 +1,27 @@
+// https://leetcode.com/problems/smallest-number-in-infinite-set/solutions/3452142/btreeset-beats-100-rust/
+use std::collections::BTreeSet;
+
+struct SmallestInfiniteSet {
+    stack: BTreeSet<i32>,
+    min: i32,
+}
+
+impl SmallestInfiniteSet {
+    fn new() -> Self {
+        Self { stack: BTreeSet::new(), min: 1 }
+    }
+    
+    fn pop_smallest(&mut self) -> i32 {
+        if self.stack.len() > 0 {
+            let ans = *self.stack.iter().nth(0).unwrap();
+            self.stack.take(&ans).unwrap()
+        } else {
+            self.min += 1;
+            self.min - 1
+        }
+    }
+    
+    fn add_back(&mut self, num: i32) {
+        if num < self.min { self.stack.insert(num); }
+    }
+}

@@ -1,0 +1,53 @@
+// https://leetcode.com/problems/path-sum-ii/solutions/362258/rust-solution/
+// Definition for a binary tree node.
+// #[derive(Debug, PartialEq, Eq)]
+// pub struct TreeNode {
+//   pub val: i32,
+//   pub left: Option<Rc<RefCell<TreeNode>>>,
+//   pub right: Option<Rc<RefCell<TreeNode>>>,
+// }
+// 
+// impl TreeNode {
+//   #[inline]
+//   pub fn new(val: i32) -> Self {
+//     TreeNode {
+//       val,
+//       left: None,
+//       right: None
+//     }
+//   }
+// }
+use std::cell::RefCell;
+use std::rc::Rc;
+impl Solution {
+
+    pub fn path_sum(root: Option<Rc<RefCell<TreeNode>>>, sum: i32) -> Vec<Vec<i32>> {
+        let mut res = vec![];
+        let mut acc = vec![];
+        Self::_path_sum(root, sum, &mut acc, &mut res);
+        res
+    }
+
+    fn _path_sum(
+        root: Option<Rc<RefCell<TreeNode>>>,
+        sum: i32,
+        acc: &mut Vec<i32>,
+        res: &mut Vec<Vec<i32>>,
+    ) {
+        if let Some(node) = root {
+            if node.borrow().left.is_none() && node.borrow().right.is_none() {
+                if node.borrow().val == sum {
+                    let mut tmp = acc.clone();
+                    tmp.push(node.borrow().val);
+                    res.push(tmp.to_vec());
+                }
+                return;
+            }
+            acc.push(node.borrow().val);
+            let new_sum = sum - node.borrow().val;
+            Self::_path_sum(node.borrow().left.clone(), new_sum, acc, res);
+            Self::_path_sum(node.borrow().right.clone(), new_sum, acc, res);
+            acc.pop();
+        }
+    }
+}

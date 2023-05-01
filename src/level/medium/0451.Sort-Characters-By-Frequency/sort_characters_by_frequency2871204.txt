@@ -1,0 +1,32 @@
+// https://leetcode.com/problems/sort-characters-by-frequency/solutions/2871204/rust-is-cool/
+use std::{collections::HashMap, iter};
+
+
+impl Solution {
+    pub fn frequency_sort(s: String) -> String {
+        let mut counts = HashMap::new();
+
+        for c in s.chars() {
+            let count = counts.entry(c).or_insert(0);
+            *count += 1;
+        }
+
+        let max_freq = *counts.values().max().unwrap() as usize;
+
+        let mut buckets: Vec<Vec<char>> = iter::repeat(Vec::new()).take(max_freq + 1).collect();
+
+        for (c, count) in counts {
+            buckets[count as usize].push(c);
+        }
+
+        let mut result = String::with_capacity(s.len());
+
+        for (i, chars) in buckets.iter().enumerate().rev() {
+            for c in chars {
+                result.push_str(&iter::repeat(c).take(i).collect::<String>());
+            }
+        }
+
+        result
+    }
+}

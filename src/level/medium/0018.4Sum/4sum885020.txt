@@ -1,0 +1,28 @@
+// https://leetcode.com/problems/4sum/solutions/885020/rust-naive-o-n-4-solution/
+use std::collections::HashSet;
+impl Solution {
+    pub fn four_sum(mut nums: Vec<i32>, target: i32) -> Vec<Vec<i32>> {
+        nums.sort_unstable();
+        let target: i64 = target.into();
+        let mut result:HashSet<[i32;4]> = HashSet::new();
+        for (i, &v0) in nums.iter().enumerate(){
+            let sum = i64::from(v0);
+            let subslice = &nums[i+1..];
+            for (i, &v1) in subslice.iter().enumerate(){
+                let sum = sum + i64::from(v1);
+                let subslice = & subslice[i+1..];
+                for (i, &v2) in subslice.iter().enumerate(){
+                    let sum = sum + i64::from(v2);
+                    let subslice = & subslice[i+1..];
+                    for (i, &v3) in subslice.iter().enumerate(){
+                        let sum = sum + i64::from(v3);
+                        if sum == target{
+                            result.insert([v0, v1,v2,v3]);
+                        }
+                    }
+                }
+            }
+        }
+        result.into_iter().map(|v|v.to_vec()).collect()
+    }
+}

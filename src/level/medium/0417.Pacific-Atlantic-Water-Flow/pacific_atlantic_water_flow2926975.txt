@@ -1,0 +1,79 @@
+// https://leetcode.com/problems/pacific-atlantic-water-flow/solutions/2926975/rust-19ms-2-4-mb-bfs/
+use std::collections::{VecDeque, HashSet};
+impl Solution {
+    pub fn pacific_atlantic(mut heights: Vec<Vec<i32>>) -> Vec<Vec<i32>> {
+        
+        let mut res = Vec::new();
+        let (mut row, mut col) = (heights.len(), heights[0].len());
+    
+        let (mut p_queue, mut a_queue) = (VecDeque::new(), VecDeque::new());
+        let (mut p_set, mut a_set) = (HashSet::new(), HashSet::new());
+
+        /*
+            find the starting points and then add them to our queues
+            set it as visited 
+        */
+        
+        for r in 0..row { 
+            for c in 0..col { 
+                // Cell is on the Pacific Coast 
+                if r == 0 || c == 0 { 
+                    p_queue.push_back((r, c));
+                    p_set.insert((r, c));
+                }
+                // Cell is on the Atlantic Coast  
+                if r == row - 1 || c == col - 1{ 
+                    a_queue.push_back((r, c));
+                    a_set.insert((r, c));
+                }
+            }
+        }
+        
+        // Perform BFS on both queues 
+        Self::bfs(&mut heights, &mut p_queue, &mut p_set);
+        Self::bfs(&mut heights, &mut a_queue, &mut a_set);
+        /*
+            Find values that have been both visited by both 
+            oceans and then store it our result lists
+        */
+        for r in 0..row { 
+            for c in 0..col {
+                if p_set.contains(&(r, c)) && a_set.contains(&(r, c)) {
+                    res.push(vec![r as i32, c as i32]);
+                }
+            }
+        }
+        return res
+
+    }
+    /*
+        Scan neighbouring cells
+    */
+    fn bfs(mut heights: &mut Vec<Vec<i32>>, 
+        mut queue: &mut VecDeque<(usize, usize)>,
+        mut reachable: &mut HashSet<(usize, usize)>
+    ) {
+        
+        let (mut rows, mut cols) = (heights.len(), heights[0].len());
+ 
+        while let Some((r, c)) = queue.pop_front() { 
+            /*
+                Scan neighbouring cells in 4 directions 
+            */
+            let directions: Vec<(i32, i32)> = vec![(0, -1),(0, 1),(1, 0),(-1, 0)];
+            for (dr, dc) in directions { 
+                let (mut row, mut col) = (dr as usize + r, dc as usize + c); 
+                
+                // Check if the row, col are inbounds 
+                if let Some(neighbour) = heights.get_mut(row).and_then(|f| f.get_mut(col)) { 
+                    
+                    // Check if the neighbours have been visited and neighbours cell >= current cell
+                    if !reachable.contains(&(row, col)) && heights[row][col] >= heights[r][c] { 
+                        queue.push_back((row, col));
+                        reachable.insert((row, col));
+                    } 
+                }
+            }
+        }
+    }
+}

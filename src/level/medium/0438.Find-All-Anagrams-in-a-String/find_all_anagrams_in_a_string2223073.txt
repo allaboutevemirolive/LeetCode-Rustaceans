@@ -1,0 +1,27 @@
+// https://leetcode.com/problems/find-all-anagrams-in-a-string/solutions/2223073/simple-rust-solution/
+pub fn find_anagrams(s: String, p: String) -> Vec<i32> {     
+	if p.len() > s.len() { return Vec::new() }
+
+	let (s, p) = (s.as_bytes(), p.as_bytes());
+	let mut s_freqs = [0u8; 26];
+	let mut p_freqs = [0u8; 26];   
+	for b in p {
+		p_freqs[(b - b'a') as usize] += 1;
+	}
+	for b in &s[..p.len()] {
+		s_freqs[(b - b'a') as usize] += 1;
+	}
+
+	let mut ans = Vec::new();
+	if s_freqs == p_freqs {
+		ans.push(0i32);
+	}  
+	for (i, b) in s.iter().enumerate().skip(p.len()) {
+		s_freqs[(b - b'a') as usize] += 1;
+		s_freqs[(s[i - p.len() as usize] - b'a') as usize] -= 1;
+		if s_freqs == p_freqs {
+			ans.push((i - p.len() + 1) as i32);
+		}
+	} 
+	ans
+}

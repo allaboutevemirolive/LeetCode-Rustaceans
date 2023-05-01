@@ -1,0 +1,16 @@
+// https://leetcode.com/problems/rotate-image/solutions/1792637/rust-1ms-2-2/
+impl Solution {
+    pub fn rotate(matrix: &mut Vec<Vec<i32>>) {
+        //  Reallocate the each value to their respective list.
+        //  1st num - 1st column?
+        matrix.reverse();
+        for i in 0..matrix.len() { 
+            for j in i..matrix.len()  { 
+                let x = matrix[i][j];
+                let y = matrix[j][i];
+                matrix[j][i] = x;
+                matrix[i][j] = y;
+            }
+        }
+    }
+}

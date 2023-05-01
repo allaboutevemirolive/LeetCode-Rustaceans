@@ -1,0 +1,32 @@
+// https://leetcode.com/problems/restore-ip-addresses/solutions/3079257/rust-elixir-backtracking-solution/
+impl Solution {
+    pub fn restore_ip_addresses(s: String) -> Vec<String> {
+        let mut ans = Vec::new();
+        Self::backtrack(&mut Vec::new(), &mut ans, s.as_bytes());
+        ans
+    }
+
+    fn backtrack(ip: &mut Vec<i32>, ans: &mut Vec<String>, bytes: &[u8]) {
+        if bytes.len() < 4 - ip.len()
+        || bytes.len() >= (5 - ip.len()) * 3
+        || *ip.last().unwrap_or(&0) > 255 { 
+            return;
+        }
+        else if bytes.is_empty() {
+            let v: Vec<String> = ip.iter()
+                .map(|&x| x.to_string())
+                .collect();
+            ans.push(v.join(".").to_owned());
+            return;
+        }
+        ip.push((bytes[0] - b'0') as i32);
+        Self::backtrack(ip, ans, &bytes[1..]); 
+        ip.pop();
+        let x = *ip.last().unwrap_or(&0);
+        if x > 0 {
+            *ip.last_mut().unwrap() = x * 10 + (bytes[0] - b'0') as i32;
+            Self::backtrack(ip, ans, &bytes[1..]); 
+            *ip.last_mut().unwrap() = x;
+        }
+    }
+}

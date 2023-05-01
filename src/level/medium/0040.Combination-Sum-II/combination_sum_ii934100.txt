@@ -1,0 +1,27 @@
+// https://leetcode.com/problems/combination-sum-ii/solutions/934100/rust-0ms-dfs-simple-solution/
+impl Solution {
+    pub fn combination_sum2(candidates: Vec<i32>, target: i32) -> Vec<Vec<i32>> {
+        let mut res = vec![];
+        let mut candidates = candidates;
+        candidates.sort_unstable();
+        Self::dfs_helper(&candidates, &mut vec![], &mut res, target, 0);
+        res
+    }
+    fn dfs_helper(candidates: &Vec<i32>, cans: &mut Vec<i32>, res: &mut Vec<Vec<i32>>, target: i32, idx: usize) {
+        if target < 0 {
+            return;
+        } else if target == 0 {
+            res.push(cans.clone());
+            return;
+        }
+
+        for i in idx..candidates.len() {
+            if i > idx && candidates[i] == candidates[i-1] {
+                continue;
+            }
+            cans.push(candidates[i]);
+            Self::dfs_helper(candidates, cans, res, target-candidates[i], i+1);
+            cans.pop();
+        }
+    }
+}

@@ -1,0 +1,23 @@
+// https://leetcode.com/problems/swap-nodes-in-pairs/solutions/1254177/rust-recurison/
+impl Solution {
+    pub fn swap_pairs(head: Option<Box<ListNode>>) -> Option<Box<ListNode>> {
+        return Solution::swap_pairs_helper(head);
+    }
+
+    pub fn swap_pairs_helper(head: Option<Box<ListNode>>) -> Option<Box<ListNode>> {
+        let mut head = head;
+        if let Some(mut first) = head.take() {
+            if let Some(mut second) = first.next.take() {
+                if let Some(next) = second.next.take() {
+                    first.next = Solution::swap_pairs_helper(Some(next));
+                } else {
+                    first.next = None;
+                }
+                second.next = Some(first);
+                return Some(second);
+            }
+            return Some(first);
+        }
+        return None;
+    }
+}

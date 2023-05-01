@@ -1,0 +1,17 @@
+// https://leetcode.com/problems/reverse-integer/solutions/2821467/rust-beats-100/
+impl Solution {
+    pub fn reverse(x: i32) -> i32 {
+        let mut mut_x = x;
+        let mut res: i32 = 0;
+        while (mut_x != 0) {
+            if (res.abs() > i32::MAX / 10) {
+                return 0;
+            }
+            
+            res = (res*10) + (mut_x % 10);
+            mut_x /= 10;
+        }
+
+        res
+    }
+}

@@ -1,0 +1,23 @@
+// https://leetcode.com/problems/wiggle-sort-ii/solutions/2050008/rust-simple-o-nlgn-time-o-n-space-100-speed-memory/
+impl Solution {
+    pub fn wiggle_sort(nums: &mut Vec<i32>) {
+        let len = nums.len();
+        // clone into new vec, allocator likely only reserves exactly the size of the given nums
+        let mut temp = nums.clone();
+        // stable sort temp - unstable doesn't allocate, and no worries around stability here
+        // O(nlgn worst case)
+        temp.sort_unstable();
+        
+        let mut temp_idx = len - 1;
+        // assign elements starting from largest to each odd idx
+        for i in (1..len).step_by(2) {
+            nums[i] = temp[temp_idx];
+            temp_idx -= 1;
+        }
+        // assign smallest half of elements from largest to each even idx
+        for i in (0..len).step_by(2) {
+            nums[i] = temp[temp_idx];
+            temp_idx -= 1;   
+        }
+    }
+}

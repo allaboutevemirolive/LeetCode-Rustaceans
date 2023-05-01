@@ -1,0 +1,26 @@
+// https://leetcode.com/problems/rotate-function/solutions/1771845/rust-26ms/
+use std::cmp::max;
+
+// F(k) = F(k-1) + sum - nums.len() * nums[nums.len() - k]
+
+impl Solution {
+    pub fn max_rotate_function(nums: Vec<i32>) -> i32 {
+        let len = nums.len();
+        let sum: i32 = nums.iter().sum::<i32>();
+        
+        let mut val: i32 = 0;
+        for i in 0..nums.len() {
+            val += i as i32 * nums[i];
+        }
+        
+        let mut max_val = val;
+        
+        for i in 1..nums.len() {
+            val = val + sum - len as i32 * nums[len - i];
+            
+            max_val = max(max_val, val);
+        }
+        
+        max_val
+    }
+}

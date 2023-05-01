@@ -1,0 +1,27 @@
+// https://leetcode.com/problems/top-k-frequent-elements/solutions/3370640/rust-binary-heap/
+impl Solution {
+	pub fn top_k_frequent(nums: Vec<i32>, k: i32) -> Vec<i32> {
+		use std::collections::HashMap;
+		use std::collections::BinaryHeap;
+		let mut cnt = HashMap::new();
+		for n in nums {
+			*cnt.entry(n).or_insert(0) += 1;
+		}
+
+		let mut hq  = BinaryHeap::new();
+		for (key,val) in cnt.iter() {
+			hq.push((-val,key));
+			if hq.len() > k as usize {
+				hq.pop();
+			}
+		}
+
+		let mut res = Vec::new();
+
+		while let Some(v) = hq.pop() {
+			res.push(*v.1);
+		}
+
+		return res;
+	}
+}

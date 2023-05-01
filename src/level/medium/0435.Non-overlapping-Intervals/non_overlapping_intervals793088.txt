@@ -1,0 +1,16 @@
+// https://leetcode.com/problems/non-overlapping-intervals/solutions/793088/rust-functional-solution-o-n-time-o-1-space-0ms-2-6mb/
+impl Solution {
+    pub fn erase_overlap_intervals(mut intervals: Vec<Vec<i32>>) -> i32 {
+        intervals.sort_by(|a, b| a[1].cmp(&b[1]).then(a[0].cmp(&b[0])));
+        intervals
+            .into_iter()
+            .fold((std::i32::MIN, 0), |(prev_end, min_erases), interval| {
+                if interval[0] < prev_end {
+                    (prev_end, min_erases + 1)
+                } else {
+                    (interval[1], min_erases)
+                }    
+            })
+            .1
+    }
+}

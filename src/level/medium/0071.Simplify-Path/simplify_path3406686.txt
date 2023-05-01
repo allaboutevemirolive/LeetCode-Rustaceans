@@ -1,0 +1,25 @@
+// https://leetcode.com/problems/simplify-path/solutions/3406686/rust/
+impl Solution {
+    pub fn simplify_path(path: String) -> String {
+        let mut stack = vec![];
+
+        for s in path.split('/') {
+            match s {
+                "" | "." => {}
+                ".." => { stack.pop(); }
+                _ => stack.push(s),
+            }
+        }
+
+        if stack.is_empty() {
+            return String::from("/");
+        }
+
+        let mut ret = String::new();
+        for s in stack {
+            ret += "/";
+            ret += s;
+        }
+        ret
+    }
+}

@@ -1,0 +1,63 @@
+// https://leetcode.com/problems/basic-calculator-ii/solutions/3352755/rust-2-approaches/
+impl Solution {
+    pub fn calculate(s: String) -> i32 {
+        fn stack_approach(s: String) -> i32 {
+            let s = s.chars().collect::<Vec<_>>();
+            let mut stack = vec![];
+            let mut cur_num = 0;
+            let mut operation = '+';
+            for i in 0..s.len() {
+                if s[i].is_ascii_digit() {
+                    cur_num = cur_num * 10 + s[i].to_digit(10).unwrap() as i32;
+                }
+                if !s[i].is_ascii_digit() && s[i] != ' ' || i == s.len() - 1 {
+                    if operation == '+' {
+                        stack.push(cur_num);
+                    } else if operation == '-' {
+                        stack.push(-cur_num);
+                    } else if operation == '*' {
+                        let top = stack.pop().unwrap();
+                        stack.push(top * cur_num);
+                    } else if operation == '/' {
+                        let top = stack.pop().unwrap();
+                        stack.push(top / cur_num);
+                    }
+                    cur_num = 0;
+                    operation = s[i];
+                }
+            }
+            let mut result = 0;
+            while let Some(num) = stack.pop() {
+                result += num;
+            }
+            result
+        }
+        fn optimized_approach(s: String) -> i32 {
+            let s = s.chars().collect::<Vec<_>>();
+            let mut last_num = 0;
+            let mut result = 0;
+            let mut cur_num = 0;
+            let mut operation = '+';
+            for i in 0..s.len() {
+                if s[i].is_ascii_digit() {
+                    cur_num = cur_num * 10 + s[i].to_digit(10).unwrap() as i32;
+                }
+                if !s[i].is_ascii_digit() && s[i] != ' ' || i == s.len() - 1 {
+                    if operation == '+' || operation == '-' {
+                        result += last_num;
+                        last_num = if operation == '+' { cur_num } else { -cur_num };
+                    } else if operation == '*' {
+                        last_num *= cur_num;
+                    } else if operation == '/' {
+                        last_num /= cur_num;
+                    }
+                    cur_num = 0;
+                    operation = s[i];
+                }
+            }
+            result += last_num;
+            result
+        }
+        optimized_approach(s)
+    }
+}

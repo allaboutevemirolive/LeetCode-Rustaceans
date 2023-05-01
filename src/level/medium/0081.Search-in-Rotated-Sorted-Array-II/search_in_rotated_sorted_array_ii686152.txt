@@ -1,0 +1,15 @@
+// https://leetcode.com/problems/search-in-rotated-sorted-array-ii/solutions/686152/rust-0ms/
+impl Solution {
+    pub fn search(nums: Vec<i32>, target: i32) -> bool {
+        let mut i = 0usize;
+        loop {
+            if i == nums.len() {
+                return false;
+            }
+            if nums[i] == target {
+                return true;
+            }
+            i+=1
+        }
+    }
+}

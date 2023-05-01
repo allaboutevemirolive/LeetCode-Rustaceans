@@ -1,0 +1,130 @@
+// https://leetcode.com/problems/basic-calculator-ii/solutions/509683/my-rust-solution/
+#[derive(Debug)]
+enum Token {
+    Number(i32),
+    Operator(char),
+}
+
+impl Solution {
+    pub fn calculate(s: String) -> i32 {
+        let tokens = Solution::to_tokens(s);
+        let mut s1 = vec![];
+        let mut s2 = vec![];
+        
+		// to RPN
+        tokens.iter().for_each(|x| {
+            match x {
+                Token::Number(n) => {
+                    s2.push(Token::Number(*n))              
+                },
+                
+                Token::Operator(o) => {
+                    while !s1.is_empty() {
+            
+                        if let Token::Operator(c) = s1[s1.len()-1] {
+                            if (c == '+' || c == '-') && (*o == '*' || *o == '/') {
+                                break;
+                            }
+                            s1.pop();
+                            s2.push(Token::Operator(c));  
+                        }
+                    }
+
+                    s1.push(Token::Operator(*o));
+                }
+            }
+        });
+        
+        while !s1.is_empty() {
+            s2.push(s1.pop().unwrap());
+        }
+        
+		// calculate RPN
+        s2.iter().for_each(|x| {
+            match x {
+                Token::Number(n) => {
+                    s1.push(Token::Number(*n));                  
+                },
+                
+                Token::Operator(o) => {
+                    let a: i32 = if let Some(Token::Number(x)) = s1.pop() {
+                        x
+                    } else {
+                        0
+                    };
+                    let b: i32 = if let Some(Token::Number(x)) = s1.pop() {
+                        x
+                    } else {
+                        0
+                    };
+                    let mut r: i32 = 0;
+                    
+                    match o {
+                        '+' => {
+                            r = b + a;
+                        },
+                        
+                        '-' => {
+                            r = b - a;
+                        },
+                        
+                        '*' => {
+                            r = b * a;
+                        },
+                        
+                        '/' => {
+                            r = b / a;
+                        },
+                        
+                        _ => ()
+                    }
+                                        
+                    s1.push(Token::Number(r))
+                }
+            }    
+        });
+        
+        if let Some(Token::Number(x)) = s1.first() {
+            *x
+        } else {
+            0 as i32
+        }
+    }
+    
+    fn to_tokens (s: String) -> Vec<Token> {
+        let mut num = vec![];
+        let mut tokens = vec![];
+     
+        fn try_push(num: &mut Vec<char>, tokens: &mut Vec<Token>) {
+            if  num.len() == 0 {
+                return;
+            }
+            
+            let n = num.iter()
+                .map(|x| x.to_string())
+                .collect::<Vec<String>>()
+                .join("");
+            
+            num.clear();
+            tokens.push(Token::Number(n.parse::<i32>().unwrap()));
+        }
+        
+        s.chars().for_each(|x| {
+            match x {
+                n @ '0'..='9' => {
+                    num.push(n);
+                },
+
+                o @ _ if o == '+' || o == '-' || o == '*' || o == '/' => {
+                    try_push(&mut num, &mut tokens);
+                    tokens.push(Token::Operator(o));
+                },
+
+                _ => ()
+            }
+        });
+        
+        try_push(&mut num, &mut tokens);
+        tokens
+    }
+}

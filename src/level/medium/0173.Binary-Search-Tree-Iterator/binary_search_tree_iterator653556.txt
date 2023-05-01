@@ -1,0 +1,52 @@
+// https://leetcode.com/problems/binary-search-tree-iterator/solutions/653556/rust-suicide-traversal/
+use std::cell::RefCell;
+use std::option::Option::Some;
+use std::rc::Rc;
+
+type TreeNodeType = Option<Rc<RefCell<TreeNode>>>;
+
+#[derive(Debug)]
+pub struct BSTIterator {
+    stack: Vec<TreeNodeType>,
+}
+
+/**
+ * `&self` means the method takes an immutable reference.
+ * If you need a mutable reference, change it to `&mut self` instead.
+ */
+impl BSTIterator {
+    pub fn new(root: Option<Rc<RefCell<TreeNode>>>) -> Self {
+        let mut stack = Vec::new();
+        let mut cursor = root;
+
+        while let Some(cursor_node) = cursor {
+            cursor = cursor_node.borrow_mut().left.take();
+            stack.push(Some(cursor_node));
+        }
+
+        BSTIterator { stack }
+    }
+
+    /** @return the next smallest number */
+    #[allow(clippy::should_implement_trait)]
+    pub fn next(&mut self) -> i32 {
+        let node = self.stack.pop().unwrap().unwrap();
+        let result = node.borrow().val;
+
+        if node.borrow().right.is_some() {
+            let mut cursor = node.borrow_mut().right.take();
+
+            while let Some(cursor_node) = cursor {
+                cursor = cursor_node.borrow_mut().left.take();
+                self.stack.push(Some(cursor_node));
+            }
+        }
+
+        result
+    }
+
+    /** @return whether we have a next smallest number */
+    pub fn has_next(&self) -> bool {
+        !self.stack.is_empty()
+    }
+}

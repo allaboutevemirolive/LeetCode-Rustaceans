@@ -1,0 +1,27 @@
+// https://leetcode.com/problems/perfect-squares/solutions/2838052/rust-concise-and-simple-dp-solution-explained/
+impl Solution {
+    pub fn num_squares(n: i32) -> i32 {
+        let n = n as usize;
+        
+        // dp[i] = least number of perfect square numbers that sum to i
+        let mut dp = vec![std::i32::MAX; n + 1];
+        dp[0] = 0;
+        
+        for v in 1..=n {
+            // for all of the possible perfect squares
+            // that could be used to calculate our cur
+            // soln, our wanted soln will be the minimum
+            // of dp[v - the_perfect_square] + 1
+            //
+            // this is because we can just add the
+            // single perfect square to the previous 
+            // calculated sum (i.e., adding 1 to the count)
+            dp[v] = (1..=(v as f32).sqrt().floor() as usize)
+                        .map(|i| dp[v - (i * i)] + 1)
+                        .min()
+                        .unwrap();
+        }
+        
+        dp[n]
+    }
+}

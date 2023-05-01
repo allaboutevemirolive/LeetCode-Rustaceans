@@ -1,0 +1,17 @@
+// https://leetcode.com/problems/sort-colors/solutions/1837371/rust-counting-sort/
+impl Solution {
+    pub fn sort_colors(nums: &mut Vec<i32>) {
+        let mut counters = [0usize; 3];
+        for i in nums.iter() {
+            counters[*i as usize] += 1;
+        }
+
+        let mut idx = 0;
+        for i in 0..counters.len() {
+            for _ in 0..counters[i] {
+                nums[idx] = i as i32;
+                idx += 1;
+            }
+        }
+    }
+}

@@ -1,0 +1,46 @@
+// https://leetcode.com/problems/binary-search-tree-iterator/solutions/257725/rust-12ms-solution-using-stack/
+use std::rc::Rc;
+use std::cell::RefCell;
+/*
+ 非递归中序遍历
+ */
+pub struct BSTIterator {
+    stack: Vec<Rc<RefCell<TreeNode>>>,
+}
+
+
+/** 
+ * `&self` means the method takes an immutable reference.
+ * If you need a mutable reference, change it to `&mut self` instead.
+ */
+impl BSTIterator {
+
+    pub fn new(root: Option<Rc<RefCell<TreeNode>>>) -> Self {
+        let mut node = root;
+        let mut stack = Vec::new();
+        while let Some(inner) = node.clone() {
+            stack.push(inner.clone());
+            node = node.unwrap().borrow().left.clone();
+        }
+        BSTIterator{
+            stack: stack,
+        }
+    }
+    
+    /** @return the next smallest number */
+    pub fn next(&mut self) -> i32 {
+        let node = self.stack.pop().unwrap();
+        let res = node.borrow().val;
+        let mut next = node.borrow().right.clone();
+        while let Some(inner) = next.clone() {
+            self.stack.push(inner.clone());
+            next = next.unwrap().borrow().left.clone();
+        }
+        res
+    }
+    
+    /** @return whether we have a next smallest number */
+    pub fn has_next(&self) -> bool {
+        !self.stack.is_empty()
+    }
+}

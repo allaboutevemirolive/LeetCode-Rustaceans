@@ -1,0 +1,54 @@
+// https://leetcode.com/problems/combination-sum-ii/solutions/1813596/rust-backtracking/
+impl Solution {
+    fn combi(res: &mut Vec<Vec<i32>>, buffer: &mut Vec<i32>, candidates: &[i32], target: &i32) {
+        // println!("buffer:{:?}, candidates:{:?}", buffer, candidates);
+        buffer.push(candidates[0]);
+
+        if buffer.iter().sum::<i32>()==*target {
+            res.push(buffer.clone());
+        } else if buffer.iter().sum::<i32>()<*target {
+            let mut pre_value: Option<i32> = None;
+            for i in 1..candidates.len() {
+                match pre_value {
+                    Some(v) => {
+                        if v==candidates[i] {continue}
+                        Solution::combi(res, buffer, &candidates[i..], target);
+                        pre_value = Some(candidates[i]);
+                    },
+                    None => {
+                        Solution::combi(res, buffer, &candidates[i..], target);
+                        pre_value = Some(candidates[i]);
+                    }
+                }
+            }
+        }
+
+        buffer.pop();
+    }
+    
+    pub fn combination_sum2(candidates: Vec<i32>, target: i32) -> Vec<Vec<i32>> {
+        let mut candidate = candidates;
+        candidate.sort();
+        let mut res: Vec<Vec<i32>> = vec![];
+        let mut buffer: Vec<i32>;
+        let mut pre_value: Option<i32> = None;
+       
+        for i in 0..candidate.len() {
+            match pre_value {
+                Some(v) => {
+                    if candidate[i]==v {continue}
+                    buffer = vec![];
+                    Solution::combi(&mut res, &mut buffer, &candidate[i..], &target);
+                    pre_value = Some(candidate[i]);
+                },
+                None => {
+                    buffer = vec![];
+                    Solution::combi(&mut res, &mut buffer, &candidate[i..], &target);
+                    pre_value = Some(candidate[i]);
+                }
+            }
+            
+        }
+        res
+    }
+}

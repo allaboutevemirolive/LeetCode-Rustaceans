@@ -1,0 +1,18 @@
+// https://leetcode.com/problems/sort-colors/solutions/2193113/rust-solution-using-bucket-sort/
+impl Solution {
+    pub fn sort_colors(nums: &mut Vec<i32>) {
+        let n = nums.len();
+        
+        let mut arr = vec![0;3];
+        for &v in nums.iter() {
+            arr[v as usize] += 1;
+        }
+        let mut ci = 0;
+        for i in 0..3 {
+            for _ in 0..arr[i] {
+                nums[ci] = i as i32;
+                ci += 1;
+            }
+        }
+    }
+}

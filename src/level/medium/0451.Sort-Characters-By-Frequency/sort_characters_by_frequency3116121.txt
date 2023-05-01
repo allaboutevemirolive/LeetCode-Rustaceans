@@ -1,0 +1,16 @@
+// https://leetcode.com/problems/sort-characters-by-frequency/solutions/3116121/rust-using-hashmap-and-iterator/
+use std::collections::HashMap;
+
+impl Solution {
+    pub fn frequency_sort(mut s: String) -> String {
+        let mut freq: HashMap<char, usize> = HashMap::new();
+        s.chars().for_each(|c| { *freq.entry(c).or_insert(0) += 1; });
+        
+        let mut pair: Vec<(char, usize)> = freq.into_iter().collect();
+        pair.sort_unstable_by(|a, b| b.1.cmp(&a.1));
+
+        s.clear();
+
+        pair.into_iter().fold(s, |mut s, p| s + &p.0.to_string().repeat(p.1))
+    }
+}

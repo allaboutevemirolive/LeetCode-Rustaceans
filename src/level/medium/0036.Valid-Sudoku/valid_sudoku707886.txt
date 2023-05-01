@@ -1,0 +1,27 @@
+// https://leetcode.com/problems/valid-sudoku/solutions/707886/simple-rust-with-hashset/
+use std::collections::HashSet;
+
+impl Solution {
+    pub fn is_valid_sudoku(board: Vec<Vec<char>>) -> bool {
+        let mut verticals: Vec<HashSet<char>> = vec![HashSet::new(); 9];
+        let mut horizontals: Vec<HashSet<char>> = vec![HashSet::new(); 9];
+        let mut squares: Vec<HashSet<char>> = vec![HashSet::new(); 9];
+
+        for row in 0..9 {
+            for col in 0..9 {
+                if board[row][col] != '.' && (
+                    verticals[col].contains(&board[row][col]) ||
+                    horizontals[row].contains(&board[row][col]) ||
+                    squares[(row / 3) * 3 + col / 3].contains(&board[row][col])) {
+                    return false;
+                } else {
+                    verticals[col].insert(board[row][col]);
+                    horizontals[row].insert(board[row][col]);
+                    squares[(row / 3) * 3 + col / 3].insert(board[row][col]);
+                }
+            }
+        }
+
+        true
+    }
+}

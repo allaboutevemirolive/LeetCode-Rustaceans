@@ -1,0 +1,32 @@
+// https://leetcode.com/problems/search-in-rotated-sorted-array/solutions/1936390/rust-binary-search/
+pub fn search(nums: Vec<i32>, target: i32) -> i32 {
+    let mut result = -1;
+    if nums.len() < 1 {
+        return result;
+    }
+
+    let mut left: usize = 0;
+    let mut right: usize = nums.len()-1;
+    let mut mid: usize;
+    
+
+    while left <= right {
+        mid = left + (right - left) / 2;
+
+        if nums[mid] == target {
+            result = mid as i32;
+            break;
+        } else if left == right{
+            break;
+        } else if target < nums[mid] && nums[mid] > nums[right] && target < nums[left] {
+            left = mid + 1;
+        } else if target > nums[mid] && nums[mid] < nums[left] && target > nums[right] {
+            right = mid;
+        } else if target < nums[mid] {
+            right = mid;
+        } else if target > nums[mid] {
+            left = mid + 1;
+        }
+    }
+    result
+}

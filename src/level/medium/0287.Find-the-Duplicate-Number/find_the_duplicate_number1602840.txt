@@ -1,0 +1,18 @@
+// https://leetcode.com/problems/find-the-duplicate-number/solutions/1602840/rust-o-n-time-but-o-n-space/
+impl Solution {
+    pub fn find_duplicate(nums: Vec<i32>) -> i32 {
+        let mut seen: Vec<bool> = Vec::with_capacity(nums.len() + 1);
+        
+        for _ in 0..&nums.len() + 1 {
+            seen.push(false);
+        }
+        
+        for num in &nums {
+            if seen[*num as usize] {
+                return *num;
+            }
+            seen[*num as usize] = true;
+        }
+        panic!("No Duplicate Number!");
+    }
+}

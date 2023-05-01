@@ -1,0 +1,50 @@
+// https://leetcode.com/problems/linked-list-cycle-ii/solutions/3275321/rust-python3-fast-and-slow-references/
+use std::rc::Rc;
+use std::cell::RefCell;
+
+#[derive(PartialEq, Eq, Clone, Ord, PartialOrd)]
+pub struct AltListNode {
+    pub val: i32,
+    pub next: Option<Rc<RefCell<AltListNode>>>, 
+    // ↑ ↑ is more versatile than Option<Box<ListNode>>.
+}
+
+
+type NodeOpt = Option<Rc<RefCell<AltListNode>>>;
+
+pub struct Solution;
+
+impl Solution {
+    pub fn detect_cycle(head: NodeOpt) -> NodeOpt {
+
+        fn next(node_opt: &NodeOpt) -> NodeOpt {
+            match node_opt {
+                Some(node) => node.borrow().next.clone(),
+                None       => None,
+            }
+        }
+        let mut slow = head.clone();
+        let mut fast = head.clone();
+        let mut pos  = None;
+
+        loop {
+            slow = next(&slow);
+            fast = next(&next(&fast));
+
+            if fast.is_none() {
+                break;
+            }
+
+            if slow == fast {
+                slow = head;
+                while slow != fast {
+                    slow = next(&slow);
+                    fast = next(&fast);
+                }
+                pos = slow;
+                break;
+            }
+        }
+        pos
+    }
+}

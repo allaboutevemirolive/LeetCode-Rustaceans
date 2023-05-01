@@ -1,0 +1,15 @@
+// https://leetcode.com/problems/kth-smallest-element-in-a-sorted-matrix/solutions/1596354/rust-4ms-2-7mb-max-heaps/
+use std::collections::BinaryHeap;
+impl Solution {
+    pub fn kth_smallest(matrix: Vec<Vec<i32>>, k: i32) -> i32 {
+        let mut nums: Vec<i32> = matrix.into_iter().flatten().collect();
+        let mut maxheap = BinaryHeap::from(nums);
+        let mut n: usize = maxheap.len() - (k as usize) + 1;
+        while n > 1 { 
+            maxheap.pop();
+            n -= 1;
+        }
+        *maxheap.peek().unwrap()
+        
+    }
+}

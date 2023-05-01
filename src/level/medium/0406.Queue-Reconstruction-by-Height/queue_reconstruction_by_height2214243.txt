@@ -1,0 +1,25 @@
+// https://leetcode.com/problems/queue-reconstruction-by-height/solutions/2214243/rust-solution-seeking-entry-level-employment/
+impl Solution {
+    pub fn reconstruct_queue(mut people: Vec<Vec<i32>>) -> Vec<Vec<i32>> {
+        people.sort_unstable_by(|a, b| {
+            if a[1] != b[1] { 
+                a[1].cmp(&b[1]) 
+            } else {
+                b[0].cmp(&a[0])
+            }
+        });
+        let mut recon: Vec<Vec<i32>> = vec![];
+        for person in people {
+            let (mut i, mut taller) = (0, 0);
+            while i < recon.len() && taller <= person[1] {
+                if recon[i][0] >= person[0] {
+                    taller += 1; 
+                }
+                i += 1; 
+            }
+            let idx = if taller <= person[1] || i == 0 { i } else { i - 1 };
+            recon.insert(idx, person);
+        }
+        recon
+    }
+}

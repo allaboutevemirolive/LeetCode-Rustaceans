@@ -1,0 +1,47 @@
+// https://leetcode.com/problems/house-robber-ii/solutions/2530277/a-rust-solution-with-dp/
+use std::cmp::max;
+impl Solution {
+    pub fn rob(nums: Vec<i32>) -> i32 {
+        /*
+            1.不抢头，不抢尾
+            2.抢头，不抢尾
+            3.不抢头，抢尾
+        */
+        if nums.len() == 0 {
+            return 0;
+        }
+        if nums.len() == 1 {
+            return nums[0];
+        }
+        let mut arr = nums.clone();
+        let mut arr1 = &arr[1..nums.len()];
+        let mut arr2 = &arr[0..nums.len() - 1];
+        let mut arr3 = &arr[1..nums.len() - 1];
+        return max(max(Solution::helper(arr1.to_vec()), Solution::helper(arr2.to_vec())), Solution::helper(arr3.to_vec()));
+    }
+    
+    pub fn helper(nums: Vec<i32>) -> i32 {
+        if nums.len() == 0 {
+            return 0;
+        }
+        if nums.len() == 1 {
+            return nums[0];
+        }
+        let mut dp = vec![0; nums.len()];
+        let mut res = max(nums[0], nums[1]);
+        
+        for i in 0..nums.len() {
+           if i == 0 {
+               dp[i as usize] = nums[0];
+               continue;
+            }
+            if i == 1 {
+                dp[i as usize] = max(nums[1], nums[0]);
+                continue;
+            }
+           dp[i as usize] = max(dp[i-1], dp[i-2] + nums[i]);
+           res = max(res, dp[i as usize]);
+        }
+        res
+    }
+}

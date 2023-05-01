@@ -1,0 +1,11 @@
+// https://leetcode.com/problems/jump-game/solutions/1110205/rust-fold-solution/
+impl Solution {
+    pub fn can_jump(nums: Vec<i32>) -> bool {
+        nums.iter().enumerate().fold(0, |acc, (i, v)| {
+            if acc < i as i32 {
+                return -1;
+            }
+            acc.max(i as i32 + *v)
+        }) >= (nums.len() - 1) as i32
+    }
+}

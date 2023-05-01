@@ -1,0 +1,30 @@
+// https://leetcode.com/problems/unique-binary-search-trees-ii/solutions/1901340/rust-100-faster-dfs-memoization/
+impl Solution {
+    fn dfs(st : usize, end : usize, cache : &mut Vec<Vec<Vec<Option<Rc<RefCell<TreeNode>>>>>>) -> Vec<Option<Rc<RefCell<TreeNode>>>>{
+    if st>end {
+        return vec![None];
+    }
+    
+    if cache[st][end].len() > 0 {
+        return cache[st][end].to_vec();    
+    }
+
+    for i in st..end+1 {
+        let left = Self::dfs(st, i-1, cache);
+        let right = Self::dfs(i+1, end, cache);
+        for l in left.iter() {
+            for r in right.iter() {
+                let mut n = TreeNode::new(i as i32);
+                n.left = l.clone();
+                n.right = r.clone();
+                cache[st][end].push(Some(Rc::new(RefCell::new(n))));
+            }
+        }
+    }
+    cache[st][end].to_vec()
+}
+    pub fn generate_trees(n: i32) -> Vec<Option<Rc<RefCell<TreeNode>>>> {
+        let mut cache : Vec<Vec<Vec<Option<Rc<RefCell<TreeNode>>>>>> = vec![vec![vec![];n as usize+1]; n as usize+1];
+        Self::dfs(1,n as usize, &mut cache)
+    }
+}

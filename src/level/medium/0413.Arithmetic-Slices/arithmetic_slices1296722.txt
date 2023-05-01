@@ -1,0 +1,23 @@
+// https://leetcode.com/problems/arithmetic-slices/solutions/1296722/rust-cheapest-best/
+pub fn number_of_arithmetic_slices(nums: Vec<i32>) -> i32 {
+        (0..nums.len() - 1)
+            .fold(std::collections::HashMap::new(), |mut acc, i| {
+                acc.entry(nums[i + 1] - nums[i]).or_insert(vec![]).push(i);
+                acc
+            })
+            .values()
+            .flat_map(|v| {
+                (0..v.len() - 1).map(move |i| {
+                    (i + 1..v.len())
+                        .try_fold(0, |sum, j| {
+                            if v[j] - v[j - 1] == 1 {
+                                Ok(sum + 1)
+                            } else {
+                                Err(sum)
+                            }
+                        })
+                        .unwrap_or_else(std::convert::identity)
+                })
+            })
+            .sum()
+    }

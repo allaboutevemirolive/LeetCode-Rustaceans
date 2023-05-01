@@ -1,0 +1,32 @@
+// https://leetcode.com/problems/search-a-2d-matrix-ii/solutions/2327863/rust-0ms-recursive-binary-search/
+impl Solution {
+    pub fn search_matrix(matrix: Vec<Vec<i32>>, target: i32) -> bool {
+        Self::binary_search(&matrix, (0, matrix.len()), (0, matrix[0].len()), target)
+    }
+
+    fn binary_search(matrix: &Vec<Vec<i32>>, row: (usize, usize), col: (usize, usize), target: i32) -> bool {
+        
+        let (row_low, row_high) = row;
+        let (col_low, col_high) = col;
+
+        if row_high <= row_low || col_high <= col_low {return false}
+
+        let row_mid = row_low + (row_high - row_low ) / 2; 
+        let col_mid = col_low + (col_high - col_low ) / 2; 
+
+        let mid = matrix[row_mid][col_mid];
+
+        match mid.cmp(&target) {
+            std::cmp::Ordering::Equal => true,
+            std::cmp::Ordering::Less =>
+                Self::binary_search(matrix, (row_mid + 1, row_high), (col_low, col_mid + 1), target) ||
+                Self::binary_search(matrix, (row_low, row_mid + 1), (col_mid + 1, col_high), target) ||
+                Self::binary_search(matrix, (row_mid + 1, row_high), (col_mid + 1, col_high), target) 
+            ,
+            std::cmp::Ordering::Greater => 
+                Self::binary_search(matrix, (row_low, row_mid), (col_low, col_mid), target) ||
+                Self::binary_search(matrix, (row_low, row_mid), (col_mid, col_high), target) ||
+                Self::binary_search(matrix, (row_mid, row_high), (col_low, col_mid), target)
+        }
+    }
+}

@@ -1,0 +1,75 @@
+// https://leetcode.com/problems/find-all-anagrams-in-a-string/solutions/2832982/rust-sliding-window-hashmap/
+use std::collections::{HashMap, HashSet};
+impl Solution {
+    pub fn find_anagrams(s: String, p: String) -> Vec<i32> {
+        let p_len = p.len();
+        
+        if p_len > s.len() {
+            return vec![];
+        }
+        
+        let mut m = HashMap::<char, i32>::new();
+        for c in p.chars() {
+            *m.entry(c).or_insert(0) += 1;
+        }
+        
+        let m_len = m.len();
+        
+        let s = s.chars().collect::<Vec<char>>();
+        
+        let (mut left, mut right, mut zero_count) = (0, 0, 0);
+		// build out our initial window
+        while right < p_len {
+            if m.contains_key(&s[right]) {
+                *m.get_mut(&s[right]).unwrap() -= 1;
+                let v = m[&s[right]];
+                if v == 0 {
+                    zero_count += 1;
+                } else if v == -1 {
+                    zero_count -= 1;
+                }
+            }
+            right += 1;
+        }
+        
+        right -= 1;
+        
+        let mut result = vec![];
+		// check if initial window is a solution
+        if zero_count == m_len {
+            result.push(left as i32);
+        }
+        
+		// start sliding
+        while right < s.len() - 1 {
+            if m.contains_key(&s[left]) {
+                *m.get_mut(&s[left]).unwrap() += 1;
+                let v = m[&s[left]];
+                if v == 0 {
+                    zero_count += 1;
+                } else if v == 1 {
+                    zero_count -= 1;
+                }
+            }
+            
+            left += 1;
+            right += 1;
+            
+            if m.contains_key(&s[right]) {
+                *m.get_mut(&s[right]).unwrap() -= 1;
+                let v = m[&s[right]];
+                if v == 0 {
+                    zero_count += 1;
+                } else if v == -1 {
+                    zero_count -= 1;
+                }
+            }
+                        
+            if zero_count == m_len {
+                result.push(left as i32);
+            }
+        }
+        
+        result
+    }
+}

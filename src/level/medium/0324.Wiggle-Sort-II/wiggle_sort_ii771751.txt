@@ -1,0 +1,82 @@
+// https://leetcode.com/problems/wiggle-sort-ii/solutions/771751/rust-translated/
+struct Solution;
+
+impl Solution {
+    pub fn wiggle_sort(nums: &mut Vec<i32>) {
+        fn get_middle(v: &mut [i32], l: usize, r: usize) -> usize {
+            let mut i = l;
+            for j in l + 1..=r {
+                if v[j] < v[l] {
+                    i += 1;
+                    v.swap(i, j)
+                }
+            }
+            v.swap(l, i);
+            i
+        }
+
+        fn kth_smallest(nums: &mut Vec<i32>, mut k: usize) -> i32 {
+            let mut l = 0;
+            let mut r = nums.len() - 1;
+            k -= 1;
+            while l < r {
+                let m = get_middle(nums, l, r);
+               if m < k {
+                    l = m + 1;
+                } else if m > k {
+                    r = m - 1;
+                } else {
+                    break;
+                }
+            }
+            nums[k]
+        }
+
+        let n = nums.len();
+        let m = (n + 1) / 2;
+        let median = kth_smallest(nums, m);
+        // println!("{}", median);
+        // println!("{:?}", nums);
+        let mut i = 0;
+        let mut k = n - 1;
+        let mut j = 0;
+        while j <= k {
+            if nums[(2 * j + 1) % (n | 1)] > median {
+                nums.swap((2 * i + 1) % (n | 1), (2 * j + 1) % (n | 1));
+                i += 1;
+                j += 1;
+            } else if nums[(2 * j + 1) % (n | 1)] < median {
+                nums.swap((2 * j + 1) % (n | 1), (2 * k + 1) % (n | 1));
+                k -= 1;
+            } else {
+                j += 1;
+            }
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_wiggle_sort() {
+        let mut nums = vec![1, 5, 1, 1, 6, 4];
+        Solution::wiggle_sort(&mut nums);
+        assert_eq!(nums, vec![1, 4, 1, 5, 1, 6])
+    }
+
+    #[test]
+    fn test_wiggle_sort_02() {
+        let mut nums = vec![1, 3, 2, 2, 3, 1];
+        Solution::wiggle_sort(&mut nums);
+        assert_eq!(nums, vec![2, 3, 1, 3, 1, 2])
+    }
+
+    #[test]
+    fn test_wiggle_sort_03() {
+        let mut nums = vec![3,2,1,1,3,2];
+        Solution::wiggle_sort(&mut nums);
+        assert_eq!(nums, vec![2,3,1,3,1,2])
+    }
+}

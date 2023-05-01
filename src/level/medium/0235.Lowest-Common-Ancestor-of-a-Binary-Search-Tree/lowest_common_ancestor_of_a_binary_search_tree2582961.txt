@@ -1,0 +1,20 @@
+// https://leetcode.com/problems/lowest-common-ancestor-of-a-binary-search-tree/solutions/2582961/rust-0ms-recursive/
+use std::rc::Rc;
+use std::cell::RefCell;
+impl Solution {
+    pub fn lowest_common_ancestor(root: Option<Rc<RefCell<TreeNode>>>, p: Option<Rc<RefCell<TreeNode>>>, q: Option<Rc<RefCell<TreeNode>>>) -> Option<Rc<RefCell<TreeNode>>> {
+        let rb = root.as_ref().unwrap().borrow();
+        let pb = p.as_ref().unwrap().borrow();
+        let qb = q.as_ref().unwrap().borrow();
+        
+        if (rb.val > pb.val && rb.val < qb.val) || (rb.val > qb.val && rb.val <pb.val) || rb.val == pb.val || rb.val == qb.val  {
+            root.clone()
+        } else if (rb.val > pb.val && rb.val > qb.val) {
+            Solution::lowest_common_ancestor(rb.left.clone(), p.clone(), q.clone())    
+        } else {
+           Solution::lowest_common_ancestor(rb.right.clone(), p.clone(), q.clone())   
+        }
+        
+        
+    }
+}

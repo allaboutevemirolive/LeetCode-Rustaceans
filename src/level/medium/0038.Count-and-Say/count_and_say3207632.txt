@@ -1,0 +1,27 @@
+// https://leetcode.com/problems/count-and-say/solutions/3207632/rust-faster-than-100/
+impl Solution {
+    pub fn count_and_say(n: i32) -> String {
+        let mut res = "1".to_string();
+        for i in 1..n {
+            res = Solution::help(res);
+        }
+        res
+    }
+    fn help(n: String) -> String {
+        let mut res = String::with_capacity(100);
+        let n = n.chars().collect::<Vec<char>>();
+        let (mut i, len) = (0, n.len());
+        while i < len {
+            let mut c = 1;
+            let mut j = i + 1;
+            while j < len && n[i] == n[j] {
+                j += 1;
+                c += 1;
+            }
+            res.push_str(&c.to_string());
+            res.push(n[i]);
+            i = j;
+        }
+        res
+    }
+}

@@ -1,0 +1,64 @@
+// https://leetcode.com/problems/lru-cache/solutions/597577/rust-optimization-tips/
+use std::collections::HashMap;
+use std::collections::VecDeque;
+
+struct LRUCache {
+    capacity: usize,
+    map: HashMap<i32, i32>,
+    order: VecDeque<i32>,
+}
+
+/** 
+ * `&self` means the method takes an immutable reference.
+ * If you need a mutable reference, change it to `&mut self` instead.
+ */
+impl LRUCache {
+    fn new(capacity: i32) -> Self {
+        LRUCache {
+            capacity: capacity as usize,
+            map: HashMap::new(),
+            order: VecDeque::with_capacity(capacity as usize),
+        }
+    }
+    
+    fn get(&mut self, key: i32) -> i32 {
+        if !self.map.contains_key(&key) {
+            return -1;
+        }
+
+        self.move_to_head(key);
+        *self.map.get(&key).unwrap()
+    }
+    
+    fn put(&mut self, key: i32, value: i32) {
+        self.map.insert(key, value);
+        self.move_to_head(key);
+        
+        if (self.map.len() > self.capacity) {
+            self.evict_tail();
+        }
+    }
+    
+    fn evict_tail(&mut self) {
+        let tail = self.order.pop_front();
+        self.map.remove(&tail.unwrap());
+    }
+    
+    fn move_to_head(&mut self, key: i32) {
+        self.remove_node_from_order(&key);
+        self.order.push_back(key);
+    }
+    
+    fn remove_node_from_order(&mut self, key: &i32) {
+        match find_first(&self.order, *key) {
+            None => {},
+            Some(index) => {
+                self.order.remove(index);
+            }
+        };
+    }
+}
+
+fn find_first(v: &VecDeque<i32>, elem: i32) -> Option<usize> {
+    v.iter().position(|&x| x == elem)
+}

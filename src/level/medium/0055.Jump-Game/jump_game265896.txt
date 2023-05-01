@@ -1,0 +1,28 @@
+// https://leetcode.com/problems/jump-game/solutions/265896/rust-solution/
+pub fn can_jump(nums: Vec<i32>) -> bool {
+        let nums_len = nums.len() as u32;
+        if nums_len == 0 {
+            return false;
+        }
+
+        let mut current_max_reach = 0;
+        for i in 0..nums_len {
+            if current_max_reach >= nums_len - 1 {
+                return true;
+            }
+
+            if i > current_max_reach {
+                return false;
+            }
+
+            let step = nums[i as usize];
+            let reached = i + step as u32;
+            if reached >= current_max_reach {
+                current_max_reach = reached;
+            }
+        }
+        false
+    }
+	```
+	
+	I will rewrite this code using some cool rust features.

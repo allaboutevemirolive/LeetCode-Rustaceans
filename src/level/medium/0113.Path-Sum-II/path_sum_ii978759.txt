@@ -1,0 +1,31 @@
+// https://leetcode.com/problems/path-sum-ii/solutions/978759/rust-cheapest-best/
+use std::rc::Rc;
+use std::cell::RefCell;
+impl Solution {
+    pub fn path_sum(root: Option<Rc<RefCell<TreeNode>>>, sum: i32) -> Vec<Vec<i32>> {
+        let mut result = vec![];
+        Self::go(&root, &mut 0, &mut vec![], &mut result, sum);
+        result
+    }
+
+    fn go(
+        root: &Option<Rc<RefCell<TreeNode>>>,
+        cur: &mut i32,
+        v: &mut Vec<i32>,
+        result: &mut Vec<Vec<i32>>,
+        sum: i32,
+    ) {
+        if let Some(node) = root {
+            *cur += node.borrow().val;
+            v.push(node.borrow().val);
+            if cur == &sum && node.borrow().left.is_none() && node.borrow().right.is_none() {
+                result.push(v.clone());
+            } else {
+                Self::go(&node.borrow().left, cur, v, result, sum);
+                Self::go(&node.borrow().right, cur, v, result, sum);
+            }
+            v.pop();
+            *cur -= node.borrow().val;
+        }
+    }
+}

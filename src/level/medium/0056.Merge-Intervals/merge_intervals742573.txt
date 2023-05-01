@@ -1,0 +1,38 @@
+// https://leetcode.com/problems/merge-intervals/solutions/742573/rust-cheapest-best/
+impl Solution {
+    pub fn merge(mut intervals: Vec<Vec<i32>>) -> Vec<Vec<i32>> {
+        intervals.sort_by(|a, b| a[1].cmp(&b[1]));
+        intervals
+            .into_iter()
+            .fold(Vec::<Vec<i32>>::new(), |mut acc, cur| {
+                if let Some(v) = acc.last_mut() {
+                    if v[1] >= cur[0] {
+                        v[1] = cur[1];
+                        if v[0] > cur[0] {
+                            v[0] = cur[0];
+                        }
+                        return acc;
+                    }
+                }
+                acc.push(cur);
+                acc
+            })
+            .into_iter()
+            .rev()
+            .fold(Vec::<Vec<i32>>::new(), |mut acc, cur| {
+                if let Some(v) = acc.last_mut() {
+                    if v[0] <= cur[1] {
+                        if cur[0] < v[0] {
+                            v[0] = cur[0];
+                        }
+                        return acc;
+                    }
+                }
+                acc.push(cur);
+                return acc;
+            })
+            .into_iter()
+            .rev()
+            .collect()
+    }
+}

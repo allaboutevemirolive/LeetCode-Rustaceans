@@ -1,0 +1,24 @@
+// https://leetcode.com/problems/remove-nth-node-from-end-of-list/solutions/1479849/rust-vec-solution/
+impl Solution {
+    pub fn remove_nth_from_end(mut head: Option<Box<ListNode>>, n: i32) -> Option<Box<ListNode>> {
+        
+        let mut tmp: Vec<Option<Box<ListNode>>> = vec![];
+        let mut res = None; 
+        while let Some(mut node) = head { 
+            head = node.next.take();
+            tmp.push(Some(node));
+        }
+
+        
+        for (i, link) in tmp.into_iter().rev().enumerate() {
+            if i != (n - 1)  as usize { 
+                let mut node = link.unwrap();
+                node.next = res; 
+                res = Some(node);
+            }
+        }
+        res
+    
+        
+    }
+}

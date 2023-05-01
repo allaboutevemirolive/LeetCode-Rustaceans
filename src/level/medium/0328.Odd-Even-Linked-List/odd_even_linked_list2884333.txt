@@ -1,0 +1,13 @@
+// https://leetcode.com/problems/odd-even-linked-list/solutions/2884333/rust-2ms-2-4-mb/
+This problem is going to be hell without understanding Rust's borrow
+checker. We need to create two different head nodes (1 for odd and one
+for even) and then create two mutable references to these heads so
+that we can move values out of our input list into our answer. Another
+issue is the fact that Rust does not have a null value we can point to,
+which makes implementation of the solution a little awkward. But we
+won't run into seg faults...which is nice.
+
+Other languages let you get away with relatively straight forward
+assignment operations, in Rust we have to "pysically" move values from
+one structure into the next one. Once that hurdle is overcome the problem
+becomes a simple matter of traversing a list.

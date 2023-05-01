@@ -1,0 +1,24 @@
+// https://leetcode.com/problems/remove-nth-node-from-end-of-list/solutions/229716/rust-recursion-0ms/
+pub fn remove(head: Option<Box<ListNode>>, n: i32) -> (i32, Option<Box<ListNode>>) {
+    if let Some(boxed) = head {
+        let (mut tail_index, tail) = remove(boxed.next, n);
+        tail_index += 1;
+
+        if tail_index == n {
+            (tail_index, tail)
+        } else {
+            (tail_index, Some(Box::new(ListNode {
+                val: boxed.val,
+                next: tail
+            })))
+        }
+    } else {
+        (0, None)
+    }
+}
+
+impl Solution {
+    pub fn remove_nth_from_end(head: Option<Box<ListNode>>, n: i32) -> Option<Box<ListNode>> {
+        remove(head, n).1
+    }
+}

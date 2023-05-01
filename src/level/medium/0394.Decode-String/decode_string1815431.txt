@@ -1,0 +1,35 @@
+// https://leetcode.com/problems/decode-string/solutions/1815431/stack-rust/
+impl Solution {
+    pub fn decode_string(s: String) -> String {
+        let mut ans = String::from("");
+        let mut stack: Vec<String> = vec!["".to_string()];
+        
+        let mut num = String::from("");
+        let mut curr = String::from("");
+        for c in s.chars() {
+            if c >= '0' && c <= '9' {
+                num.push(c);
+            } else if c == '[' {
+                stack.push(curr);
+                // stack.push(num.clone());
+                stack.push(num);
+                num = "".to_string();
+                curr = "".to_string();
+            } else if c == ']' {
+                num = stack.pop().unwrap();
+                if let Ok(cnt) = num.parse() {
+                    // println!("stack: {:#?}", stack);
+                    curr = curr.repeat(cnt);
+                    let mut pre = stack.pop().unwrap().to_string();
+                    // pre.push_str(&curr);
+                    curr = pre + &curr;
+                    // println!("curr: {:?}", curr);
+                }
+                num = "".to_string();
+            } else {
+                curr.push(c);
+            }
+        }
+        curr
+    }
+}

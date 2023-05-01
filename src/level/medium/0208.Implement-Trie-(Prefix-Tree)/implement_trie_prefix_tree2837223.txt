@@ -1,0 +1,49 @@
+// https://leetcode.com/problems/implement-trie-prefix-tree/solutions/2837223/rust/
+#[derive(Clone)]
+struct Trie {
+    terminal: bool,
+    childs: Vec<Option<Trie>>,
+}
+
+impl Trie {
+    fn new() -> Self {
+        Trie { terminal: false, childs: vec![None; 26] }
+    }
+    
+    fn insert(&mut self, word: String) {
+        match word.as_bytes().len(){
+            0 => self.terminal = true,
+            _ => {
+                let letter = word.as_bytes()[0];
+                let idx = (letter - 'a' as u8) as usize;
+                if self.childs[idx].is_none() {
+                    self.childs[idx] = Some(Trie::new());
+                }
+
+                self.childs[idx].as_mut().unwrap().insert(word.chars().skip(1).collect());
+            }
+        }
+    }
+    
+    fn search(&self, word: String) -> bool {
+        match word.len() {
+            0 => self.terminal,
+            _ => {
+                let letter = word.as_bytes()[0];
+                let idx = (letter - 'a' as u8) as usize;
+                self.childs[idx].as_ref().map_or(false, |f|f.search(word.chars().skip(1).collect()))
+            }
+        }
+    }
+    
+    fn starts_with(&self, prefix: String) -> bool {
+        match prefix.len() {
+            0 => true,
+            _ => {
+                let letter = prefix.as_bytes()[0];
+                let idx = (letter - 'a' as u8) as usize;
+                self.childs[idx].as_ref().map_or(false, |f|f.starts_with(prefix.chars().skip(1).collect()))
+            }
+        }
+    }
+}

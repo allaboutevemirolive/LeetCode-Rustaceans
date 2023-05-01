@@ -1,0 +1,22 @@
+// https://leetcode.com/problems/zigzag-conversion/solutions/3133915/simple-rust/
+impl Solution {
+    pub fn convert(s: String, num_rows: i32) -> String {
+        if num_rows == 1 { return s}
+        let mut weird = vec![vec![]; num_rows as usize];
+        let mut idx = 0i32;
+        let mut dir = 1;
+        for c in s.chars() {
+            weird[idx as usize].push(c);
+            if idx == 0 {
+                // go down
+                dir = 1
+            }
+            if idx == num_rows - 1 {
+                // go up
+                dir = -1 
+            }
+            idx = idx + dir;
+        }
+        weird.iter().flatten().collect()
+    }
+}

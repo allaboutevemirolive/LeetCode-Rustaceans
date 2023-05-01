@@ -1,0 +1,24 @@
+// https://leetcode.com/problems/combination-sum-iii/solutions/2025185/rust-1-expression-solution/
+impl Solution {
+    pub fn combination_sum3(k: i32, n: i32) -> Vec<Vec<i32>> {
+        (0..k)
+            .into_iter()
+            .fold(vec![vec![]], |acc, _| {
+                acc.into_iter()
+                    .flat_map(|seq| {
+                        (seq.last().cloned().unwrap_or(0) + 1..=9)
+                            .zip(std::iter::repeat(seq))
+                            .map(|(num, mut seq)| {
+                                seq.push(num);
+                                seq
+                            })
+                            .filter(|seq| seq.iter().sum::<i32>() <= n)
+                            .collect::<Vec<_>>()
+                    })
+                    .collect()
+            })
+            .into_iter()
+            .filter(|seq| seq.iter().sum::<i32>() == n)
+            .collect()
+    }
+}

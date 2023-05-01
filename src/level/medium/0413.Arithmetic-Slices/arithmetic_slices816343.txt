@@ -1,0 +1,14 @@
+// https://leetcode.com/problems/arithmetic-slices/solutions/816343/rust-0ms-dp/
+impl Solution {
+    pub fn number_of_arithmetic_slices(a: Vec<i32>) -> i32 {
+        let mut dp: Vec<i32> = vec![0;a.len()];
+       let mut sum = 0;
+       for i in 2..a.len(){
+           if a[i] - a[i-1] == a[i-1] -a[i-2] {
+               dp[i] = 1+dp[i-1];
+           }
+           sum+=dp[i]
+       }
+       sum
+    }
+}

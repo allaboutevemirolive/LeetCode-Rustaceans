@@ -1,0 +1,14 @@
+// https://leetcode.com/problems/swap-nodes-in-pairs/solutions/540192/rust-recursion-solution-clean-code/
+impl Solution {
+    pub fn swap_pairs(head: Option<Box<ListNode>>) -> Option<Box<ListNode>> {
+        let mut head = head;
+        if head.is_none() || head.as_ref().unwrap().next.is_none() {
+            return head;
+        } else {
+            let mut temp = head.as_mut().unwrap().next.take();
+            head.as_mut().unwrap().next = Self::swap_pairs(temp.as_mut().unwrap().next.take());
+            temp.as_mut().unwrap().next = head;
+            temp
+        }
+    }
+}

@@ -1,0 +1,14 @@
+// https://leetcode.com/problems/reverse-integer/solutions/2537649/rust-iter/
+impl Solution {
+    pub fn reverse(x: i32) -> i32 {
+        x.signum() * match x.abs()
+            .to_string()
+            .chars()
+            .rev()
+            .collect::<String>()
+            .parse::<i32>() {
+                Ok(value) => value,
+                Err(_)    => 0,
+            }
+    }
+}

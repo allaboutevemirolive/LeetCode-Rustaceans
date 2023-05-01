@@ -1,0 +1,30 @@
+// https://leetcode.com/problems/peeking-iterator/solutions/1982308/rust-generically-implementing-the-iterator-interface/
+struct PeekingIterator<'a, T: Copy> {
+    nums : &'a Vec<T>,
+    pos  : usize,
+} 
+
+impl<'a, T: Copy> PeekingIterator<'a, T> {
+    fn new(nums: &'a Vec<T>) -> Self {
+        Self { nums, pos: 0 }
+    }
+    fn peek(&self) -> Option<T> {
+        if self.pos < self.nums.len() 
+             { Some(self.nums[self.pos]) } 
+        else { None                      }
+    }
+    fn has_next(&self) -> bool {
+        self.pos < self.nums.len()
+    }
+}
+
+impl<'a, T: Copy> Iterator for PeekingIterator<'a, T> {
+    type Item = T;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        self.pos += 1;
+        if self.pos <= self.nums.len() 
+             { Some(self.nums[self.pos - 1]) } 
+        else { None                          }
+    }
+}

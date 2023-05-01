@@ -1,0 +1,68 @@
+// https://leetcode.com/problems/insert-delete-getrandom-o1/solutions/2858762/rust-value-index-hash-map-and-array-stack-o-1/
+use std::collections::HashMap;
+use rand::Rng; 
+
+struct RandomizedSet {
+    xs: HashMap<i32, usize>,
+    arr: Vec<i32>,
+}
+
+
+/** 
+ * `&self` means the method takes an immutable reference.
+ * If you need a mutable reference, change it to `&mut self` instead.
+ */
+impl RandomizedSet {
+
+    fn new() -> Self {
+        RandomizedSet {
+            xs: HashMap::new(),
+            arr: vec![],
+        }
+    }
+    
+    fn insert(&mut self, val: i32) -> bool {
+        if self.xs.contains_key(&val) {
+            return false;
+        }
+        self.arr.push(val);
+        let n = self.arr.len();
+        self.xs.insert(val, n-1);
+        // println!("arr {:?} xs {:?}", self.arr, self.xs);
+        true
+    }
+    
+    fn remove(&mut self, val: i32) -> bool {
+        if !self.xs.contains_key(&val) {
+            return false;
+        }
+        let i = self.xs[&val];
+        let n = self.arr.len();
+        // (self.arr[i], self.arr[n-1]) = (self.arr[n-1], self.arr[i]);
+        let tail = self.arr[n-1];
+        // self.arr[n-1] = self.arr[i];
+        // self.arr[i] = tmp;
+        self.arr.swap(i, n-1);
+        self.arr.pop();
+        self.xs.remove(&val);
+        if val != tail {
+            self.xs.insert(tail, i);
+        }
+        // println!("arr {:?} xs {:?}", self.arr, self.xs);
+        true
+    }
+    
+    fn get_random(&self) -> i32 {
+        let n = self.arr.len();
+        let i = rand::thread_rng().gen_range(0, n);
+        self.arr[i]
+    }
+}
+
+/**
+ * Your RandomizedSet object will be instantiated and called as such:
+ * let obj = RandomizedSet::new();
+ * let ret_1: bool = obj.insert(val);
+ * let ret_2: bool = obj.remove(val);
+ * let ret_3: i32 = obj.get_random();
+ */

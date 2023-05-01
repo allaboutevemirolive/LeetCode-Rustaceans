@@ -1,0 +1,35 @@
+// https://leetcode.com/problems/next-permutation/solutions/2458906/rust-solution-beats-100-runtime-0-ms-faster-than-100-00-of-rust/
+// ref: https://leetcode.com/problems/next-permutation/discuss/13867/C%2B%2B-from-Wikipedia
+
+// According to Wikipedia, a man named Narayana Pandita presented the following simple algorithm to solve this problem in the 14th century.
+
+// Find the largest index k such that nums[k] < nums[k + 1]. If no such index exists, just reverse nums and done.
+// Find the largest index l > k such that nums[k] < nums[l].
+// Swap nums[k] and nums[l].
+// Reverse the sub-array nums[k + 1:].
+impl Solution {
+    pub fn next_permutation(nums: &mut Vec<i32>) {
+        let mut k = (nums.len()-2) as i32;
+        // find largest idx k which nums[k] < nums[k+1]
+        while k>= 0  && nums[k as usize] >= nums[(k+1) as usize]{
+            k -= 1;
+        }
+        if k < 0 {
+            nums.reverse();
+        } else {
+            // find largest idx l which l > k and nums[l] > nums[k]
+            let mut l = (nums.len()-1) as i32;
+            while l > k  && nums[l as usize] <= nums[k as usize] {
+                l -= 1;
+            }
+            
+            // swap nums[k] nums[l]
+            let tmp = nums[k as usize];
+            nums[k as usize] = nums[l as usize];
+            nums[l as usize] = tmp;
+            nums[(k+1) as usize..].reverse();  // reverse nums[k+1..end]
+            
+        }
+        
+    }
+}

@@ -1,0 +1,49 @@
+// https://leetcode.com/problems/palindrome-partitioning/solutions/3165906/rust-99-ms-20-6mb-backtracking/
+impl Solution {
+    
+    fn is_palin(sub: &String) -> bool {
+        if sub.len() == 1 { return true }
+        
+        let half = sub.len() / 2;
+        
+        sub.chars().take(half).eq(sub.chars().rev().take(half)) 
+    }
+    
+    fn generate_comb(
+        s: &String, 
+        idx: usize, 
+        mut curr: &mut Vec<String>, 
+        mut res: &mut Vec<Vec<String>>
+    ) { 
+        
+        if idx == s.len() { 
+            res.push(curr.to_vec());
+        }
+        
+        for nextNode in idx..s.len() { 
+            let val = s[idx..=nextNode].to_owned();
+            
+            if !Self::is_palin(&val) { continue } 
+            
+            curr.push(val);
+            
+            Self::generate_comb(s, nextNode + 1, curr, res);
+            
+            curr.pop();
+        }
+    }
+    
+    pub fn partition(s: String) -> Vec<Vec<String>> {
+        /*
+            1. Generate the base case first 
+            2. Setting the conditions 
+            
+            needs: isPalindrome
+        */
+        let mut res: Vec<Vec<String>> = vec![];
+        let mut curr : Vec<String> = vec![];
+        
+        Self::generate_comb(&s, 0, &mut curr, &mut res);
+        res
+    }
+}

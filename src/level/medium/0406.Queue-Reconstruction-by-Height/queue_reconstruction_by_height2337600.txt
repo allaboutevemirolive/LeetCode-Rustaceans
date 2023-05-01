@@ -1,0 +1,61 @@
+// https://leetcode.com/problems/queue-reconstruction-by-height/solutions/2337600/rust-binary-indexed-tree-n-log-n-log-n/
+impl Solution {
+    pub fn reconstruct_queue(people: Vec<Vec<i32>>) -> Vec<Vec<i32>> {
+        let n = people.len();
+        let mut bit = vec![0i32; n + 1];
+        let mut people = people;
+        
+        // if we think the available positions are 
+        // p[0] = 0; p[1] = 1; ... p[n - 1] = n - 1;
+        // we are setting bit[1] = p[0]; bit[2] = bit[0] + p[1]... 
+        // bit[k] = bit[k - 1] + pos[k - 1]...bit[n] = bit[n - 1] + pos[n - 1] 
+        for i in 2..=n { 
+            Self::add(i as i32, 1, &mut bit);
+        }
+        // we sort people shorter in front, people with same height will also be listed in reverse order
+        // ex: [[4,4],[5,2],[5,0],[6,1],[7,1][7,0]]
+        people.sort_by(|a, b| { if a[0] == b[0] { b[1].cmp(&a[1]) } else { a[0].cmp(&b[0]) } });
+        
+        // use the example above, we will find the position of [4, 4], once we find the right 
+        // position (which is 4) using binary search, its position is "removed", or collapsed with
+        // its front position with calling Self::add(left as i32 + 1, -1, &mut bit). 
+        // Please notice the justification behind is the fact that: 
+		// where the current person's position is has no impact or the relative
+        // order for those people behind the person who just found his/her position
+        
+        // Runtime: N * logN * LogN
+        let mut ret:Vec<Vec<i32>> = vec![vec![]; n]; 
+        for i in 0..n {
+            let (mut left, mut right) = (0, n);
+            while left < right {
+                let mid = left + (right - left) / 2;
+                if Self::sum(mid as i32 + 1, &mut bit) < people[i][1] { left = mid + 1; }
+                else  { right = mid; }
+            }
+            ret[left] = people[i as usize].clone();
+            Self::add(left as i32 + 1, -1, &mut bit);
+        }
+        
+        ret
+    }
+    
+    fn add(i: i32, a: i32, bit: &mut Vec<i32>) {
+        let mut i = i;
+        
+        while i < bit.len() as i32 {
+            bit[i as usize] += a;
+            i += (i & -i);
+        }
+    }
+    
+    fn sum(i: i32, bit: &mut Vec<i32>) -> i32 {
+        let mut i = i;
+        let mut ret = 0;
+        while i > 0 {
+            ret += bit[i as usize];
+            i -= (i & -i);
+        }
+        
+        ret
+    }
+}

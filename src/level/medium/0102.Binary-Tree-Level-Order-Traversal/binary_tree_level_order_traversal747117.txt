@@ -1,0 +1,23 @@
+// https://leetcode.com/problems/binary-tree-level-order-traversal/solutions/747117/recursive-rust/
+impl Solution {
+    fn _level_order(node: &Option<Rc<RefCell<TreeNode>>>, level: usize, acc: &mut Vec<Vec<i32>>) {
+        if let Some(n) = node {
+            if acc.len() == level {
+                acc.push(Vec::new());
+            }
+
+            acc[level].push(n.borrow().val);
+
+            Self::_level_order(&n.borrow().left, level + 1, acc);
+            Self::_level_order(&n.borrow().right, level + 1, acc);
+        }
+    }
+    
+    pub fn level_order(root: Option<Rc<RefCell<TreeNode>>>) -> Vec<Vec<i32>> {
+        let mut acc: Vec<Vec<i32>> = Vec::new();
+
+        Self::_level_order(&root, 0, &mut acc);
+
+        acc
+    }
+}

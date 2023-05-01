@@ -1,0 +1,22 @@
+// https://leetcode.com/problems/utf-8-validation/solutions/260801/a-rust-solution/
+impl Solution {
+    pub fn valid_utf8_slice(data: &[i32]) -> bool {
+        let bytes = match data.get(0) {
+            None => return true,
+            Some(0b0000_0000...0b0111_1111) => 1,
+            Some(0b1100_0000...0b1101_1111) => 2,
+            Some(0b1110_0000...0b1110_1111) => 3,
+            Some(0b1111_0000...0b1111_0111) => 4,
+            Some(_) => return false,
+        };
+
+        return
+            data.len() >= bytes &&
+            data[1..bytes].iter().all(|x| x & 0b11000_0000 == 0b1000_0000) &&
+            Self::valid_utf8_slice(&data[bytes..]);
+    }
+
+    pub fn valid_utf8(data: Vec<i32>) -> bool {
+        Self::valid_utf8_slice(&data)
+    }
+}

@@ -1,0 +1,16 @@
+// https://leetcode.com/problems/maximum-subarray/solutions/857273/rust-solution/
+use std::cmp;
+impl Solution {
+    pub fn max_sub_array(nums: Vec<i32>) -> i32 {
+        let nums_len = nums.len() as i32;
+        let mut best = nums[0];
+        let mut sum = 0;
+        let mut k = 0;
+        while(k<nums_len){
+            sum= cmp::max(nums[k as usize], sum + nums[k as usize]);
+            best = cmp::max(best, sum);
+            k+=1;
+        }
+        best
+    }
+}

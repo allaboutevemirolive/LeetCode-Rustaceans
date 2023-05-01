@@ -1,0 +1,16 @@
+// https://leetcode.com/problems/find-all-duplicates-in-an-array/solutions/798317/rust-map-solution/
+impl Solution {
+    pub fn find_duplicates(nums: Vec<i32>) -> Vec<i32> {
+        let (mut m, mut res) = (std::collections::HashMap::new(), vec![]);
+
+        for v in nums.iter() {
+            if let Some(_) = m.get(v) {
+                res.push(*v);
+            } else {
+                m.insert(v, 1);
+            }
+        }
+        
+        res
+    }
+}

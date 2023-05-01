@@ -1,0 +1,26 @@
+// https://leetcode.com/problems/reverse-words-in-a-string/solutions/2808499/rust-follow-up-answer/
+impl Solution {
+    pub fn reverse_words(mut s: String) -> String {
+        s.push(' ');
+        let bytes = unsafe { s.as_bytes_mut() };
+        let mut length = 0;
+        let mut lo = 0;
+        for hi in 0..bytes.len() {
+            if bytes[hi] == b' ' {
+                if hi > lo {
+                    let word_len = hi - lo;
+                    for i in 0..word_len {
+                        bytes[length + i] = bytes[lo + i];
+                    }
+                    bytes[length..length + word_len].reverse();
+                    bytes[length + word_len] = b' ';
+                    length += word_len + 1;
+                }
+                lo = hi + 1;
+            }
+        }
+        s.truncate(length - 1);
+        unsafe { s.as_bytes_mut().reverse(); }
+        s
+    }
+}

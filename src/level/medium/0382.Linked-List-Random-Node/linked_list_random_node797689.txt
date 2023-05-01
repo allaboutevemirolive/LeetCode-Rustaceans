@@ -1,0 +1,43 @@
+// https://leetcode.com/problems/linked-list-random-node/solutions/797689/rust-cheapest-best/
+use rand::Rng;
+use std::iter::Iterator;
+
+struct ListIterator<'a> {
+    head: &'a Option<Box<ListNode>>,
+}
+
+impl<'a> Iterator for ListIterator<'a> {
+    type Item = &'a Box<ListNode>;
+
+    fn next(&mut self) -> Option<&'a Box<ListNode>> {
+        self.head.as_ref().and_then(|head| {
+            self.head = &head.next;
+            head.next.as_ref()
+        })
+    }
+}
+
+struct Solution {
+    head: Option<Box<ListNode>>,
+}
+
+impl Solution {
+    fn new(head: Option<Box<ListNode>>) -> Self {
+        Solution { head }
+    }
+
+    fn get_random(&self) -> i32 {
+        let mut rng = rand::thread_rng();
+        (ListIterator { head: &self.head })
+            .into_iter()
+            .fold(
+                (1, self.head.as_ref().unwrap()),
+                |(count, x), cur| match rng.gen_range(0, count + 1) {
+                    0 => (count + 1, cur),
+                    _ => (count + 1, x),
+                },
+            )
+            .1
+            .val
+    }
+}

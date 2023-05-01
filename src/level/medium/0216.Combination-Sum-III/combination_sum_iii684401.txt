@@ -1,0 +1,24 @@
+// https://leetcode.com/problems/combination-sum-iii/solutions/684401/rust-dfs-backtracking-o-n-0ms/
+impl Solution {
+    pub fn combination_sum3(k: i32, n: i32) -> Vec<Vec<i32>> {
+        let mut res = Vec::new();
+        let mut comb = Vec::new();
+        Self::dfs(k, n, 1, &mut comb, &mut res);
+        res
+    }
+    
+    fn dfs(k: i32, n:i32, start: i32, comb: &mut Vec<i32>, res: &mut Vec<Vec<i32>>) {
+        if k == 0 && n == 0 {
+            res.push(comb.clone());
+            return;
+        }
+        if k < 0 || n < 0 {
+            return;
+        }
+        for i in start..10 {
+            comb.push(i);
+            Self::dfs(k - 1, n - i, i+1, comb, res);
+            comb.pop();
+        }
+    }
+}

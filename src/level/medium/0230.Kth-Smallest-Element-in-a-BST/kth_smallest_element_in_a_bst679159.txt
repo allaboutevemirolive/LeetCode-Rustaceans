@@ -1,0 +1,25 @@
+// https://leetcode.com/problems/kth-smallest-element-in-a-bst/solutions/679159/rust-dfs-o-n/
+use std::rc::Rc;
+use std::cell::RefCell;
+impl Solution {
+    pub fn kth_smallest(root: Option<Rc<RefCell<TreeNode>>>, k: i32) -> i32 {
+        let ans = &mut 0;
+        let mut mk = k;
+        Solution::dfs(&root, &mut mk, ans);
+        *ans
+    }
+    
+    fn dfs(root: &Option<Rc<RefCell<TreeNode>>>, k: &mut i32, ans: &mut i32) {
+        if None == *root || *k == 0 {
+            return;
+        }
+        if let Some(root) = root {
+            Solution::dfs(&root.borrow().left, k, ans);
+            *k -= 1;
+            if *k == 0 {
+                *ans = root.borrow().val;
+            }
+            Solution::dfs(&root.borrow().right, k, ans);
+        }
+    }
+}

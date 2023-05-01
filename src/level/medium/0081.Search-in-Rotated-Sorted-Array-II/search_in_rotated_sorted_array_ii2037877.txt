@@ -1,0 +1,46 @@
+// https://leetcode.com/problems/search-in-rotated-sorted-array-ii/solutions/2037877/rust-binary-search-0ms/
+impl Solution {
+    pub fn search(nums: Vec<i32>, target: i32) -> bool {
+        if nums.is_empty() { return false;}
+        let (mut lo, mut hi) = (0, nums.len()-1);
+        while lo <= hi {
+            let mi = lo + (hi - lo) / 2;
+            if nums[mi] == target { return true; }
+
+            if (nums[lo] == nums[mi]) && (nums[mi] == nums[hi]){
+                lo += 1;
+            } else if nums[lo] <= nums[mi] {
+                if nums[lo] <= target && target < nums[mi]  {
+                    hi = mi;
+                } else {
+                    lo = mi + 1;
+                }
+            } else {
+                if nums[mi] < target && target <= nums[hi] {
+                    lo = mi + 1;
+                } else {
+                    hi = mi;
+                }
+            }
+        }
+        false
+    }
+}
+
+#[test]
+fn tests() {
+    assert_eq!(search(vec![1,0,1,1,1], 0), true);
+    assert_eq!(search(vec![2,5,6,0,0,1,2], 0), true);
+    assert_eq!(search(vec![2,5,6,0,0,1,2], 3), false);
+    assert_eq!(search(vec![3,1], 1), true);
+    assert_eq!(search(vec![4, 5, 6, 7, 0, 1, 2], 0), true);
+    assert_eq!(search(vec![3, 4, 5, 6, 7, 0, 1, 2], 0), true);
+    assert_eq!(search(vec![3, 4, 5, 6, 7, 0, 1, 2], 7), true);
+    assert_eq!(search(vec![4, 5, 6, 7, 0, 1, 2], 3), false);
+    assert_eq!(search(vec![3, 5, 1], 5), true);
+    assert_eq!(search(vec![1], 0), false);
+    assert_eq!(search(vec![], 0), false);
+    assert_eq!(search(vec![1], 1), true);
+    assert_eq!(search(vec![10, 111, 245, -4, -3, -1, 7], 111), true);
+    assert_eq!(search(vec![10, 111, 245, -4, -3, -1, 7], -3), true);
+}

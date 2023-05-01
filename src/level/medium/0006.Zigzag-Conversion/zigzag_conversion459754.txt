@@ -1,0 +1,26 @@
+// https://leetcode.com/problems/zigzag-conversion/solutions/459754/rust/
+impl Solution {
+    pub fn convert(s: String, num_rows: i32) -> String {
+        let mut step: i32 = 0;
+        let mut idx = 0;
+        if num_rows <= 1{
+            return s;
+        }
+        let mut res: Vec<String> = vec![String::new(); num_rows as usize];
+        for c in s.chars() {
+            res[idx].push_str(&c.to_string());
+            if idx == 0 {
+                step = 1;
+            }
+            if idx == num_rows as usize - 1  {
+                step = -1;
+            }
+            idx = (idx as i32 + step) as usize;
+        }
+        let mut ans = String::new();
+        for ss in res {
+            ans += &ss;
+        }
+        return ans;
+    }
+}

@@ -1,0 +1,17 @@
+// https://leetcode.com/problems/subsets-ii/solutions/1380299/rust-solution/
+pub fn subsets_with_dup(mut nums: Vec<i32>) -> Vec<Vec<i32>> {
+    nums.sort_unstable();
+    nums.into_iter()
+        .fold(HashSet::new(), |mut set, n| {
+            if set.is_empty() {
+                set.insert(Vec::new());
+            }
+            set.extend(&mut set.clone().into_iter().map(|mut s| {
+                s.push(n);
+                s
+            }));
+            set
+        })
+        .into_iter()
+        .collect()
+}

@@ -1,0 +1,45 @@
+// https://leetcode.com/problems/path-sum-iii/solutions/678846/in-rust/
+use std::rc::Rc;
+use std::cell::RefCell;
+use std::collections::HashMap;
+
+impl Solution {
+    
+    fn ps(root: &Option<Rc<RefCell<TreeNode>>>, sum: i32,
+            target: i32, sums: &mut HashMap<i32, i32>) -> i32 {
+
+        let mut res = 0;
+
+        if let Some(node) = root {
+            let node = node.borrow();
+            let curr_sum = sum + node.val;
+
+            let n = curr_sum - target;
+
+            match sums.get(&n) {
+                Some(count) => res += count,
+                None => res += 0
+            };
+
+            match sums.get(&curr_sum) {
+                Some(count) => sums.insert(curr_sum, count + 1),
+                None => sums.insert(curr_sum, 1)
+            };
+
+            res += Solution::ps(&node.left, curr_sum, target, sums);
+            res += Solution::ps(&node.right, curr_sum, target, sums);
+            
+            match sums.get(&curr_sum) {
+                Some(count) => sums.insert(curr_sum, count - 1),
+                None => sums.insert(curr_sum, 0)
+            };
+        }
+        res
+    }
+    
+    pub fn path_sum(root: Option<Rc<RefCell<TreeNode>>>, sum: i32) -> i32 {
+        let mut sums = HashMap::new();
+        sums.insert(0, 1);
+        Solution::ps(&root, 0, sum, &mut sums)
+    }
+}

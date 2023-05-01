@@ -1,0 +1,29 @@
+// https://leetcode.com/problems/count-primes/solutions/810780/8ms-rust-simple-solution-using-sieve-of-eratosthenes/
+impl Solution {
+      
+      pub fn count_primes(n: i32) -> i32 {
+            // If an index in vector is marked false it's a prime.
+            //   Whenever a number is encountered, whose index value is false,
+            //  it's index in vector is set to true and the counter is incremented.
+            let mut is_multiple_of_prime = vec![false; n as usize];
+
+            let mut count = 0;
+
+            for i in 2..n {
+                  if !is_multiple_of_prime[i as usize] {
+                        count += 1;
+
+                        let mut j = i;
+
+                        //Then this loops all multiples of this index are marked as true.
+						// ie 3+3 = 6, 3+3+3 =9, and so on
+                        while j < n {
+                              is_multiple_of_prime[j as usize] = true;
+                              j += i;
+                        }
+                  }
+            }
+
+            count
+      }
+}

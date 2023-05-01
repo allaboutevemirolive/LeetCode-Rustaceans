@@ -1,0 +1,46 @@
+// https://leetcode.com/problems/binary-tree-level-order-traversal-ii/solutions/2838727/rust-dfs-traversal-simple/
+// Definition for a binary tree node.
+// #[derive(Debug, PartialEq, Eq)]
+// pub struct TreeNode {
+//   pub val: i32,
+//   pub left: Option<Rc<RefCell<TreeNode>>>,
+//   pub right: Option<Rc<RefCell<TreeNode>>>,
+// }
+// 
+// impl TreeNode {
+//   #[inline]
+//   pub fn new(val: i32) -> Self {
+//     TreeNode {
+//       val,
+//       left: None,
+//       right: None
+//     }
+//   }
+// }
+use std::rc::Rc;
+use std::cell::RefCell;
+impl Solution {
+    pub fn level_order_bottom(root: Option<Rc<RefCell<TreeNode>>>) -> Vec<Vec<i32>> {
+        fn helper(root: Option<Rc<RefCell<TreeNode>>>, result: &mut Vec<Vec<i32>>, level: usize) {
+            match root {
+                None => {},
+                Some(r) => {
+                    let mut r = r.borrow_mut();
+                    
+                    if result.len() == level {
+                        result.push(vec![r.val]);
+                    } else {
+                        result[level].push(r.val);
+                    }
+                    
+                    helper(r.left.take(), result, level+1);
+                    helper(r.right.take(), result, level+1);
+                }
+            }
+        }
+    
+        let mut result = vec![];
+        helper(root, &mut result, 0);
+        result.into_iter().rev().collect()
+    }
+}

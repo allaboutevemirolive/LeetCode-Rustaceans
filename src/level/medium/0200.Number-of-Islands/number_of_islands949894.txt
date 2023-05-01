@@ -1,0 +1,29 @@
+// https://leetcode.com/problems/number-of-islands/solutions/949894/rust/
+impl Solution {
+    pub fn num_islands(grid: Vec<Vec<char>>) -> i32 {
+        let mut grid_copy = grid.clone();
+        let mut count = 0;
+        for i in 0..grid_copy.len() {
+            for j in 0..grid_copy[0].len() {
+                if grid_copy[i][j] == '1' {
+                    count += 1;
+                }
+                Self::clear_island(&mut grid_copy, i, j);
+            }
+        }
+        
+        count
+    }
+    
+    fn clear_island(grid: &mut Vec<Vec<char>>, i: usize, j: usize) {
+        if (i < 0 || j < 0 || i >= grid.len() || j >= grid[0].len() || grid[i][j] == '0') {
+            return;
+        }
+        
+        grid[i][j] = '0';
+        Self::clear_island(grid, i - 1, j);
+        Self::clear_island(grid, i + 1, j);
+        Self::clear_island(grid, i, j - 1);
+        Self::clear_island(grid, i, j + 1);
+    }
+}

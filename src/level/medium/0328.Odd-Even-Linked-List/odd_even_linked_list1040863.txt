@@ -1,0 +1,32 @@
+// https://leetcode.com/problems/odd-even-linked-list/solutions/1040863/rust-no-dummy-nodes/
+impl Solution {
+    pub fn odd_even_list(head: Option<Box<ListNode>>) -> Option<Box<ListNode>> {
+        //establish Even and Odd lists
+        let mut odd_head = head?;
+        let mut odd_tail = &mut odd_head.next;
+        let mut even_head = match odd_tail.take() {
+            Some(node) => node,
+            None => return Some(odd_head),
+        };
+        let mut even_tail = &mut even_head.next;
+
+        //iterate over remaining nodes and alternate appends to Even and Odd
+        let mut rest = even_tail.take();
+        let mut even = false;
+        while let Some(mut node) = rest {
+            rest = node.next.take();
+            if even {
+                *even_tail = Some(node);
+                even_tail = even_tail.as_mut().map(|node| &mut node.next).unwrap();
+            } else {
+                *odd_tail = Some(node);
+                odd_tail = odd_tail.as_mut().map(|node| &mut node.next).unwrap();
+            }
+            even = !even;
+        }
+        //Place Even at the end of Odd
+        *odd_tail = Some(even_head);
+        
+        Some(odd_head)
+    }
+}

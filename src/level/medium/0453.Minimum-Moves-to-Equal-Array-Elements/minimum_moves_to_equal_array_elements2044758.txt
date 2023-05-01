@@ -1,0 +1,12 @@
+// https://leetcode.com/problems/minimum-moves-to-equal-array-elements/solutions/2044758/rust-solution/
+impl Solution {
+    pub fn min_moves(nums: Vec<i32>) -> i32 {
+        let min = *nums.iter().min().unwrap();
+        let mut result = 0;
+        
+        for v in nums {
+            result += v - min;
+        }
+        result
+    }
+}

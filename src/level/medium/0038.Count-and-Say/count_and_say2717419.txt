@@ -1,0 +1,31 @@
+// https://leetcode.com/problems/count-and-say/solutions/2717419/rust-solution/
+impl Solution {
+    pub fn count_and_say(n: i32) -> String {
+        fn get_pairs(s: String) -> Vec<(char, i32)> {
+            let mut v = Vec::new();
+            let (mut prev_dig, mut num_dig) = (' ', 0);
+            for d in s.chars() {
+                if d != prev_dig && prev_dig != ' ' {
+                    v.push((prev_dig, num_dig));
+                    num_dig = 0;
+                }
+                prev_dig = d;
+                num_dig += 1;
+            }
+            v.push((prev_dig, num_dig));
+            v
+        }
+
+        fn get_num_from_pairs(pairs: Vec<(char, i32)>) -> String {
+            pairs
+                .iter()
+                .fold(String::new(), |s, &(dig, count)| format!("{s}{count}{dig}"))
+        }
+
+        let mut res = "1".to_string();
+        for _ in 1..n {
+            res = get_num_from_pairs(get_pairs(res));
+        }
+        res
+    }
+}

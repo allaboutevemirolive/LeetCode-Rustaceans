@@ -1,0 +1,21 @@
+// https://leetcode.com/problems/longest-substring-without-repeating-characters/solutions/2133992/rust-solution/
+impl Solution {
+    pub fn length_of_longest_substring(s: String) -> i32 {
+        let mut positions = [0; 128];
+        let (mut max_len, mut start) = (0, 1);
+        
+        for (b, i) in s.bytes().zip(1..) {
+            let prev_pos = &mut positions[b as usize];
+            match *prev_pos {
+                0 => *prev_pos = i,
+                _ => {
+                    max_len = max_len.max(i - start);
+                    start = start.max(*prev_pos + 1);
+                    *prev_pos = i;
+                }
+            }
+        }
+        
+        max_len.max(s.len() as i32 - start + 1)
+    }
+}

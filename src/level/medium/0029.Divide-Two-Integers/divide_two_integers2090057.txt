@@ -1,0 +1,49 @@
+// https://leetcode.com/problems/divide-two-integers/solutions/2090057/rust-binary-long-division-no-cheating-no-early-return-with-comments/
+impl Solution {
+    pub fn divide(dividend: i32, divisor: i32) -> i32 {
+        // We will have a negative preliminary result in the end.
+        // The neg flag will be false if this should be flipped to
+        // a positive end result.
+        let neg = (dividend < 0) ^ (divisor < 0);
+        // We are working with negative numbers to be able to represent numbers
+        // with magnitude 2^31.
+        // Make sure that our remainder (initialized with the dividend) is negative.
+        let mut neg_remainder = if dividend < 0 { dividend } else { -dividend };
+        // Likewise, make sure the divisor we work with is negative.
+        let neg_divisor = if divisor < 0 { divisor } else { -divisor };
+        // Shifted divisor (divisor multiplied by a power of two).
+        let mut shifted_divisor = neg_divisor;
+        // The negative, preliminary quotient.
+        let mut neg_quotient = 0;
+        
+        // We will now shift the divisor so that the highest set bit in the
+        // magnitude of the dividend is set in the shifted divisor magnitude.
+        while neg_remainder - shifted_divisor <= shifted_divisor {
+            shifted_divisor <<= 1;
+        }
+
+        // Perform binary long division on the negative dividend and divisor,
+        // keeping the quotient negative to be able to represent the 2^31
+        // magnitude.
+        while shifted_divisor <= neg_divisor {
+            neg_quotient <<= 1;
+            if neg_remainder <= shifted_divisor {
+                neg_quotient -= 1;
+                neg_remainder -= shifted_divisor;
+            }
+            shifted_divisor = if shifted_divisor == -1 { 0 } else { shifted_divisor >> 1 };
+        }
+
+        // A positive result of 2^31 is a special case that we cap
+        // as per the instructions.
+        if neg_quotient == i32::MIN && !neg {
+            i32::MAX
+        } else {
+            if neg {
+                neg_quotient
+            } else {
+                -neg_quotient
+            }
+        }
+    }
+}

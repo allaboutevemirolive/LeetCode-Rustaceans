@@ -1,0 +1,9 @@
+// https://leetcode.com/problems/search-in-rotated-sorted-array-ii/solutions/1964069/rust-0ms-2-2mb/
+impl Solution {
+    pub fn search(nums: Vec<i32>, target: i32) -> bool {
+        match nums.iter().position(|&x| x == target){
+            Some(index) => true,
+            None => false,
+        }
+    }
+}

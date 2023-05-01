@@ -1,0 +1,13 @@
+// https://leetcode.com/problems/jump-game/solutions/1920413/rust-solution/
+impl Solution {
+    pub fn can_jump(nums: Vec<i32>) -> bool {
+        // foward tacing
+        let mut remain = 0;
+        for value in nums {
+            if remain<0 {return  false;}
+            if value > remain {remain=value};
+            remain-=1;
+        }
+        return true;
+    }
+}

@@ -1,0 +1,20 @@
+// https://leetcode.com/problems/sort-colors/solutions/742711/rust-cheapest-best/
+impl Solution {
+    pub fn sort_colors(nums: &mut Vec<i32>) {
+        let (mut low, mut mid, mut high) = (0usize, 0usize, (nums.len() - 1) as i32);
+        while high >= 0 && mid <= high as usize {
+            match nums[mid] {
+                0 => {
+                    nums.swap(low, mid);
+                    low += 1;
+                    mid += 1
+                }
+                1 => mid += 1,
+                _ => {
+                    nums.swap(mid, high as usize);
+                    high -= 1
+                }
+            }
+        }
+    }
+}

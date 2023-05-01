@@ -1,0 +1,55 @@
+// https://leetcode.com/problems/course-schedule/solutions/842263/rust-translated-0ms-100/
+impl Solution {
+    pub fn can_finish(n: i32, prerequisites: Vec<Vec<i32>>) -> bool {
+        use std::collections::VecDeque;
+
+        let mut g = vec![vec![]; n as usize];
+        let mut degree = vec![0; n as usize];
+        let mut queue = VecDeque::<i32>::new();
+        let mut count = 0;
+
+        for e in prerequisites {
+            g[e[1] as usize].push(e[0]);
+            degree[e[0] as usize] += 1;
+        }
+        for i in 0..n as usize {
+            if degree[i] == 0 {
+                queue.push_back(i as i32);
+                count += 1;
+            }
+        }
+
+        while !queue.is_empty() {
+            let course = queue.pop_front().unwrap();
+            for i in 0..g[course as usize].len() {
+                let pointer = g[course as usize][i];
+                degree[pointer as usize] -= 1;
+                if degree[pointer as usize] == 0 {
+                    queue.push_back(pointer);
+                    count += 1;
+                }
+            }
+        }
+        count == n
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_can_finish() {
+        assert_eq!(Solution::can_finish(2, vec![vec![1, 0]]), true);
+    }
+
+    #[test]
+    fn test_can_finish_02() {
+        assert_eq!(Solution::can_finish(2, vec![vec![1, 0], vec![0, 1]]), false);
+    }
+
+    #[test]
+    fn test_can_finish_03() {
+        assert_eq!(Solution::can_finish(3, vec![vec![1, 0], vec![2, 1]]), true);
+    }
+}

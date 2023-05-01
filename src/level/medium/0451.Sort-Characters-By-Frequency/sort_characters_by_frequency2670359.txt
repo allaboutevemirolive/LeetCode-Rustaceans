@@ -1,0 +1,28 @@
+// https://leetcode.com/problems/sort-characters-by-frequency/solutions/2670359/rust/
+impl Solution {
+    pub fn frequency_sort(s: String) -> String {
+        let mut counts = vec![0; 75]; // ascii range from '0' to 'z'
+        
+        /* determine letter counts */
+        s.chars()
+            .for_each(|c| counts[c as usize - '0' as usize] += 1);
+        
+        /* combine indicies with counts and remove zero-count entries */
+        let mut tups: Vec<(usize, u32)> = counts.into_iter()
+            .enumerate()
+            .filter(|(i, n)| *n != 0)
+            .collect(); // Vec<(index, count)>
+        
+        /* sort by count (decreasing) */
+        tups.sort_by(|(_, ca), (_, cb)| cb.partial_cmp(&ca).unwrap());
+        
+        /* combine (reduce) indicies and counts to output string */
+        tups.into_iter()
+            .fold("".to_string(), |mut acc, (ind, cnt)| {
+                for i in 0..cnt {
+                    acc += &char::from(ind as u8 + '0' as u8).to_string();
+                }
+                acc
+             })
+    }
+}

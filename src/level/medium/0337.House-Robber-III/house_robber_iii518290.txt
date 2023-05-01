@@ -1,0 +1,71 @@
+// https://leetcode.com/problems/house-robber-iii/solutions/518290/rust-recursive-with-memo/
+// Definition for a binary tree node.
+// #[derive(Debug, PartialEq, Eq)]
+// pub struct TreeNode {
+//   pub val: i32,
+//   pub left: Option<Rc<RefCell<TreeNode>>>,
+//   pub right: Option<Rc<RefCell<TreeNode>>>,
+// }
+// 
+// impl TreeNode {
+//   #[inline]
+//   pub fn new(val: i32) -> Self {
+//     TreeNode {
+//       val,
+//       left: None,
+//       right: None
+//     }
+//   }
+// }
+use std::rc::Rc;
+use std::cell::RefCell;
+use std::cmp::max;
+use std::collections::HashMap;
+
+macro_rules! get {
+    ($a1:ident, $a2:ident, $node:ident) => (
+        if let Some(n) = get!($a1, $node) {
+            get!($a2, n)
+        } else {
+            None
+        }
+    );
+    
+    ($a1:ident, $node:ident) => (
+        $node.borrow().$a1.clone()
+    );
+}
+
+impl Solution {
+    pub fn rob(root: Option<Rc<RefCell<TreeNode>>>) -> i32 {
+        Self::helper(root, &mut HashMap::new())
+    }
+    
+    fn helper (root: Option<Rc<RefCell<TreeNode>>>, memo: &mut HashMap<usize, i32>) -> i32 {
+        if let None = root {
+            return 0 as i32;
+        } 
+        
+        let node = root.unwrap();
+        let key = Rc::into_raw(Rc::clone(&node)) as usize;
+            
+        if let Some(res) = memo.get(&key) {
+            return *res;
+        }
+
+        let r1 = node.borrow().val + 
+            Self::helper(get!(left, left, node), memo) + 
+            Self::helper(get!(left, right, node), memo) + 
+            Self::helper(get!(right, left, node), memo) + 
+            Self::helper(get!(right, right, node), memo);
+
+        let r2 = 
+            Self::helper(get!(left, node), memo) + 
+            Self::helper(get!(right, node), memo);
+
+        let res = max(r1, r2);
+
+        memo.insert(key, res);
+        res
+    }   
+}

@@ -1,0 +1,54 @@
+// https://leetcode.com/problems/spiral-matrix/solutions/3300144/rust-simulation/
+impl Solution {
+    pub fn spiral_order(matrix: Vec<Vec<i32>>) -> Vec<i32> {
+        const DIRS: [(i32, i32); 4] = [(0, 1), (1, 0), (0, -1), (-1, 0)];
+        fn simulate_step(
+            matrix: &[Vec<i32>],
+            coord: &mut (i32, i32),
+            dir_idx: &mut usize,
+            row: &mut (i32, i32),
+            col: &mut (i32, i32),
+            path: &mut Vec<i32>,
+        ) {
+            if coord.1 == col.1 && (*dir_idx % 4) == 0 {
+                *col = (col.0, col.1 - 1);
+                *dir_idx += 1;
+            }
+            if coord.1 == col.0 && (*dir_idx % 4) == 2 {
+                *col = (col.0 + 1, col.1);
+                *dir_idx += 1;
+            }
+            if coord.0 == row.1 && (*dir_idx % 4) == 1 {
+                *row = (row.0 + 1, row.1);
+                *dir_idx += 1;
+            }
+            if coord.0 == row.0 && (*dir_idx % 4) == 3 {
+                *row = (row.0, row.1 - 1);
+                *dir_idx += 1;
+            }
+
+            path.push(matrix[coord.0 as usize][coord.1 as usize]);
+
+            let dir = DIRS[*dir_idx % 4];
+            *coord = (coord.0 + dir.0, coord.1 + dir.1);
+        }
+
+        let mut path = vec![];
+        let mut row = (0_i32, matrix.len() as i32 - 1);
+        let mut col = (0_i32, matrix[0].len() as i32 - 1);
+        let mut coord = (0, 0);
+        let mut dir_idx = 0;
+
+        while path.len() != matrix.len() * matrix[0].len() {
+            simulate_step(
+                &matrix,
+                &mut coord,
+                &mut dir_idx,
+                &mut row,
+                &mut col,
+                &mut path,
+            );
+        }
+        path     
+    }
+}

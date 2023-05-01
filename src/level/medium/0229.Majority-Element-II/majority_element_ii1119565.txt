@@ -1,0 +1,16 @@
+// https://leetcode.com/problems/majority-element-ii/solutions/1119565/rust-cheapest-best/
+use std::collections::HashMap;
+
+impl Solution {
+    pub fn majority_element(mut nums: Vec<i32>) -> Vec<i32> {
+        let target = nums.len() / 3;
+        let mut map = HashMap::new();
+        while let Some(n) = nums.pop() {
+            (*map.entry(n).or_insert(0)) += 1;
+        }
+        map.into_iter()
+            .filter(|(_, v)| v > &target)
+            .map(|(k, _)| k)
+            .collect()
+    }
+}

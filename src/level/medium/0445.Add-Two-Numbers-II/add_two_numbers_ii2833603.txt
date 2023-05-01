@@ -1,0 +1,84 @@
+// https://leetcode.com/problems/add-two-numbers-ii/solutions/2833603/rust-solution/
+// Definition for singly-linked list.
+// #[derive(PartialEq, Eq, Clone, Debug)]
+// pub struct ListNode {
+//   pub val: i32,
+//   pub next: Option<Box<ListNode>>
+// }
+// 
+// impl ListNode {
+//   #[inline]
+//   fn new(val: i32) -> Self {
+//     ListNode {
+//       next: None,
+//       val
+//     }
+//   }
+// }
+
+impl ListNode {
+    pub fn push(&mut self, val: i32) {
+        let new_node = Box::new(ListNode {
+            val: val,
+            next: self.next.take(),
+        });
+
+        self.next = Some(new_node);
+    }
+}
+
+impl Solution {
+    pub fn add_two_numbers(l1: Option<Box<ListNode>>, l2: Option<Box<ListNode>>) -> Option<Box<ListNode>> {
+        let mut l1 = l1;
+        let mut l2 = l2;
+
+        let mut l1_digit = vec![];
+        let mut l2_digit = vec![];
+		
+        while let Some(x) = l1 {
+            l1_digit.push(x.val);
+            l1 = x.next;
+        }
+        while let Some(y) = l2 {
+            l2_digit.push(y.val);
+            l2 = y.next;
+        }
+
+        let (mut max, mut min) = (vec![], vec![]);
+
+        if l1_digit.len() >= l2_digit.len() {
+            max = l1_digit;
+            min = l2_digit;
+        } else {
+            max = l2_digit;
+            min = l1_digit;
+        }
+
+        let mut min = min.iter().rev();
+        let mut d = 0;
+        let mut res = ListNode::new(0);
+
+        while let Some(n) = min.next().take() {
+            let tmp = max.pop().unwrap(); // unwrap here is safe
+            res.push((d + n + tmp) % 10);
+            d = (d + n + tmp) / 10;
+        }
+
+        let mut max = max.iter().rev();
+
+        while let Some(n) = max.next().take() {
+            res.push((d + n) % 10);
+            d = (d + n) / 10;
+        }
+
+        if d != 0 {
+            if max.len() != 0 {
+                res.push(1);
+            } else {
+                res.push(1);
+            }
+        }
+
+        res.next
+    }
+}

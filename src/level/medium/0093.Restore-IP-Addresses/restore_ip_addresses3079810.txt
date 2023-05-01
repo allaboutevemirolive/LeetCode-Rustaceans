@@ -1,0 +1,34 @@
+// https://leetcode.com/problems/restore-ip-addresses/solutions/3079810/rust-pyramid-of-doom-0ms/
+impl Solution {
+    pub fn restore_ip_addresses(s: String) -> Vec<String> {
+        let     n    = s.len();
+        let mut answ = vec![];
+
+        if (4..=12).contains(&n) {
+            
+            for i in 1..=3.min(n - 3) {
+
+                for j in i + 1..=(i + 3).min(n - 2) {
+
+                    for k in j + 1..=(j + 3).min(n - 1) {
+
+                        if n - k <= 3 {
+                            let ip = [&s[ ..i], &s[i..j], 
+                                      &s[j..k], &s[k.. ]];
+
+                            if ip.iter().all(Self::is_valid) {
+                                answ.push(ip.join("."));
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        answ
+    }
+
+    fn is_valid(s: &&str) -> bool {
+        !(s.len() > 1 && s.starts_with('0')) &&
+        s.parse::<i32>().map_or(false, |n| n >= 0 && n <= 255)
+    }
+}

@@ -1,0 +1,41 @@
+// https://leetcode.com/problems/divide-two-integers/solutions/346711/rust-solution-with-comments/
+impl Solution {
+    /// Consider x = |dividend|, y = |divisor|
+    /// we can reduce the problem to the following.
+    /// x = y * (2^0 + 2^1 + ...)
+    pub fn divide(dividend: i32, divisor: i32) -> i32 {
+        if dividend == 0 {
+            return 0;
+        }
+        let y = (divisor as i64).abs();
+
+        // rem = x - (y * 2^0) - (y * 2^1) ...
+        let mut rem = (dividend as i64).abs();
+
+        // res = (y * 2^0) + (y * 2^1) ...
+        let mut res = 0_i64;
+
+        while rem >= y {
+            let mut i = 0;
+			// Find the greatest power of 2 that isnt more than `rem`ainder
+            while rem >= (y << (i+1)) { // rem >= y * 2_i64.pow(i+1)
+                i += 1;
+            }
+            rem -= y << i; // rem -= y * 2_i64.pow(i);
+
+            
+            res += 1 << i; // res += 2_i64.pow(i)
+        } 
+
+        if (dividend < 0) ^ (divisor < 0) {
+            res = -res;
+        }
+
+        if res > std::i32::MAX as i64 {
+            std::i32::MAX
+        } else {
+            res as i32
+        }
+    }
+}
+

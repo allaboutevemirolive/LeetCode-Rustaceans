@@ -1,0 +1,19 @@
+// https://leetcode.com/problems/h-index-ii/solutions/750307/rust-cheapest-best/
+impl Solution {
+    pub fn h_index(mut citations: Vec<i32>) -> i32 {
+        Self::helper(&citations, 0, citations.len())
+    }
+
+    pub fn helper(citations: &Vec<i32>, l: usize, r: usize) -> i32 {
+        if l >= r {
+            return l as i32;
+        }
+
+        let m = (l + r) / 2;
+        if citations[citations.len() - m - 1] > m as i32 {
+            Self::helper(citations, m + 1, r)
+        } else {
+            Self::helper(citations, l, m)
+        }
+    }
+}

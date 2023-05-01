@@ -1,0 +1,15 @@
+// https://leetcode.com/problems/maximum-xor-of-two-numbers-in-an-array/solutions/1277041/rust-brute-force-o-n-2-still-passes-tests/
+impl Solution {
+    pub fn find_maximum_xor(nums: Vec<i32>) -> i32 {
+        let mut nums = nums.clone();
+        nums.sort();
+        nums.dedup();
+        let mut mx = 0;
+        for (i, x) in nums.iter().enumerate() {
+            for y in &nums[0..i] {
+                mx = mx.max(x ^ y);
+            }
+        }
+        mx
+    }
+}

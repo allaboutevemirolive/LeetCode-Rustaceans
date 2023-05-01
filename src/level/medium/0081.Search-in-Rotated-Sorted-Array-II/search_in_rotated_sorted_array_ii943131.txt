@@ -1,0 +1,6 @@
+// https://leetcode.com/problems/search-in-rotated-sorted-array-ii/solutions/943131/search-in-rotated-sorted-array-ii-rust-time-worst-o-n-best-o-log-n/
+impl Solution {
+    pub fn search(nums: Vec<i32>, target: i32) -> bool {
+        nums.contains(&target)
+    }
+}

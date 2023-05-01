@@ -1,0 +1,28 @@
+// https://leetcode.com/problems/repeated-dna-sequences/solutions/1268000/easy-to-understand-rust-solution-o-n-runtime-o-n-memory/
+use std::collections::HashSet;
+
+impl Solution {
+    pub fn find_repeated_dna_sequences(s: String) -> Vec<String> {
+        let mut repeats: Vec<String> = Vec::new();
+        let mut sequences: HashSet<String> = HashSet::new();
+        let mut ans: HashSet<String> = HashSet::new();
+        let s_size = s.chars().count();
+        if s_size < 11 {
+            return repeats;
+        }
+        
+        for i in 0..s_size-9 {
+            let sequence: String = s[i..i+10].to_string();
+            if !sequences.contains(&sequence) {
+                sequences.insert(sequence);
+            } else if !ans.contains(&sequence) {
+                ans.insert(sequence);
+            }
+        }
+        
+        for sequence in &ans {
+            repeats.push(sequence.to_string());
+        }
+        repeats
+    }
+}

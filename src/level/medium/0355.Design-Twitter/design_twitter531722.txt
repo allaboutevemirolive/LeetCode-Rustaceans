@@ -1,0 +1,142 @@
+// https://leetcode.com/problems/design-twitter/solutions/531722/rust-solution/
+use std::collections::{
+    HashMap,
+    HashSet,
+    BTreeSet
+};
+
+use std::cmp::min;
+
+#[derive(Debug)]
+struct Twitter {
+    time: usize,
+    followers: HashMap<i32, HashSet<i32>>, // followee_id, follower_ids list
+    feeds: HashMap<i32, BTreeSet<(usize, i32, i32)>>,  // follower_id, (post_time, user_id, tweet_id) list
+    tweets: HashMap<i32, BTreeSet<(usize, i32)>>, // user_id, (post_time, tweet_id) list
+}
+
+
+/** 
+ * `&self` means the method takes an immutable reference.
+ * If you need a mutable reference, change it to `&mut self` instead.
+ */
+impl Twitter {
+
+    /** Initialize your data structure here. */
+    fn new() -> Self {
+        Self {
+            time: 0,
+            followers: HashMap::new(),
+            feeds: HashMap::new(),
+            tweets: HashMap::new(),
+        }
+    }
+    
+    /** Compose a new tweet. */
+    fn post_tweet(&mut self, user_id: i32, tweet_id: i32) {
+        self.time += 1;
+        let tweet = (self.time, user_id, tweet_id);
+        
+        // insert into posters tweets
+        let mut tweets = self.find_tweets_mut(user_id);
+        tweets.insert((tweet.0, tweet.2));
+        
+        // insert into posters feeds
+        let mut feeds = self.find_feeds_mut(user_id);
+        feeds.insert(tweet.clone()); 
+        
+        // insert into followers feeds
+        let followers = self.find_followers_mut(user_id).iter().map(|x| *x).collect::<Vec<i32>>();    
+        for follower_id in followers {
+            self.find_feeds_mut(follower_id).insert(tweet.clone());
+        }
+    }
+    
+    /** Retrieve the 10 most recent tweet ids in the user's news feed. Each item in the news feed must be posted by users who the user followed or by the user herself. Tweets must be ordered from most recent to least recent. */
+    fn get_news_feed(&mut self, user_id: i32) -> Vec<i32> {
+        let mut res = vec![];
+        
+        if let Some(feeds) = self.find_feeds(user_id) {   
+            for tweet in feeds.iter().rev() {
+                let post_user_id = tweet.1;
+                
+                if post_user_id == user_id {
+                    res.push(tweet.2);
+                } else if let Some(followers) = self.find_followers(post_user_id) {
+                    if followers.contains(&user_id) {
+                        res.push(tweet.2);
+                    }
+                }
+                
+                if res.len() == 10 { break; }
+            }
+        }
+        
+        res
+    }
+    
+    /** Follower follows a followee. If the operation is invalid, it should be a no-op. */
+    fn follow(&mut self, follower_id: i32, followee_id: i32) {
+        // save follow
+        let mut followers = self.find_followers_mut(followee_id);
+        followers.insert(follower_id);
+        
+        // insert followees tweets into follower's feeds
+        // most recently 10
+        let tweets = self.find_tweets_mut(followee_id)
+            .iter().rev().take(10).map(|x| *x)
+            .collect::<Vec<(usize, i32)>>();
+        
+        let mut feeds = self.find_feeds_mut(follower_id);
+        
+        for tweet in tweets {
+            feeds.insert((tweet.0, followee_id, tweet.1));
+        }
+    }
+    
+    /** Follower unfollows a followee. If the operation is invalid, it should be a no-op. */
+    fn unfollow(&mut self, follower_id: i32, followee_id: i32) {
+        let mut followers = self.find_followers_mut(followee_id);
+        followers.remove(&follower_id);
+    }
+    
+    // private
+    fn find_followers(&self, followee_id: i32) -> Option<&HashSet<i32>> {
+        self.followers.get(&followee_id)
+    }
+    
+    fn find_followers_mut(&mut self, followee_id: i32) -> &mut HashSet<i32> {
+        self.followers
+            .entry(followee_id)
+            .or_insert(HashSet::new())
+    }
+    
+    fn find_tweets(&self, user_id: i32) -> Option<&BTreeSet<(usize, i32)>> {
+        self.tweets.get(&user_id)
+    }
+    
+    fn find_tweets_mut(&mut self, user_id: i32) -> &mut BTreeSet<(usize, i32)> {
+        self.tweets
+            .entry(user_id)
+            .or_insert(BTreeSet::new())
+    }
+    
+    fn find_feeds(&self, user_id: i32) -> Option<&BTreeSet<(usize, i32, i32)>> {
+        self.feeds.get(&user_id)
+    }
+    
+    fn find_feeds_mut(&mut self, user_id: i32) -> &mut BTreeSet<(usize, i32, i32)> {
+        self.feeds
+            .entry(user_id)
+            .or_insert(BTreeSet::new())
+    }
+}
+
+/**
+ * Your Twitter object will be instantiated and called as such:
+ * let obj = Twitter::new();
+ * obj.post_tweet(userId, tweetId);
+ * let ret_2: Vec<i32> = obj.get_news_feed(userId);
+ * obj.follow(followerId, followeeId);
+ * obj.unfollow(followerId, followeeId);
+ */

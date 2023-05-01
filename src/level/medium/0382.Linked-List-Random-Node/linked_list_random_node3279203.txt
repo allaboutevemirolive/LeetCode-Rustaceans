@@ -1,0 +1,23 @@
+// https://leetcode.com/problems/linked-list-random-node/solutions/3279203/rust-simple-vec-solution/
+
+use rand::seq::SliceRandom;
+
+struct Solution {
+    list: Vec<i32>,
+}
+
+impl Solution {
+    fn new(head: Option<Box<ListNode>>) -> Self {
+        let mut res = vec![];
+        let mut link = head.as_ref();
+        while let Some(node) = link {
+            res.push(node.val);
+            link = node.next.as_ref();
+        };
+        Solution{list: res}
+    }
+
+    fn get_random(&self) -> i32 {
+        *self.list.choose( &mut rand::thread_rng()).unwrap()
+    }
+}

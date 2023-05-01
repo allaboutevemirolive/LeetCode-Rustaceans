@@ -1,0 +1,36 @@
+// https://leetcode.com/problems/ones-and-zeroes/solutions/2075639/rust-dp/
+fn convert(s: String) -> (i32, i32) {
+    let mut zeroes = 0;
+    let mut ones = 0;
+    for ch in s.chars() {
+        match ch {
+            '0' => zeroes += 1,
+            '1' => ones += 1,
+            _ => panic!("incorrect input"),
+        }
+    }
+    (zeroes, ones)
+}
+
+fn recur(input: &Vec<(i32, i32)>, memo: &mut Vec<Vec<Vec<i32>>>, i: usize, m: i32, n: i32) -> i32 {
+    if i == input.len() {
+        return 0;
+    }
+    if memo[i][m as usize][n as usize] > -1 {
+        return memo[i][m as usize][n as usize];
+    }
+    let mut res = recur(input, memo, i+1, m, n);
+    if m >= input[i].0 && n >= input[i].1 {
+        res = res.max(1 + recur(input, memo, i+1, m-input[i].0, n-input[i].1))
+    }
+    memo[i][m as usize][n as usize] = res;
+    res
+}
+
+impl Solution {
+    pub fn find_max_form(strs: Vec<String>, m: i32, n: i32) -> i32 {
+        let input: Vec<(i32,i32)> = strs.into_iter().map(convert).collect();
+        let mut memo = vec![vec![vec![-1; n as usize + 1]; m as usize + 1]; input.len()];
+        recur(&input, &mut memo, 0, m, n) 
+    }
+}

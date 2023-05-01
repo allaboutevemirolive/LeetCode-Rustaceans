@@ -1,0 +1,29 @@
+// https://leetcode.com/problems/partition-equal-subset-sum/solutions/2094424/rust-bottom-up-dp-with-explanation/
+impl Solution {
+    pub fn can_partition(nums: Vec<i32>) -> bool {
+        let total: i32 = nums.iter().sum();
+		// if the total sum is odd then there is no integer solution
+        if total % 2 == 1 {
+            return false;
+        }
+
+        let half = total / 2;
+
+        let mut dp = vec![vec![0; half as usize + 1]; nums.len()];
+
+        for i in 0..nums.len() {
+            for s in 1..(half as usize + 1) {
+                if i == 0 {
+                    dp[i][s] =  if nums[i] <= s as i32 {nums[i]} else {0};
+                    continue;
+                }
+                if nums[i] <= s as i32 {
+                    dp[i][s] = dp[i-1][s].max(nums[i] + dp[i-1][s-nums[i] as usize]);
+                } else {
+                    dp[i][s] = dp[i-1][s];
+                }
+            }
+        }
+        dp[nums.len()-1][half as usize] == half
+    }
+}

@@ -1,0 +1,17 @@
+// https://leetcode.com/problems/verify-preorder-serialization-of-a-binary-tree/solutions/1428287/rust-counting-solution-o-1-space-o-n-time/
+impl Solution {
+    pub fn is_valid_serialization(preorder: String) -> bool {
+        let mut iter = preorder.split(',');
+        let mut count = 1;
+        for slice in iter {
+            count -= 1;
+            if count < 0 {
+                return false
+            }
+            if slice != "#" {
+                count += 2;
+            }
+        }
+        return count == 0;
+    }
+}

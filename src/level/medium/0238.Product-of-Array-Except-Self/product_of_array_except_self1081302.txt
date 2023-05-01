@@ -1,0 +1,23 @@
+// https://leetcode.com/problems/product-of-array-except-self/solutions/1081302/rust-o-n-solution/
+use std::collections::VecDeque;
+
+impl Solution {
+    pub fn product_except_self(nums: Vec<i32>) -> Vec<i32> {
+        let mut right = VecDeque::new();
+        let mut cur = 1;
+        
+        for &n in nums.iter().rev() {
+            right.push_front(cur);
+            cur = cur * n;
+        }
+        
+        let mut ans = vec![];
+        cur = 1;
+        for (index, n) in nums.iter().enumerate() {
+            ans.push(cur * right[index]);
+            cur *= n;
+        }
+        
+        ans
+    }
+}

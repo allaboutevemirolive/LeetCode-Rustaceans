@@ -1,0 +1,19 @@
+// https://leetcode.com/problems/subsets/solutions/739271/rust-0ms-backtrack/
+impl Solution {
+    pub fn help(nums: &Vec<i32>, res: &mut Vec<Vec<i32>>, cur: &mut Vec<i32>, idx: i32)
+    {
+        for i in idx..nums.len() as i32
+        {
+            cur.push(nums[i as usize].clone());
+            Self::help(nums, res, cur, i+1);
+            cur.pop();
+        }
+        res.push(cur.clone());
+    }
+    
+    pub fn subsets(nums: Vec<i32>) -> Vec<Vec<i32>> {
+        let mut res = Vec::new();
+        Self::help(&nums, &mut res, &mut Vec::new(), 0);
+        return res;
+    }
+}

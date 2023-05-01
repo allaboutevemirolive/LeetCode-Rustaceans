@@ -1,0 +1,18 @@
+// https://leetcode.com/problems/longest-consecutive-sequence/solutions/2007487/rust-fastest-hashset/
+pub fn longest_consecutive(nums: Vec<i32>) -> i32 {
+
+    let hset: HashSet<i32> = HashSet::from_iter(nums.iter().cloned());
+    let mut best = 0;
+    for x in hset.iter() {
+        if !hset.contains(&(*x-1)) {
+            
+            let mut y = x + 1;
+            
+            while hset.contains(&y) {
+                y += 1;
+            }
+            best =  std::cmp::max(best, y-x);
+        }   
+    }
+    best
+}

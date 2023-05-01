@@ -1,0 +1,67 @@
+// https://leetcode.com/problems/find-first-and-last-position-of-element-in-sorted-array/solutions/1997134/rust-two-bs/
+impl Solution {
+    pub fn search_range(nums: Vec<i32>, target: i32) -> Vec<i32> {
+
+        if nums.len() == 0 {
+            return vec![-1,-1];
+        }
+
+        if nums.len() == 1 {
+            if nums[0] == target {
+                return vec![0,0];
+            }
+            else {
+                return vec![-1,-1];
+            }
+        }
+
+        vec![Solution::search_lower_bound(&nums, target), Solution::search_upper_bound(&nums, target)]      
+    }
+
+    fn search_lower_bound(nums: &Vec<i32>, target: i32) -> i32 {
+        let (mut left, mut right) = (0, nums.len()-1);
+
+        while left < right {
+            let mid = (right-left)/2 + left;
+
+            if target <= nums[mid] {
+                right = mid;
+            }
+            else {
+                left = mid+1;
+            }
+        }
+        if nums[left] == target {
+            left as i32
+        }
+        else {
+            -1
+        }
+    }
+
+    fn search_upper_bound(nums: &Vec<i32>, target: i32) -> i32 {
+        let (mut left, mut right) = (0, nums.len()-1);
+
+        while left+1 < right {
+            let mid = (right-left)/2 + left;
+
+            if target >= nums[mid] {
+                left = mid;
+            }
+            else {
+                right = mid;
+            }
+        }
+		
+		// Checking right first is necessary for case when nums last element is target
+        if nums[right] == target { 
+            right as i32
+        }
+        else if nums[left] == target {
+            left as i32
+        }
+        else {
+            -1
+        }
+    }
+}

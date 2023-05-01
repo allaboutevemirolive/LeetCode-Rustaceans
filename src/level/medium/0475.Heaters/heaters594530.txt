@@ -1,0 +1,24 @@
+// https://leetcode.com/problems/heaters/solutions/594530/rust-iterator-solution-fast-4ms/
+pub fn find_radius(houses: Vec<i32>, heaters: Vec<i32>) -> i32 {
+
+	let mut heaters = heaters;
+	heaters.sort();
+
+	houses.iter()
+			.map(|h| (h, heaters.binary_search(&h))) // which index would current house insert into heaters at
+			.map(|(h, min_dist)| { 
+				match min_dist {
+					Ok(_) => 0, // if binary_search() returned Ok(_) then current house matched exactly a heater and min distance is zero
+					Err(i) => { // if binary_search() returned Err, current house was not matched exactly
+						match i {
+							0 => heaters[i] - h, // if current house is less than first heater, first heater - house is the min distance
+							x if x == heaters.len() => h - heaters[i - 1], // if current house is more than last heater, min distance is current house - last heater
+							_ => (heaters[i] - h).min((h - heaters[i - 1])) // take the minimal difference between the current house and the heater to either side of it
+						}
+					}
+				}
+			}
+			)
+			.max() // take the maximum of those minimal distances to ensure every house is covered
+			.unwrap_or(std::i32::MAX)
+}

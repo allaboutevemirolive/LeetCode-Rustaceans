@@ -1,0 +1,16 @@
+// https://leetcode.com/problems/rotate-array/solutions/2178553/rust-o-n-space/
+impl Solution {
+    pub fn rotate(nums: &mut Vec<i32>, mut k: i32) {
+        if k > nums.len() as i32 {
+            k = k%nums.len() as i32;
+        }
+        let remainings = (nums.len() as i32 - k..nums.len() as i32)
+            .map(|x| nums[x as usize])
+            .collect::<Vec<i32>>();
+        (k..nums.len() as i32)
+            .rev()
+            .for_each(|x| nums[x as usize] = nums[x as usize - k as usize]);
+        (0..remainings.len()).for_each(|x| nums[x] = remainings[x]);
+    }
+}
+

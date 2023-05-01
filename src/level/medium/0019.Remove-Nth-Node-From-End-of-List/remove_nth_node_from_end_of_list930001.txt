@@ -1,0 +1,24 @@
+// https://leetcode.com/problems/remove-nth-node-from-end-of-list/solutions/930001/rust-cheapest-best/
+pub fn remove_nth_from_end(head: Option<Box<ListNode>>, n: i32) -> Option<Box<ListNode>> {
+        unsafe {
+            let mut head = head.unwrap();
+            let mut fast: *mut Box<ListNode> = &mut head;
+            let mut slow: *mut Box<ListNode> = &mut head;
+
+            for _ in 0..n {
+                if let Some(node) = (*fast).as_mut().next.as_mut() {
+                    fast = node;
+                } else {
+                    return head.next;
+                }
+            }
+            while let Some(node) = &mut (*fast).as_mut().next {
+                fast = node as *mut Box<ListNode>;
+                slow = (*slow).as_mut().next.as_mut().unwrap();
+            }
+
+            (*slow).as_mut().next = (*slow).as_mut().next.as_mut().unwrap().next.take();
+
+            Some(head)
+        }
+    }

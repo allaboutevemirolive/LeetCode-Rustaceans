@@ -1,0 +1,42 @@
+// https://leetcode.com/problems/combination-sum-iii/solutions/1117631/rust-cheapest-best/
+use std::collections::HashMap;
+
+fn all_combos(rng: &[i32]) -> Vec<Vec<i32>> {
+    match rng.len() {
+        1 => vec![rng.iter().cloned().collect()],
+        _ => {
+            let first = *rng.iter().next().unwrap();
+            let mut result = vec![vec![first]];
+            for v in all_combos(&rng[1..]) {
+                let mut new = vec![first];
+                new.extend(v.clone());
+                result.push(v);
+                result.push(new);
+            }
+            result
+        }
+    }
+}
+
+lazy_static! {
+    static ref MAP: HashMap<i32, HashMap<i32, Vec<Vec<i32>>>> = {
+        all_combos(&(1..=9i32).collect::<Vec<i32>>())
+            .into_iter()
+            .fold(HashMap::new(), |mut acc, v| {
+                acc.entry(v.iter().sum::<i32>())
+                    .or_insert(HashMap::new())
+                    .entry(v.len() as i32)
+                    .or_insert(vec![])
+                    .push(v);
+                acc
+            })
+    };
+}
+
+impl Solution {
+    pub fn combination_sum3(k: i32, n: i32) -> Vec<Vec<i32>> {
+        MAP.get(&n)
+            .and_then(|m| m.get(&k).map(|v| v.clone()))
+            .unwrap_or(vec![])
+    }
+}

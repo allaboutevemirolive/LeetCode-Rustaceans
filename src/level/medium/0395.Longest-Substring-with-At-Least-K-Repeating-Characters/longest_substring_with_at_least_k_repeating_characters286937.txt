@@ -1,0 +1,66 @@
+// https://leetcode.com/problems/longest-substring-with-at-least-k-repeating-characters/solutions/286937/rust-solution/
+impl Solution {
+    pub fn get_sep_chars(s: &String, k: &i32) -> HashSet<char> {
+        let mut hash = HashMap::new();
+        let mut sep_chars = HashSet::new();
+
+        for c in s.chars() {
+            match hash.insert(c, 1) {
+                Some(x) => { hash.insert(c, x + 1); }
+                None => (),
+            };
+        }
+        for (&key, &v) in hash.iter() {
+            if &v < k {
+                sep_chars.insert(key);
+            }
+        }
+        sep_chars
+    }
+
+    pub fn split_string(s: &String, sep_chars: &HashSet<char>) -> Vec<String> {
+        let mut result = Vec::new();
+
+        let mut cur = Vec::new();
+        for c in s.chars() {
+            if sep_chars.contains(&c) {
+                if cur.len() > 0 {
+                    let sub = String::from_iter(cur);
+                    result.push(sub);
+                    cur = Vec::new();
+                }
+            } else {
+                cur.push(c);
+            }
+        }
+        let sub = String::from_iter(&cur);
+        result.push(sub);
+
+        result
+    }
+
+    pub fn longest_substring(s: String, k: i32) -> i32 {
+        let mut strings: Vec<String> = Vec::new();
+        strings.push(s);
+
+        let mut max = 0;
+        while !strings.is_empty() {
+            let mut new_strings: Vec<String> = vec![];
+            for item in strings.iter() {
+                if item.len() <= max {
+                    continue;
+                }
+
+                let sep_chars = Solution::get_sep_chars(&item, &k);
+                if sep_chars.is_empty() {
+                    max = item.len();
+                } else {
+                    let sub_strings = Solution::split_string(&item, &sep_chars);
+                    new_strings.extend(sub_strings);
+                }
+            }
+            strings = new_strings;
+        }
+        max as i32
+    }
+}

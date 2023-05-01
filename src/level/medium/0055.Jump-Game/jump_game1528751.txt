@@ -1,0 +1,28 @@
+// https://leetcode.com/problems/jump-game/solutions/1528751/rust-solution-1ms/
+use std::cmp;  
+impl Solution {
+    pub fn can_jump(nums: Vec<i32>) -> bool {
+        let vecInit = |x : &mut Vec<i32>, size : &usize|  { 
+            for i in 0..*size { 
+                x.push(0);
+            }
+        };
+        let n = nums.len() ; 
+        if n == 1 { 
+            return true;
+        }
+        let mut maxIndex = 0 ;
+        let mut dp = Vec::new();
+        vecInit(&mut dp, &n);
+        for i in 0..n { 
+            dp[i] = nums[i]  + i as i32 ;
+            maxIndex = cmp::max(maxIndex, dp[i]);
+            if maxIndex != nums.len() as i32  - 1  && i as i32  >= maxIndex  { 
+                return false ;
+            }
+            
+        }
+        maxIndex >= nums.len() as i32  - 1
+        
+    }
+}

@@ -1,0 +1,25 @@
+// https://leetcode.com/problems/repeated-dna-sequences/solutions/3297798/rust-hashmap-solution-explained/
+use std::collections::HashMap;
+impl Solution {
+    pub fn find_repeated_dna_sequences(s: String) -> Vec<String> {
+//map stores occurances of every 10 characters substring in the string
+        let mut map:HashMap<&str,i32> = HashMap::new();
+        let mut i =0;
+        while i+9 < s.len(){
+//we get a slice of length=10
+            let z = &s[i..=i+9];
+//increment i so we get the next slice
+            i+=1;
+//put slice in map and increment it's counter
+            *map.entry(z).or_insert(0)+=1;
+        }
+        let mut res: Vec<String> = vec![];
+        for (k,v) in map {
+//if slice occcured more than once we push in res
+            if v>1 {
+                res.push(String::from(k));
+            }
+        }
+        return res;
+    }
+}

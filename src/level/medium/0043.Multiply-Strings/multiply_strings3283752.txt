@@ -1,0 +1,58 @@
+// https://leetcode.com/problems/multiply-strings/solutions/3283752/rust-0ms-with-naive-multiplication-algorithm/
+fn multiply(num1: String, num2: String) -> String {
+    fn add(lhs: &str, rhs: &str) -> String {
+        let (lhs, rhs) = align_str(lhs, rhs);
+        let mut res: Vec<u8> = Vec::with_capacity(lhs.len() + 1);
+        let mut carry: u8 = 0;
+        // notice that 48 == ('0' as u8)
+        for (l, r) in lhs.bytes().zip(rhs.bytes()).rev() {
+            let val = l - 48 + r - 48 + carry;
+            if val >= 10 { // carry over
+                res.push(val - 10 + 48);
+                carry = 1;
+            } else {
+                res.push(val + 48);
+                carry = 0
+            }
+        }
+        res.push(carry + 48);
+        res.reverse();
+        unsafe { String::from_utf8_unchecked(res) }
+    }
+    fn plain_mul(lhs: &str, rhs: &str) -> String {
+        // trim '0's to avoid these prefix '0's misadvising the number of digits
+        let (lhs, rhs) = (lhs.trim_start_matches("0"), rhs.trim_start_matches("0")); 
+        // if small enough for multiplying in u128
+        if lhs.len() + rhs.len() < 38 {
+            let lhs = lhs.parse::<u128>().unwrap_or(0);
+            let rhs = rhs.parse::<u128>().unwrap_or(0);
+            return (lhs * rhs).to_string();
+        }
+        let (lhs, rhs) = align_str(lhs, rhs);
+        let mid = lhs.len() / 2;
+        let (xh, xl) = lhs.split_at(mid);
+        let (yh, yl) = rhs.split_at(mid);
+        let mid = lhs.len() - mid; // IMPORTANT
+        let xh_yh = plain_mul(xh, yh) + &"0".repeat(mid * 2); // 10 ^ (2*mid)
+        let xh_yl = plain_mul(xh, yl) + &"0".repeat(mid); // 10 ^ mid
+        let xl_yh = plain_mul(xl, yh) + &"0".repeat(mid); // 10 ^ mid
+        let xl_yl = plain_mul(xl, yl);
+        return add(&add(&xh_yh, &xh_yl), &add(&xl_yh, &xl_yl));
+    }
+    #[inline]
+    fn align_str(left: &str, right: &str) -> (String, String) {
+        let max_len = left.len().max(right.len());
+        (
+            "0".repeat(max_len - left.len()).to_string() + left,
+            "0".repeat(max_len - right.len()).to_string() + right,
+        )
+    }
+
+    let res = plain_mul(num1.as_str(), num2.as_str())
+        .trim_start_matches("0")
+        .to_string();
+    if res.is_empty() {
+        return String::from("0");
+    }
+    return res;
+}

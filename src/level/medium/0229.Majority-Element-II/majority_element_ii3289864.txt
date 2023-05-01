@@ -1,0 +1,26 @@
+// https://leetcode.com/problems/majority-element-ii/solutions/3289864/rust-hashmap-simple-solution/
+use std::collections::HashMap;
+
+impl Solution {
+    pub fn majority_element(mut nums: Vec<i32>) -> Vec<i32> {
+        let mut map:HashMap<i32,i32> = HashMap::new();
+        let mut res:Vec<i32> = vec![];
+        for (i,v) in nums.iter().enumerate() {
+//get current occurrences of element or default to 0
+            let count = map.entry(*v).or_insert(0);
+//increase count by 1
+            *count+=1;
+        }
+        for (k,v) in map {
+//if count of current element more than len/3 push to vec
+            if v>nums.len() as i32/3  {
+                res.push(k);
+            }
+//if vec contain 2 elements break
+            if res.len()==2 {
+                break;
+            }  
+        }
+        res
+    }
+}

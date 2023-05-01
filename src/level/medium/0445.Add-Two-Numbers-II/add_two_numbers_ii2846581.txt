@@ -1,0 +1,56 @@
+// https://leetcode.com/problems/add-two-numbers-ii/solutions/2846581/rust/
+// Definition for singly-linked list.
+// #[derive(PartialEq, Eq, Clone, Debug)]
+// pub struct ListNode {
+//   pub val: i32,
+//   pub next: Option<Box<ListNode>>
+// }
+// 
+// impl ListNode {
+//   #[inline]
+//   fn new(val: i32) -> Self {
+//     ListNode {
+//       next: None,
+//       val
+//     }
+//   }
+// }
+impl Solution {
+    pub fn add_two_numbers(
+        l1: Option<Box<ListNode>>,
+        l2: Option<Box<ListNode>>,
+    ) -> Option<Box<ListNode>> {
+        let mut v1 = Vec::with_capacity(100);
+        let mut v2 = Vec::with_capacity(100);
+        let mut m_l1 = l1;
+        let mut m_l2 = l2;
+
+        let mut answer = Box::new(ListNode::new(0));
+
+        while let Some(t) = m_l1 {
+            v1.push(t.val);
+            m_l1 = t.next;
+        }
+
+        while let Some(t) = m_l2 {
+            v2.push(t.val);
+            m_l2 = t.next;
+        }
+
+
+        let mut carry = 0;
+        while v1.len() != 0 || v2.len() != 0 || carry > 0 {
+            let x = if let Some(t) = v1.pop() { t } else { 0 };
+            let y = if let Some(t) = v2.pop() { t } else { 0 };
+            let tmp = x + y + carry;
+
+            let mut node = ListNode::new(tmp % 10);
+
+            carry = tmp / 10;
+            node.next = answer.next.take();
+            answer.next = Some(Box::new(node));
+        }
+
+        answer.next
+    }
+}

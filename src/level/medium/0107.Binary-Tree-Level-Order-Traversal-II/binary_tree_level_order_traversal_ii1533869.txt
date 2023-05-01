@@ -1,0 +1,34 @@
+// https://leetcode.com/problems/binary-tree-level-order-traversal-ii/solutions/1533869/rust-bfs-optimised-solution-0ms-2-1-mb/
+use std::rc::Rc;
+use std::cell::RefCell;
+use std::collections::VecDeque;
+type Node = Option<Rc<RefCell<TreeNode>>>;
+impl Solution {
+    pub fn level_order_bottom(root: Node) -> Vec<Vec<i32>> {
+        let mut q = VecDeque::new();
+        q.push_back(root.clone());
+        let mut res = Vec::new();
+        
+        while !q.is_empty()  {
+            let mut lvl = Vec::new();
+            for _ in 0..q.len() { 
+                if let Some(Some(node)) = q.pop_front() { 
+                    let node = node.borrow_mut();
+                    lvl.push(node.val);
+                    
+                    if let Some(l) = node.left.clone() { 
+                        q.push_back(Some(l))
+                    }
+                    if let Some(r) = node.right.clone() { 
+                        q.push_back(Some(r))
+                    }
+                }
+            }
+            if lvl.len() > 0 { 
+                res.push(lvl.clone());
+            }
+        }
+        res.reverse();
+        res
+    }
+}

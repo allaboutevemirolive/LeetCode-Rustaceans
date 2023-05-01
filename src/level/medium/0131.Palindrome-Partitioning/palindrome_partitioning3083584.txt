@@ -1,0 +1,42 @@
+// https://leetcode.com/problems/palindrome-partitioning/solutions/3083584/rust-backtrack-solution/
+impl Solution {
+    pub fn partition(s: String) -> Vec<Vec<String>> {
+        let mut res: Vec<Vec<String>> = Vec::new();
+        Self::helper(&s, &mut res, &mut Vec::<String>::new(), 0);
+        res
+    }
+
+    fn helper(s: &String, res: &mut Vec<Vec<String>>, seq: &mut Vec<String>, start: usize) {
+        if start == s.len() {
+            res.push(seq.clone());
+            return;
+        }
+
+        for i in start..s.len() {
+            match s.get(start..i + 1) {
+                Some(sub_string) => if Self::is_palindrome(sub_string.to_string()) {
+                    seq.push(sub_string.to_string());
+                    Self::helper(s, res, seq, i + 1);
+                    seq.pop();
+                },
+                _ => {}
+            }
+        }
+    }
+
+    fn is_palindrome(s: String) -> bool {
+        let (mut i, mut j) = (0, s.len() - 1);
+        let chars: Vec<char> = s.chars().collect();
+
+        while i < j {
+            if chars[i] != chars[j] {
+                return false;
+            }
+
+            i += 1;
+            j -= 1;
+        }
+
+        true
+    }
+}

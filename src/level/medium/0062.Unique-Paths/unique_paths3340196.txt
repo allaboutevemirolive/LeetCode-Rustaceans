@@ -1,0 +1,15 @@
+// https://leetcode.com/problems/unique-paths/solutions/3340196/rust-memoziation/
+    let mut da = vec![vec![std::i32::MAX; n as usize]; m as usize];
+    
+    fn foo(m: usize, n: usize, da: &mut Vec<Vec<i32>>) -> i32 {
+        if m == 0 || n == 0{
+            return 1;
+        }
+        if da[m][n] == std::i32::MAX {
+            da[m][n] = foo(m-1, n, da) + foo(m, n-1, da);
+        }
+        return da[m][n];
+    }
+    
+    return foo((m-1) as usize, (n-1) as usize, &mut da);
+}

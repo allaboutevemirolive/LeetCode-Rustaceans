@@ -1,0 +1,25 @@
+// https://leetcode.com/problems/sum-root-to-leaf-numbers/solutions/1557343/rust-dfs-iterative/
+use std::rc::Rc;
+use std::cell::RefCell;
+impl Solution {
+    pub fn sum_numbers(root: Option<Rc<RefCell<TreeNode>>>) -> i32 {
+        let mut res = 0;
+        let mut stack = vec![(root, 0)];
+
+        while let Some(node_sum) = stack.pop() {
+            if let Some(node) = node_sum.0 {
+                let node = node.borrow();
+                let cur_sum = 10 * node_sum.1 + node.val;
+
+                if node.left.is_none() && node.right.is_none() {
+                    res += cur_sum;
+                    continue;
+                }
+
+                stack.push((node.left.clone(), cur_sum));
+                stack.push((node.right.clone(), cur_sum));
+            }
+        }
+        res
+    }
+}

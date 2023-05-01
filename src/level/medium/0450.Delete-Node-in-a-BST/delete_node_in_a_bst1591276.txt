@@ -1,0 +1,73 @@
+// https://leetcode.com/problems/delete-node-in-a-bst/solutions/1591276/rust-3ms-no-take-and-reconstruct-way/
+impl Solution {
+    fn delete_helper(root: &mut Option<Rc<RefCell<TreeNode>>>, key: i32) {
+        let mut replace_left = false;
+        if let Some(node) = root {
+            let cur_val = node.borrow().val;
+            match cur_val.cmp(&key) {
+                std::cmp::Ordering::Equal => {
+                    let maybe_new_val = Self::delete_leftmost(&mut node.borrow_mut().right);
+                    if let Some(new_val) = maybe_new_val {
+                        node.borrow_mut().val = new_val;
+                    } else {
+                        replace_left = true;
+                    }
+                }
+                std::cmp::Ordering::Less => Self::delete_helper(&mut node.borrow_mut().right, key),
+                std::cmp::Ordering::Greater => {
+                    Self::delete_helper(&mut node.borrow_mut().left, key)
+                }
+            }
+        }
+        if replace_left {
+            let left = root
+                .take()
+                .unwrap()
+                .replace(TreeNode {
+                    val: 0,
+                    left: None,
+                    right: None,
+                })
+                .left;
+            std::mem::replace(root, left);
+        }
+    }
+
+    fn delete_leftmost(root: &mut Option<Rc<RefCell<TreeNode>>>) -> Option<i32> {
+        let mut replace_right = None;
+        match root {
+            Some(node) => {
+                let maybe_val = Self::delete_leftmost(&mut node.borrow_mut().left);
+                if let Some(val) = maybe_val {
+                    return Some(val);
+                } else {
+                    replace_right = Some(node.borrow().val);
+                }
+            }
+            None => {
+                return None;
+            }
+        }
+        if replace_right.is_some() {
+            let right = root
+                .take()
+                .unwrap()
+                .replace(TreeNode {
+                    val: 0,
+                    left: None,
+                    right: None,
+                })
+                .right;
+            std::mem::replace(root, right);
+        }
+        replace_right
+    }
+
+    pub fn delete_node(
+        mut root: Option<Rc<RefCell<TreeNode>>>,
+        key: i32,
+    ) -> Option<Rc<RefCell<TreeNode>>> {
+        Self::delete_helper(&mut root, key);
+        root
+    }
+}

@@ -1,0 +1,60 @@
+// https://leetcode.com/problems/insert-delete-getrandom-o1/solutions/1533182/rust-50ms-with-my-observations/
+use std::collections::{HashMap, HashSet};
+
+use rand::{Rng, thread_rng};
+use rand::prelude::ThreadRng;
+
+struct RandomizedSet {
+    map: HashMap<i32, usize>,
+    data: Vec<i32>,
+}
+
+
+/**
+ * `&self` means the method takes an immutable reference
+ * If you need a mutable reference, change it to `&mut self` instead
+ */
+impl RandomizedSet {
+    fn new() -> Self {
+        RandomizedSet {
+            map: Default::default(),
+            data: Vec::new(),
+        }
+    }
+
+    fn insert(&mut self, val: i32) -> bool {
+        let new_index = self.data.len();
+        let inserted_index = self.map.entry(val)
+            .or_insert(new_index);
+        if *inserted_index == new_index {
+            // if index is same, we just add a new element
+            self.data.push(val);
+            true
+        } else {
+            false
+        }
+    }
+
+    fn remove(&mut self, val: i32) -> bool {
+        let vec_index = match self.map.remove(&val) {
+            None => {
+                return false;
+            }
+            Some(val) => { val }
+        };
+        let last_element = self.data.pop().unwrap();
+        if vec_index != self.data.len() {
+            // we pop the wrong element, reinsert it
+            self.data[vec_index] = last_element;
+            self.map.insert(last_element, vec_index);
+        }
+
+        true
+    }
+
+    //noinspection RsSelfConvention
+    fn get_random(&self) -> i32 {
+        let index = thread_rng().gen_range(0, self.data.len());
+        self.data[index]
+    }
+}

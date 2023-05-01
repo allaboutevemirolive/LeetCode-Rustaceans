@@ -1,0 +1,106 @@
+// https://leetcode.com/problems/convert-sorted-list-to-binary-search-tree/solutions/3283017/rust-avl-tree/
+use std::rc::Rc;
+use std::cell::RefCell;
+
+impl Solution {
+    pub fn sorted_list_to_bst(head: Option<Box<ListNode>>) 
+
+        -> Option<Rc<RefCell<TreeNode>>>  
+    {
+        let mut tree_root = None;
+        let mut head = head;
+
+        while head.is_some() {
+            let list_node = head.take().unwrap();
+            head = list_node.next;
+            tree_root = tree_root.insert_node(treenode(list_node.val));
+        }
+        tree_root
+    }
+}
+
+fn treenode(val: i32) -> Option<Rc<RefCell<TreeNode>>> {
+    Some(Rc::new(RefCell::new(TreeNode::new(val))))
+}
+
+trait TreeNodeExtension {
+    fn value(&self) -> Option<i32>;
+    fn left(&self) -> Self;
+    fn right(&self) -> Self;
+    fn insert_node(&self, node: Self) -> Self;
+    fn assign_left(&self, node: Self);
+    fn assign_right(&self, node: Self);
+    fn height_right(&self) -> usize;
+    fn height_left(&self) -> usize;
+    fn height_delta(&self) -> isize;
+    fn rotate_left(&self) -> Self;
+    fn rotate_right(&self) -> Self;
+}
+
+impl TreeNodeExtension for Option<Rc<RefCell<TreeNode>>> {
+    fn value(&self) -> Option<i32> {
+        self.as_ref().map(|node| node.borrow().val)
+    }
+    fn left(&self) -> Self {
+        self.as_ref().and_then(|node| node.borrow().left.clone())
+    }
+    fn right(&self) -> Self {
+        self.as_ref().and_then(|node| node.borrow().right.clone())
+    }
+    fn insert_node(&self, node: Self) -> Self {
+        if self.is_none() {
+            node
+        } else {
+            if node.value() >= self.value() {
+                self.assign_right(self.right().insert_node(node));
+            } else {
+                self.assign_left(self.left().insert_node(node));
+            }
+            match self.height_delta() {
+                -2     => self.rotate_right(),
+                 2     => self.rotate_left(),
+                 0..=1 => self.clone(),
+                _      => unreachable!(),
+            }
+        }
+    }
+    fn rotate_left(&self) -> Self {
+        let right = self.right();
+        self.assign_right(right.left());
+        right.assign_left(self.clone());
+        right
+    }
+    fn rotate_right(&self) -> Self {
+        let left = self.left();
+        self.assign_left(left.right());
+        left.assign_right(self.clone());
+        left
+    }
+    fn assign_left(&self, node: Self) {
+        self.as_ref().unwrap().borrow_mut().left = node;
+    }
+    fn assign_right(&self, node: Self) {
+        self.as_ref().unwrap().borrow_mut().right = node;
+    }
+    fn height_right(&self) -> usize {
+        let mut height = 0;
+        let mut node = self.clone();
+        while node.is_some() {
+            height += 1;
+            node = node.right();
+        }
+        height
+    }
+    fn height_left(&self) -> usize {
+        let mut height = 0;
+        let mut node = self.clone();
+        while node.is_some() {
+            height += 1;
+            node = node.left();
+        }
+        height
+    }
+    fn height_delta(&self) -> isize {
+        self.height_right() as isize - self.height_left() as isize
+    }
+}

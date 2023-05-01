@@ -1,0 +1,22 @@
+// https://leetcode.com/problems/house-robber/solutions/733669/rust-cheapest-best/
+use std::collections::HashMap;
+
+impl Solution {
+    pub fn rob(nums: Vec<i32>) -> i32 {
+        let mut cache = HashMap::new();
+        Self::helper(&mut cache, &nums, (nums.len() - 1) as i32);
+        *cache.get(&((nums.len() - 1) as i32)).unwrap_or(&0)
+    }
+
+    fn helper(cache: &mut HashMap<i32, i32>, nums: &Vec<i32>, end: i32) {
+        if end >= 0 && !cache.contains_key(&end) {
+            Self::helper(cache, nums, end - 1);
+            Self::helper(cache, nums, end - 2);
+            cache.insert(
+                end,
+                (nums[end as usize] + (*cache.get(&(end - 2)).unwrap_or(&0)))
+                    .max(*cache.get(&(end - 1)).unwrap_or(&0)),
+            );
+        }
+    }
+}

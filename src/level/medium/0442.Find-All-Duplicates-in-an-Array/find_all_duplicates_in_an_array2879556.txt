@@ -1,0 +1,26 @@
+// https://leetcode.com/problems/find-all-duplicates-in-an-array/solutions/2879556/rust-o-n-with-comments/
+impl Solution {
+    pub fn find_duplicates(mut nums: Vec<i32>) -> Vec<i32> {
+        let mut res = vec![];
+        let mut stack = vec![];
+        let mut i = 0;
+        
+        while i < nums.len() || !stack.is_empty() {
+            let num = match stack.pop(){ // taking from stack takes priority in order to avoid growing it too much.
+                Some(n) => n,
+                None => { i+=1; nums[i-1] } // if nothing in stack, take from the input vec.
+            };
+            if num < 1 { continue; } // not interested in 0s and -1s.
+            if num == nums[i-1] { // took from iterator as opposed to stack.
+                nums[i-1] = 0; // mark element as 0 to avoid picking it up again.
+            }
+            if nums[(num - 1) as usize] == -1 { // -1 means we've seen this number already.
+                res.push(num); // found dupe
+            } else {
+                stack.push(nums[(num - 1) as usize]); // we are going to override this element soon, save it in stack
+                nums[(num - 1) as usize] = -1; // mark element at target position as -1.
+            }
+        }
+        res
+    }
+}

@@ -1,0 +1,31 @@
+// https://leetcode.com/problems/water-and-jug-problem/solutions/417874/easy-rust-solution-with-simple-explain/
+///思路，首先考虑是否能满足z <= x + y 以及是否可能为 0
+/// 两桶水最终都可以转换为1或2或他们相等的本身，如果需要的是奇数，则需要求能转换为1
+impl Solution {
+    pub fn can_measure_water(mut x: i32, mut y: i32, z: i32) -> bool {
+        z <= x + y && {
+            if x == 0 || y == 0 {
+                if x == 0 && y == 0 {
+                    z == 0
+                } else {
+                    z % (x + y) == 0
+                }
+            } else {
+                while x != y && (x > 2 || y > 2) {
+                    if x > y {
+                        x = x - y;
+                    } else {
+                        y = y - x;
+                    }
+                }
+                if x == y {
+                    z % x == 0
+                } else if z % 2 != 0 {
+                    x == 1 || y == 1
+                } else {
+                    true
+                }
+            }
+        }
+    }
+}

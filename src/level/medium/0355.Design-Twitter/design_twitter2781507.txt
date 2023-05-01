@@ -1,0 +1,168 @@
+// https://leetcode.com/problems/design-twitter/solutions/2781507/rust-quick-heap-of-iterators-solution/
+use std::cell::RefCell;
+use std::cmp::Ordering;
+use std::collections::{BinaryHeap, BTreeMap, HashMap};
+use std::rc::Rc;
+
+const FEED_LIMIT: usize = 10;
+
+type UserId = i32;
+type TweetId = i32;
+type Time = usize;
+
+struct TweetIter {
+    tweet: Option<(Time, TweetId)>,
+    tweets: Rc<RefCell<BTreeMap<Time, TweetId>>>,
+}
+
+impl TweetIter {
+    fn new(tweets: Rc<RefCell<BTreeMap<Time, TweetId>>>) -> TweetIter {
+        let tweet = tweets
+            .borrow()
+            .iter()
+            .rev()
+            .next()
+            .map(|(time, id)| (*time, *id));
+        TweetIter { tweet, tweets }
+    }
+}
+
+impl PartialEq for TweetIter {
+    fn eq(&self, other: &Self) -> bool {
+        let left = self.tweet.map(|(time, _)| time);
+        let right = other.tweet.map(|(time, _)| time);
+        left == right
+    }
+}
+
+impl Eq for TweetIter {}
+
+impl PartialOrd for TweetIter {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        let left = self.tweet.map(|(time, _)| time);
+        let right = other.tweet.map(|(time, _)| time);
+        left.partial_cmp(&right)
+    }
+}
+
+impl Ord for TweetIter {
+    fn cmp(&self, other: &Self) -> Ordering {
+        self.partial_cmp(other)
+            .expect("partial_cmp behave like cmp")
+    }
+}
+
+impl Iterator for TweetIter {
+    type Item = TweetId;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        let (time, tweet_id) = self.tweet?;
+
+        self.tweet = self
+            .tweets
+            .borrow()
+            .range(..time)
+            .rev()
+            .next()
+            .map(|(time, tweet_id)| (*time, *tweet_id));
+
+        Some(tweet_id)
+    }
+}
+
+#[derive(Default)]
+struct User {
+    // ensure not more than 10
+    tweets: Rc<RefCell<BTreeMap<Time, TweetId>>>,
+    tweets_by_user: HashMap<UserId, Rc<RefCell<BTreeMap<Time, TweetId>>>>,
+}
+
+#[derive(Default)]
+struct Twitter {
+    time: usize,
+    users: HashMap<UserId, User>,
+}
+
+/**
+ * `&self` means the method takes an immutable reference
+ * If you need a mutable reference, change it to `&mut self` instead.
+ */
+impl Twitter {
+    fn new() -> Self {
+        Twitter::default()
+    }
+
+    /// O(log(tu)) where tu = number of user tweets
+    ///
+    /// Adds a tweet to the user's sorted tweet list. If the total size of tweets
+    /// exceeded [FEED_LIMIT], removes one oldest tweet.
+    fn post_tweet(&mut self, user_id: i32, tweet_id: i32) {
+        let user = self.users.entry(user_id).or_default();
+
+        let mut tweets = user.tweets.borrow_mut();
+        tweets.insert(self.time, tweet_id);
+        if tweets.len() > FEED_LIMIT {
+            let oldest = *tweets.iter().next().unwrap().0;
+            tweets.remove(&oldest);
+        }
+
+        self.time += 1;
+    }
+
+    /// O(fe) where fe = numbers of user's followees
+    ///
+    /// Builds a heap of tweet iterators and fetches 10 most recent tweets.
+    fn get_news_feed(&self, user_id: i32) -> Vec<i32> {
+        let user = match self.users.get(&user_id) {
+            Some(u) => u,
+            None => return vec![],
+        };
+
+        let mut heap = Vec::with_capacity(user.tweets_by_user.len() + 1);
+        heap.push(TweetIter::new(Rc::clone(&user.tweets)));
+        for tweets in user.tweets_by_user.values() {
+            heap.push(TweetIter::new(Rc::clone(&tweets)));
+        }
+        let mut heap = BinaryHeap::from(heap);
+
+        let mut tweets = Vec::new();
+        for _ in 0..FEED_LIMIT {
+            let mut iter = match heap.pop() {
+                None => break,
+                Some(iter) => iter,
+            };
+            match iter.next() {
+                None => break,
+                Some(tweet) => tweets.push(tweet),
+            }
+            heap.push(iter);
+        }
+
+        tweets
+    }
+
+    /// O(log(fe)) where fe = number of followees
+    ///
+    /// Adds a references to the followee's tweets.
+    fn follow(&mut self, follower_id: i32, followee_id: i32) {
+        let followee_tweets = Rc::clone(&self.users.entry(followee_id).or_default().tweets);
+
+        self.users
+            .entry(follower_id)
+            .or_default()
+            .tweets_by_user
+            .insert(followee_id, followee_tweets);
+    }
+
+    /// O(log(fe)) where fe = number of followees
+    ///
+    /// Removes a reference to the followee's tweets.
+    fn unfollow(&mut self, follower_id: i32, followee_id: i32) {
+        let follower = self
+            .users
+            .get_mut(&follower_id)
+            .expect("follower to be present");
+
+        follower.tweets_by_user.remove(&followee_id);
+    }
+}

@@ -1,0 +1,17 @@
+// https://leetcode.com/problems/best-time-to-buy-and-sell-stock-ii/solutions/565945/rust-with-peekable/
+impl Solution {
+    pub fn max_profit(prices: Vec<i32>) -> i32 {
+			let mut max_profit = 0;
+			let mut peekable = prices.iter().peekable();
+
+			while let Some(_) = peekable.peek() {
+				let current = peekable.next().unwrap();
+				if let Some(&new_price) = peekable.peek() {
+					if new_price - current > 0 {
+						max_profit += new_price - current;
+					}
+				};
+			}
+			max_profit
+    }
+}

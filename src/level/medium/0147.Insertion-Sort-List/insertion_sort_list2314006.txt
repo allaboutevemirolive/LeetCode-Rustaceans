@@ -1,0 +1,26 @@
+// https://leetcode.com/problems/insertion-sort-list/solutions/2314006/rust-insert-into-a-vector/
+impl Solution {
+    pub fn insertion_sort_list(head: Option<Box<ListNode>>) -> Option<Box<ListNode>> {
+        let mut v: Vec<Box<ListNode>> = vec![];
+        let mut head = head;
+        
+        while let Some(mut node) = head {
+            head = node.next.take();
+            node.next = None;
+            
+            let mut i = 0;
+            while i < v.len() && v[i].val <= node.val {
+                i += 1; 
+            }
+            
+            if i == v.len() { v.push(node); }
+            else { v.insert(i, node); }
+        } 
+        
+        let mut ret = None;
+        let mut tail = &mut ret;
+        for p in v { tail = &mut tail.insert(p).next; }
+        
+        ret
+    }
+}

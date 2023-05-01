@@ -1,0 +1,54 @@
+// https://leetcode.com/problems/sum-root-to-leaf-numbers/solutions/2543639/rust-dfs/
+// Definition for a binary tree node.
+// #[derive(Debug, PartialEq, Eq)]
+// pub struct TreeNode {
+//   pub val: i32,
+//   pub left: Option<Rc<RefCell<TreeNode>>>,
+//   pub right: Option<Rc<RefCell<TreeNode>>>,
+// }
+// 
+// impl TreeNode {
+//   #[inline]
+//   pub fn new(val: i32) -> Self {
+//     TreeNode {
+//       val,
+//       left: None,
+//       right: None
+//     }
+//   }
+// }
+use std::rc::Rc;
+use std::cell::RefCell;
+impl Solution {
+    pub fn sum_numbers(root: Option<Rc<RefCell<TreeNode>>>) -> i32 {
+        // dfs
+        // need to ensure all node values are between 0-9
+        fn dfs(root: Option<Rc<RefCell<TreeNode>>>, buffer: &mut Vec<i32>, value: &mut i32) {
+            *value = *value * 10 + root.as_ref().unwrap().borrow().val;
+            // This node is leaf
+            if root.as_ref().unwrap().borrow().left.is_none() && root.as_ref().unwrap().borrow().right.is_none() {
+                buffer.push(*value);
+                *value/=10;
+                return;
+            }
+
+            if let Some(node) = root.as_ref().unwrap().borrow().left.clone() {
+                dfs(Some(node), buffer, value);
+            }
+            
+            if let Some(node) = root.as_ref().unwrap().borrow().right.clone() {
+                dfs(Some(node), buffer, value);
+            }
+
+            *value/=10;
+        }
+
+        let mut buffer = Vec::new();
+        let mut value = 0;
+
+        dfs(root, &mut buffer, &mut value);
+
+        // println!("{:?}", buffer);
+        buffer.iter().sum()
+    }
+}

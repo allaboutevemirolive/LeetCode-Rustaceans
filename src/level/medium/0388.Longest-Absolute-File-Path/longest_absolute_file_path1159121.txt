@@ -1,0 +1,46 @@
+// https://leetcode.com/problems/longest-absolute-file-path/solutions/1159121/rust-stack/
+impl Solution {
+    pub fn length_longest_path(input: String) -> i32 {
+        
+        let lines = input.split('\n');
+        let mut length_stack = vec![];
+        let mut result = 0;
+        
+        for line in lines {
+            let (depth, name) = get_depth_and_name(&line);
+            while depth < length_stack.len() && length_stack.len() > 0 {
+                length_stack.pop();
+            }
+            let is_file = name_is_file(&name);
+            if depth >= length_stack.len() {
+                if is_file {
+                    length_stack.push(name.len());
+                    result = std::cmp::max(result, length_stack.iter().sum())
+                } else {
+                    length_stack.push(name.len() + 1); // +1 for trailing slash
+                }
+            }
+        }
+        result as i32
+    }
+}
+
+fn get_depth_and_name(line: &str) -> (usize, String) {
+    let mut leading_tabs = true;
+    let mut depth = 0;
+    
+    let mut characters = line.chars().peekable();
+    
+    while characters.peek() == Some(&'\t') {
+        depth += 1;
+        characters.next();
+    }
+    
+    let name = characters.collect();
+    
+    (depth, name)
+}
+
+fn name_is_file(name: &str) -> bool {
+    name.find('.').is_some()
+}

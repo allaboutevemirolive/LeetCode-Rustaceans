@@ -1,0 +1,35 @@
+// https://leetcode.com/problems/smallest-number-in-infinite-set/solutions/3452450/rust-21ms-2-6-mb/
+use std::collections::HashSet;
+
+struct SmallestInfiniteSet {
+    removed: HashSet<i32>,
+    smallest: i32,
+}
+
+impl SmallestInfiniteSet {
+    fn new() -> Self {
+        Self {
+            removed: HashSet::new(),
+            smallest: 1,
+        }
+    }
+
+    fn pop_smallest(&mut self) -> i32 {
+        let smallest = self.smallest;
+        self.removed.insert(smallest);
+
+        self.smallest = (smallest..)
+            .into_iter()
+            .filter(|val| !self.removed.contains(val))
+            .next()
+            .unwrap();
+
+        smallest
+    }
+
+    fn add_back(&mut self, num: i32) {
+        if self.smallest > num { self.smallest = num; }
+
+        self.removed.remove(&num);
+    }
+}

@@ -1,0 +1,16 @@
+// https://leetcode.com/problems/battleships-in-a-board/solutions/3275537/rust-elixir-count-the-heads/
+impl Solution {
+    pub fn count_battleships(board: Vec<Vec<char>>) -> i32 {
+        let mut ans = 0;
+        for i in 0..board.len() {
+            for j in 0..board[i].len() {
+                if board[i][j] == 'X'
+                && (i == 0 || board[i - 1][j] == '.')
+                && (j == 0 || board[i][j - 1] == '.') {
+                    ans += 1;
+                }
+            }
+        }
+        ans
+    }
+}

@@ -1,0 +1,37 @@
+// https://leetcode.com/problems/multiply-strings/solutions/1075244/rust-0ms-2mb-beats-100/
+    pub fn multiply(num1: String, num2: String) -> String {
+        fn into_num_vec(num_str: String) -> Vec<u8> {
+            num_str
+                .into_bytes()
+                .into_iter()
+                .rev()
+                .map(|x| x - 48)
+                .collect()
+        };
+        let (num1, num2) = (into_num_vec(num1), into_num_vec(num2));
+        let (m, n) = (num1.len(), num2.len());
+        let k = m + n;
+        let mut res = vec![0u8; k];
+
+        for j in 0..n {
+            let y = num2[j];
+            let mut carry = 0;
+            for i in 0..m {
+                let x = num1[i];
+                let p = x * y + carry + res[i + j];
+                res[i + j] = p % 10;
+                carry = p / 10;
+            }
+            res[j + m] = carry;
+        }
+
+        // remove leading zeros
+        let mut i = k - 1;
+        while i > 0 && res[i] == 0 {
+            res.pop().unwrap();
+            i -= 1;
+        }
+
+        unsafe { String::from_utf8_unchecked(res.into_iter().rev().map(|x| x + 48).collect()) }
+    }
+	```

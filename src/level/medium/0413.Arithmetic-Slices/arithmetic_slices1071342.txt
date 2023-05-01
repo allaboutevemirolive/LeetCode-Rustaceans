@@ -1,0 +1,45 @@
+// https://leetcode.com/problems/arithmetic-slices/solutions/1071342/rust-iteration-solution/
+enum State {
+    NoAsk,
+    // current value
+    Single(i32),
+    // current_value, distance, acc
+    Seq(i32, i32, usize),
+}
+
+
+impl Solution {
+    pub fn number_of_arithmetic_slices(a: Vec<i32>) -> i32 {
+        let mut seqs = vec![];
+        let mut state = State::NoAsk;
+
+        let mut i = 0;
+        while i < a.len() {
+            match state {
+                State::NoAsk => state = State::Single(a[i]),
+                State::Single(prev) => {
+                    state = State::Seq(a[i], a[i] - prev, 2);
+                }
+                State::Seq(prev, distance, acc) => {
+                    // NOTE: decide to continue or start next round iter
+                    if a[i] - prev == distance {
+                        state = State::Seq(a[i], distance, acc + 1);
+                    } else {
+                        if acc >= 3 {
+                            seqs.push(acc - 2);
+                        }
+                        state = State::Single(a[i - 1]);
+                        continue;
+                    }
+                }
+            }            
+            i += 1;
+        }
+        if let State::Seq(_, _, acc) = state {
+            if acc >= 3 {
+                seqs.push(acc - 2);
+            }
+        }
+        seqs.into_iter().map(|v| v * (v + 1) / 2).sum::<usize>() as i32
+    }
+}

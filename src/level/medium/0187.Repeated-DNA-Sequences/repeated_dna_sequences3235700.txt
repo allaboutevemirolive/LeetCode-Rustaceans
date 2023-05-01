@@ -1,0 +1,36 @@
+// https://leetcode.com/problems/repeated-dna-sequences/solutions/3235700/100-3ms-rust-solution-explained-line-by-line/
+use std::collections::*;
+
+impl Solution {
+    pub fn find_repeated_dna_sequences(s: String) -> Vec<String> {
+        // our set for keeping track of seen substrings
+        let mut seen = HashSet::new();
+
+        // our set to prevent duplicates in our answer
+        let mut ans = HashSet::new();
+
+        // get_unchecked is unsafe, see https://doc.rust-lang.org/std/primitive.str.html#method.get_unchecked
+        unsafe {
+
+            // we loop through the whole string
+            for i in 0..s.len() {
+
+                // get a substring of length 10 from i 
+                let slice = s.get_unchecked(i..i + 10);
+
+                // have we seen the current substring before?
+                if seen.contains(slice) {
+
+                    // add the substring to our answer set
+                    ans.insert(slice.to_string());
+                } else {
+
+                    //update our seen set with the new substring
+                    seen.insert(slice);
+                }
+            }
+        }
+        // take ownership of the set and convert it into a vec
+        ans.into_iter().collect()
+    }
+}

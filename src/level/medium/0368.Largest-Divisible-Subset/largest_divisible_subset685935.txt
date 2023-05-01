@@ -1,0 +1,27 @@
+// https://leetcode.com/problems/largest-divisible-subset/solutions/685935/rust-dynamic-programming/
+use std::collections::HashMap;
+
+impl Solution {
+    pub fn largest_divisible_subset(mut nums: Vec<i32>) -> Vec<i32> {
+        &nums.sort_unstable();
+
+        let mut subsets: HashMap<i32, Vec<i32>> = HashMap::new();
+        subsets.insert(-1, Vec::new());
+
+        for n in nums.iter() {
+            let mut s = subsets
+                .iter()
+                .filter(|(k, _)| *n % **k == 0)
+                .map(|(_, v)| v)
+                .max_by_key(|v| v.len())
+                .unwrap()
+                .to_vec();
+
+            s.push(*n);
+
+            subsets.insert(*n, s);
+        }
+
+        subsets.values().max_by_key(|v| v.len()).unwrap().to_vec()
+    }
+}

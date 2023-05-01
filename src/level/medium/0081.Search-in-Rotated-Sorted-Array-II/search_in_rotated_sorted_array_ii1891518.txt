@@ -1,0 +1,67 @@
+// https://leetcode.com/problems/search-in-rotated-sorted-array-ii/solutions/1891518/rust-find-k-then-regular-binary-search/
+impl Solution {
+    // Assumes sorted values from nums[i] up to nums[j]
+    fn binary_search(nums: &[i32], target: i32, mut i: usize, mut j: usize) -> bool {
+        if nums[i] > target || nums[j] < target {
+            return false;
+        }
+        while i < j {
+            let pivot = (j + i) / 2;
+            if nums[pivot] == target {
+                return true;
+            } else if nums[pivot] < target {
+                i = pivot + 1;
+            } else {
+                j = pivot;
+            }
+        }
+        nums[i] == target
+    }
+
+    pub fn search(nums: Vec<i32>, target: i32) -> bool {
+        let (mut i, mut j) = (0, nums.len() - 1);
+        //Edge case, only single element in vec, e.g. [1] or [3]
+        if nums.len() == 1 {
+            return target == nums[0];
+        }
+        //Edge case, left most or right most element equals target
+        if nums[i] == target || nums[j] == target {
+            return true;
+        }
+        //Edge case, k=0
+        if nums[i] < nums[j] {
+            return Solution::binary_search(&nums, target, i, j);
+        }
+        // We know len()>1, k!=0, nums[i]!=target, nums[j]!=target
+        while i < j - 1 {
+            // Skip all the same elements on the left side
+            while nums[i] == nums[i + 1] && i < j - 1 {
+                i += 1;
+            }
+            // Skip all the same elements on the right side
+            while nums[j] == nums[j - 1] && i < j - 1 {
+                j -= 1;
+            }
+            // Check if there is only one element left
+            if i == j {
+                return nums[i] == target;
+            }
+            // Pivot in the middle
+            let pivot = (j + i) / 2;
+            if nums[pivot] == target {
+                return true;
+            } else if nums[pivot] > nums[j] {
+                i = pivot;
+            } else {
+                j = pivot;
+            }
+        }
+        // Identified 0..i and j..(nums.len()-1) as the two sorted sequences.
+        if target >= nums[0] && target <= nums[i] {
+            Solution::binary_search(&nums, target, 0, i)
+        } else {
+            Solution::binary_search(&nums, target, j, nums.len() - 1)
+        }
+    }
+}
+``

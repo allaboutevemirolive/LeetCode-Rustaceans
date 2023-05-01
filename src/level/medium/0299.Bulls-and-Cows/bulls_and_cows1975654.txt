@@ -1,0 +1,31 @@
+// https://leetcode.com/problems/bulls-and-cows/solutions/1975654/rust/
+fn get_hint(secret: String, guess: String) -> String {
+	// Rust std has no multimap
+	let mut candidates = guess
+		.chars()
+		.zip(secret.chars())
+		.filter(|(g, s)| g != s)
+		.fold(std::collections::HashMap::<_, u32>::new(), |mut acc, (_, s)| {
+			*acc.entry(s).or_insert(0) += 1;
+			acc
+		});
+
+	let bulls = guess
+		.chars()
+		.zip(secret.chars())
+		.filter(|(g, s)| g == s)
+		.count();
+
+	let cows = guess
+		.chars()
+		.zip(secret.chars())
+		.filter(|(g, s)| g != s)
+		.filter_map(|(g, s)| {
+			let count = candidates.get_mut(&g)?;
+			*count = count.checked_sub(1)?;
+			Some(())
+		})
+		.count();
+
+	format!("{}A{}B", bulls, cows)
+}

@@ -1,0 +1,22 @@
+// https://leetcode.com/problems/search-in-rotated-sorted-array-ii/solutions/3189473/rust-without-hashset-using/
+impl Solution {
+    pub fn search(nums: Vec<i32>, target: i32) -> bool {
+        for i in 1..nums.len() {
+            if nums[i] < nums[i-1] {
+                match nums[..i].binary_search(&target) {
+                    Ok(res) => {return true},
+                    Err(_) => {
+                        match nums[i..].binary_search(&target) {
+                            Ok(res) => {return true},
+                            Err(_) => {return false}
+                        }        
+                    }
+                }
+            }
+        }
+        match nums.binary_search(&target) {
+            Ok(res) => {return true},
+            Err(_) => {return false}
+        }        
+    }
+}

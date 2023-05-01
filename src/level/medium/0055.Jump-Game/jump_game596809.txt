@@ -1,0 +1,12 @@
+// https://leetcode.com/problems/jump-game/solutions/596809/rust-greedy/
+impl Solution {
+    pub fn can_jump(nums: Vec<i32>) -> bool {
+        let mut m = 0;
+        for (i, val) in nums.iter().enumerate() {
+            if i > m { return false; }
+            let val = *val as usize;
+            m = std::cmp::max(m, i+val);
+        }
+        return true;
+    }
+}

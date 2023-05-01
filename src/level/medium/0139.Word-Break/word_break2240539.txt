@@ -1,0 +1,19 @@
+// https://leetcode.com/problems/word-break/solutions/2240539/rust-idiomatic-solution-dp-0ms/
+impl Solution {
+    pub fn word_break(s: String, word_dict: Vec<String>) -> bool {
+        use std::collections::HashSet;
+        
+        let mut dp = vec![false; s.len() + 1];
+        dp[0] = true;
+        let mut hs: HashSet<_> = word_dict.into_iter().collect();
+        for i in 0..s.len() {
+            for j in (0usize..=i).rev() {
+                if hs.contains(&s[j..i + 1]) && dp[j] {
+                    dp[i + 1] = true;
+                    break;
+                }  
+            }
+        }
+        dp[s.len()]
+    }
+}

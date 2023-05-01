@@ -1,0 +1,18 @@
+// https://leetcode.com/problems/unique-substrings-in-wraparound-string/solutions/1320742/rust-cheapest-best/
+impl Solution {
+    pub fn find_substring_in_wrapround_string(p: String) -> i32 {
+        let (mut dp, mut n, mut iter) = ([0; 123], 1, p.chars().peekable());
+        while let Some(a) = iter.next() {
+            dp[a as usize] = dp[a as usize].max(n);
+            n = match iter.peek().filter(|&b| match b {
+                'a' => a == 'z',
+                _ => (*b as u8) == (a as u8) + 1,
+            }) {
+                Some(_) => n + 1,
+                None => 1,
+            }
+        }
+
+        dp.iter().skip(97).sum()
+    }
+}

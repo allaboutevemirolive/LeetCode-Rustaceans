@@ -1,0 +1,24 @@
+// https://leetcode.com/problems/maximum-xor-of-two-numbers-in-an-array/solutions/850143/rust-bitfiddling-v-short-explanation/
+use std::collections::HashSet;
+impl Solution {
+    pub fn find_maximum_xor(nums: Vec<i32>) -> i32 {
+        let nums = nums.into_iter().map(|x| x as u32).collect::<Vec<u32>>();
+        let mut mask = 0u32;
+        let mut max = 0u32;
+        for i in (0..=31).rev() {
+            let potential_bit = max | (1 << i);
+            mask |= 1 << i;
+            let mut bits: HashSet<u32> = HashSet::new();
+            for n in nums.iter() {
+                bits.insert((*n as u32) & mask);
+            }
+            for b in bits.iter() {
+                if bits.contains(&(b ^ potential_bit)) {
+                    max = potential_bit;
+                    break;
+                } 
+            }
+        }
+        max as i32
+    }
+}

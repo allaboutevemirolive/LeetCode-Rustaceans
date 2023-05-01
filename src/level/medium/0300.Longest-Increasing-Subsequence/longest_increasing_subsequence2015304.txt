@@ -1,0 +1,19 @@
+// https://leetcode.com/problems/longest-increasing-subsequence/solutions/2015304/rust-one-dimension-dp-o-n-2/
+use std::cmp::max;
+
+impl Solution {
+    pub fn length_of_lis(nums: Vec<i32>) -> i32 {
+        let n = nums.len();
+        let mut f = vec![1;n];
+        
+        for i in 1..n {
+            for j in 0..i {
+                if nums[j] < nums[i] {
+                    f[i] = max(f[i], f[j] + 1);
+                }
+            }
+        }
+        let o = f.iter().max();
+        *o.unwrap()
+    }
+}

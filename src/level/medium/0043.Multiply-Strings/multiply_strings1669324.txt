@@ -1,0 +1,42 @@
+// https://leetcode.com/problems/multiply-strings/solutions/1669324/simple-rust-solution/
+use std::char;
+
+impl Solution {
+    pub fn multiply(num1: String, num2: String) -> String {
+        if (num1.len() == 1 && num1 == "0") || (num2.len() == 1 && num2 == "0") {
+               return "0".to_string();
+        } 
+        let dig1 = num1.chars().rev().map(|c| c.to_digit(10).unwrap())
+            .collect::<Vec<u32>>();
+        let dig2 = num2.chars().rev().map(|c| c.to_digit(10).unwrap())
+            .collect::<Vec<u32>>();
+      
+        let mut result: Vec<u32> = Vec::new();
+        
+        for (i,p) in dig1.iter().enumerate() {
+            let mut mr = 0;
+            let mut ar = 0;
+            let mut k = i;
+            for t in dig2.iter() {
+                let m = *t * *p + mr;
+                let mut a = m % 10 + ar;
+                if k < result.len() {
+                    a += result[k];
+                    result[k] = a % 10;
+                } else {
+                    result.push(a % 10);
+                }
+                mr = m / 10;
+                ar = a / 10;
+                k += 1;
+            }
+            let f = mr + ar;
+            if f > 0 {
+                result.push(f);
+            }
+        }
+
+        return result.iter().rev()
+            .map(|x| char::from_digit(*x, 10).unwrap()).collect();
+    }
+}

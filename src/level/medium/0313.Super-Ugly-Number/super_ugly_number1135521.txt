@@ -1,0 +1,24 @@
+// https://leetcode.com/problems/super-ugly-number/solutions/1135521/rust-and-java/
+use std::collections::BinaryHeap;
+
+impl Solution {
+    pub fn nth_super_ugly_number(n: i32, primes: Vec<i32>) -> i32 {
+        let mut heap = BinaryHeap::with_capacity(n as usize * primes.len());
+        heap.push(-1);
+
+        let mut prev = 0isize;
+
+        for _ in 0..n {
+            let top = loop {
+              let t = heap.pop().unwrap();
+              if t != prev { break t; };
+            };
+            prev = top;
+            for &p in &primes {
+                heap.push(top * p as isize);
+            }
+        }
+        
+        -prev as i32
+    }
+}

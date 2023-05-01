@@ -1,0 +1,71 @@
+// https://leetcode.com/problems/fraction-to-recurring-decimal/solutions/3197969/rust-handwritten-implementation/
+use std::collections::HashMap;
+impl Solution {
+    pub fn fraction_to_decimal(numerator: i32, denominator: i32) -> String {
+        if numerator == 0 {
+            return "0".to_string();
+        }
+        if denominator == 1 {
+            return numerator.to_string();
+        }
+        let mut res = vec![];
+
+        if (denominator.is_negative() || numerator.is_negative()) && 
+            (!(denominator.is_negative() && numerator.is_negative())) {
+                res.push('-');
+        }
+        let mut mfact = 1;
+        let mut den = (denominator as i64).abs();
+        let mut num = (numerator as i64).abs();
+        if num >= den {
+            while (den*mfact*10) < num {
+                mfact *= 10;
+            }
+
+            while mfact > 0 {
+                let mut v = 0;
+                while num >= (den*mfact*(v+1)) {
+                    v += 1;
+                }
+                res.push((b'0' + v as u8) as char);
+                num -= den*mfact*v;
+                mfact /= 10;
+            }
+            if num == 0 {
+                return res.into_iter().collect();
+            }
+        } else {
+            res.push('0');
+        }
+        res.push('.');
+        num *= 10;
+
+        let mut olds = HashMap::new();
+        while res.len() < 10000 {
+            match olds.get(&num) {
+                Some(v) => {
+                    res.insert(*v, '(');
+                    res.push(')');
+                    return res.into_iter().collect();
+                },
+                None => {olds.insert(num, res.len());}
+            }
+
+            while (num < den) && (res.len() < 32) {
+                num *= 10;
+                res.push('0');
+            }
+            let mut v = 0;
+            while num >= (den*(v+1)) {
+                v += 1;
+            }
+            res.push((b'0' + v as u8) as char);
+            num -= den*v;
+            if num == 0 {
+                break;
+            }                        
+            num *= 10;
+        }
+        return res.into_iter().collect();
+    }
+}

@@ -1,0 +1,33 @@
+// https://leetcode.com/problems/jump-game-ii/solutions/2903469/rust-0ms-100/
+impl Solution {
+    pub fn jump(nums: Vec<i32>) -> i32 {
+        if nums.len() == 1 {
+            return 0;
+        }
+
+        let mut nums = nums.into_iter().map(|x| x as usize).collect::<Vec<usize>>();
+        let mut jumps = 0;
+        let mut i = 0;
+
+        while i < nums.len() - 1 {
+            let mut max = 0;
+            let mut next_first = i + 1;
+            let next_last = i + nums[i];
+
+            if next_last >= nums.len() - 1 {
+                return jumps + 1;
+            }
+
+            while next_first <= next_last {
+                if max <= nums[next_first] + next_first {
+                    max = nums[next_first] + next_first;
+                    i = next_first;
+                }
+                next_first += 1;
+            }
+            jumps += 1;
+        }
+
+        jumps
+    }
+}

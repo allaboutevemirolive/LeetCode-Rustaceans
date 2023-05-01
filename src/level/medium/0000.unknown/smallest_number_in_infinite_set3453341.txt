@@ -1,0 +1,28 @@
+// https://leetcode.com/problems/smallest-number-in-infinite-set/solutions/3453341/clean-rust-btreeset-solution/
+struct SmallestInfiniteSet {
+    curr_min: i32,
+    st: std::collections::BTreeSet<i32>,
+}
+
+impl SmallestInfiniteSet {
+    
+    fn new() -> Self {
+        Self{curr_min: 1, st: std::collections::BTreeSet::new()}
+    }
+    
+    fn pop_smallest(&mut self) -> i32 {
+        if let Some(smallest) = self.st.iter().next().cloned() {
+            self.st.remove(&smallest);
+            return smallest;
+        }
+        
+        self.curr_min += 1;
+        self.curr_min - 1
+    }
+    
+    fn add_back(&mut self, num: i32) {
+        if num < self.curr_min {
+            self.st.insert(num);
+        }
+    }
+}

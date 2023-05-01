@@ -1,0 +1,32 @@
+// https://leetcode.com/problems/insert-interval/solutions/1835423/rust-solution/
+struct Solution;
+
+impl Solution {
+    pub fn insert(intervals: Vec<Vec<i32>>, new_interval: Vec<i32>) -> Vec<Vec<i32>> {
+        let mut result = vec![];
+        let mut left = new_interval[0];
+        let mut right = new_interval[1];
+        let mut i = 0;
+        let len = intervals.len();
+        while i < len {
+            if let [start, end] = intervals[i][..] {
+                if right < start {
+                    break;
+                }
+                if left > end {
+                    result.push(intervals[i].clone());
+                } else {
+                    left = left.min(start);
+                    right = right.max(end);
+                }
+                i += 1;
+            }
+        }
+        result.push(vec![left, right]);
+        while i < len {
+            result.push(intervals[i].clone());
+            i += 1;
+        }
+        result
+    }
+}

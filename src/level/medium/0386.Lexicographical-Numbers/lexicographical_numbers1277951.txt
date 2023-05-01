@@ -1,0 +1,17 @@
+// https://leetcode.com/problems/lexicographical-numbers/solutions/1277951/rust-simple-sort-solution/
+impl Solution {
+    pub fn lexical_order(n: i32) -> Vec<i32> {
+        let mut strings = vec![];
+        for num in 1..=n {
+            strings.push(num.to_string());
+        }
+        
+        strings.sort_by(|str1, str2| str1.cmp(str2));
+        
+        let mut ret = vec![0;strings.len()];
+        for i in 0..(n as usize) {
+            ret[i] = strings[i].parse::<i32>().unwrap();
+        }
+        return ret;
+    }
+}

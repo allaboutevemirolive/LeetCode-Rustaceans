@@ -1,0 +1,45 @@
+// https://leetcode.com/problems/string-compression/solutions/3247707/simple-rust-solution/
+impl Solution {
+    pub fn compress(chars: &mut Vec<char>) -> i32 {
+        // location where a char will be inserted
+        let mut put: usize = 0;
+        // this is 0 because we have not yet visited index 0
+        let mut count: usize = 0;
+        // first should always be counted
+        let mut last: char = chars[0];
+        // our approach doesn't calculate till the end of the same chars, so take 1 step further
+        for idx in 0..=chars.len() {
+            let this: char = if idx < chars.len() {
+                chars[idx]
+            } else {
+                // this is to change the last character
+                !(last as u8) as char
+            };
+
+            if last == this {
+                // the count continues
+                count += 1;
+                continue;
+            }
+            // save the counted char
+            chars[put] = last;
+            put += 1;
+            // next char to count
+            last = this;
+            if count == 1 {
+                // the count is one, no need to do any thing else
+                continue;
+            }
+            // push digits in the vector
+            for c in count.to_string().chars() {
+                chars[put] = c;
+                put += 1;
+            }
+            // reset count, remember we have encountered this, so its 1
+            count = 1;
+        }
+        // remove extra elements at end
+        chars.truncate(put);
+        chars.len() as i32
+    }
+}

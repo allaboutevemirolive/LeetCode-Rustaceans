@@ -1,0 +1,33 @@
+// https://leetcode.com/problems/remove-nth-node-from-end-of-list/solutions/1459350/rust-two-solutions/
+impl Solution {
+    pub fn remove_nth_from_end(head: Option<Box<ListNode>>, n: i32) -> Option<Box<ListNode>> {
+        // Find out how many nodes are present in the list
+        let mut count = 0;
+        let mut node = &head;
+        while let Some(current) = node {
+            count += 1;
+            node = &current.next;
+        }
+
+        // introduce a dummy head node in order to avoid the corner case where `count == n == 1`
+        let mut list = Some(Box::new(ListNode { val: 0, next: head }));
+        let mut tail = &mut list;
+        let mut position = 0;
+
+        while let Some(next) = tail {
+            if position == count - n {
+                let mut to_skip = next.next.take();
+                if let Some(to_skip) = to_skip {
+                    next.next = to_skip.next;
+                }
+
+                break; // no need to loop over the remaining nodes
+            }
+
+            position += 1;
+            tail = &mut next.next;
+        }
+
+        list.unwrap().next.take()
+    }
+}

@@ -1,0 +1,20 @@
+// https://leetcode.com/problems/non-overlapping-intervals/solutions/2664495/rust-greedy/
+
+impl Solution {
+    pub fn erase_overlap_intervals(mut intervals: Vec<Vec<i32>>) -> i32 {
+        intervals.sort_unstable();
+        intervals
+            .iter()
+            .skip(1)
+            .fold((&intervals[0], 0), |(prev, erased), cur| {
+                if cur[0] >= prev[1] {
+                    (cur, erased)
+                } else if cur[1] < prev[1] {
+                    (cur, erased + 1)
+                } else {
+                    (prev, erased + 1)
+                }
+            })
+            .1
+    }
+}

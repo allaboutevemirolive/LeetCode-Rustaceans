@@ -1,0 +1,21 @@
+// https://leetcode.com/problems/linked-list-random-node/solutions/3278743/javascript-rust-very-simple-solution-with-a-loop/
+struct Solution {
+    values: Vec<i32>,
+}
+
+impl Solution {
+    fn new(head: Option<Box<ListNode>>) -> Self {
+        let mut values = Vec::new();
+        let mut node_option = head;
+        while let Some(node) = node_option {
+            values.push(node.val);
+            node_option = node.next;
+        }
+        Solution { values }
+    }
+
+    fn get_random(&self) -> i32 {
+        let index = rand::random::<usize>() % self.values.len();
+        self.values[index]
+    }
+}

@@ -1,0 +1,21 @@
+// https://leetcode.com/problems/zigzag-conversion/solutions/207857/rust/
+fn convert(string: &str, num_rows: i32) -> String {
+    let num_rows = num_rows as usize;
+
+    if num_rows < 2 {
+        return string.into();
+    }
+
+    let mut strings = vec![String::new(); num_rows];
+
+    let mut i = 0;
+    let mut down = true;
+
+    for c in string.chars() {
+        strings[i].push(c);
+        i = if down { i + 1 } else { i - 1 };
+        down = down == (i > 0 && i < num_rows - 1);
+    }
+
+    strings.concat()
+}

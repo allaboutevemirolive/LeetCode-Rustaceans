@@ -1,0 +1,36 @@
+// https://leetcode.com/problems/divide-two-integers/solutions/688606/0ms-rust-solution-using-only-i32/
+impl Solution {
+    pub fn divide(dividend: i32, divisor: i32) -> i32 {
+        let min = i32::min_value();
+        let max = i32::max_value();
+
+        if divisor == min { return (dividend == min) as _; }
+		// Ok, there're some special cases and I admit it's ugly...But we are limited with i32
+        let mut dividend = dividend;
+        if dividend == min {
+            match divisor {
+                -1 => return max,           // min / -1 = max+1 (overflow)
+                1  => return min,           // min /  1 = min
+                -2 => return -(min >> 1),   // min / -2 = min/2
+                2  => return  min >> 1,     // min /  2 = -(min/2)
+                _  => dividend += 1,        // Ensure abs fit within [0, 2^31-1]
+            }
+        }
+
+        let     sign    : i32 = 1 - ((((dividend > 0) ^ (divisor > 0)) as i32) << 1);
+        let mut quotient: i32 = 0;
+        let mut shift   : i32 = 0;
+        let     divisor : i32 = divisor.abs();
+        dividend = dividend.abs();
+        while (dividend >> shift) >= divisor { shift += 1; }
+        while dividend >= divisor {
+            let diff = dividend - (divisor << shift);
+            if diff >= 0 {
+                dividend = diff;
+                quotient |= 1 << shift;
+            }
+            shift -= 1;
+        }
+        quotient * sign
+    }
+}

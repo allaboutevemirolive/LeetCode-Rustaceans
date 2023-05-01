@@ -1,0 +1,22 @@
+// https://leetcode.com/problems/find-all-anagrams-in-a-string/solutions/3143063/rust-window-solution/
+impl Solution {
+    pub fn find_anagrams(s: String, p: String) -> Vec<i32>  {
+        let mut contains:Vec<i32> = vec![0;26];
+        let mut floating:Vec<i32> = vec![0; 26];
+        let mut res = vec![];
+        let bytes = s.bytes().collect::<Vec<u8>>();
+        p.bytes().for_each(|c| {contains[(c - b'a') as usize] += 1;});
+        bytes.iter().take(p.len()).for_each(|c| { floating[(c - b'a') as usize] += 1;});
+        for (i, &ch) in bytes.iter().skip(p.len()).enumerate() {
+            if contains.eq(&floating) {
+                res.push(i as i32);
+            }
+            floating[(ch - b'a') as usize] += 1;
+            floating[(bytes[i] - b'a') as usize] -= 1;
+        }
+        if contains.eq(&floating) {
+            res.push((s.len() - p.len()) as i32);
+        }
+        res
+    }
+}

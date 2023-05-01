@@ -1,0 +1,11 @@
+// https://leetcode.com/problems/single-number-iii/solutions/1562194/rust-solution/
+impl Solution {
+    pub fn single_number(nums: Vec<i32>) -> Vec<i32> {
+        let x = nums.iter().fold(0, |a, &b| a ^ b);
+        let x = x - ((x - 1) & x);
+        nums.into_iter().fold(vec![0, 0], |mut v, b| {
+            v[if (b & x) == 0 { 0 } else { 1 }] ^= b;
+            v
+        })
+    }
+}

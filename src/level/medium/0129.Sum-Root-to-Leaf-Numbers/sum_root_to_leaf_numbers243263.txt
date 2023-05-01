@@ -1,0 +1,36 @@
+// https://leetcode.com/problems/sum-root-to-leaf-numbers/solutions/243263/rust-recursive-solution/
+// Definition for a binary tree node.
+// #[derive(Debug, PartialEq, Eq)]
+// pub struct TreeNode {
+//   pub val: i32,
+//   pub left: Option<Rc<RefCell<TreeNode>>>,
+//   pub right: Option<Rc<RefCell<TreeNode>>>,
+// }
+// 
+// impl TreeNode {
+//   #[inline]
+//   pub fn new(val: i32) -> Self {
+//     TreeNode {
+//       val,
+//       left: None,
+//       right: None
+//     }
+//   }
+// }
+use std::rc::Rc;
+use std::cell::RefCell;
+impl Solution {
+    pub fn sum_numbers(root: Option<Rc<RefCell<TreeNode>>>) -> i32 {
+        Self::sum(root, 0)
+    }
+    
+    fn sum(node: Option<Rc<RefCell<TreeNode>>>, sum: i32) -> i32 {
+        if let Some(n) = node {
+            if n.borrow().left.is_none() && n.borrow().right.is_none() {
+                return sum * 10 + n.borrow().val;
+            }
+            return Self::sum(n.borrow().left.clone(), sum * 10 + n.borrow().val) + Self::sum(n.borrow().right.clone(), sum * 10 + n.borrow().val)
+        }
+        return 0;
+    }
+}

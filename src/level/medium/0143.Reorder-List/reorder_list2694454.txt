@@ -1,0 +1,51 @@
+// https://leetcode.com/problems/reorder-list/solutions/2694454/rust-decomposition/
+impl Solution {
+    pub fn reorder_list(head: &mut Option<Box<ListNode>>) {
+        let len = Self::len(head);
+        let left_tail = Self::nth(head, (len - 1) / 2);
+
+        let mut tail = left_tail.as_mut().unwrap().next.take();
+        Self::reverse(&mut tail);
+        Self::weave(head, &mut tail);
+    }
+
+    fn len(head: &Option<Box<ListNode>>) -> usize {
+        let mut len = 0;
+        let mut cur = head;
+        while let Some(ref node) = cur {
+            len += 1;
+            cur = &node.next
+        }
+        len
+    }
+
+    fn nth(head: &mut Option<Box<ListNode>>, n: usize) -> &mut Option<Box<ListNode>> {
+        let mut cur = head;
+        for _ in 0..n {
+            cur = &mut cur.as_mut().unwrap().next;
+        }
+        cur
+    }
+
+    fn reverse(head: &mut Option<Box<ListNode>>) {
+        let mut prev = None;
+        let cur = &mut head.take();
+
+        while cur.is_some() {
+            std::mem::swap(&mut cur.as_mut().unwrap().next, &mut prev);
+            std::mem::swap(cur, &mut prev);
+        }
+
+        std::mem::swap(head, &mut prev);
+    }
+
+    fn weave(mut left: &mut Option<Box<ListNode>>, right: &mut Option<Box<ListNode>>) {
+        while left.is_some() && right.is_some() {
+            let left_next = &mut left.as_mut().unwrap().next;
+            std::mem::swap(left_next, right);
+            std::mem::swap(&mut left_next.as_mut().unwrap().next, right);
+
+            left = &mut left_next.as_mut().unwrap().next;
+        }
+    }
+}

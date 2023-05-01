@@ -1,0 +1,27 @@
+// https://leetcode.com/problems/palindrome-partitioning/solutions/3090561/rust-iterator-backtracking/
+impl Solution {
+    pub fn partition(s: String) -> Vec<Vec<String>> {
+        if s == "" {
+            return vec![vec![]];
+        }
+        (0..s.len())
+            .filter_map(|i| {
+                if Self::is_palindrome(&s[i..]) {
+                    Some((s[0..i].to_string(), s[i..].to_string()))
+                } else {
+                    None
+                }
+            })
+            .flat_map(|(prefix, suffix)| {
+                Self::partition(prefix).into_iter().map(move |mut v| {
+                    v.push(suffix.clone());
+                    v
+                })
+            })
+            .collect()
+    }
+
+    fn is_palindrome(s: &str) -> bool {
+        s.chars().eq(s.chars().rev())
+    }
+}

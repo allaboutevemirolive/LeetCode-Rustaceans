@@ -1,0 +1,11 @@
+// https://leetcode.com/problems/product-of-array-except-self/solutions/2715222/rust-solution/
+fn product_except_self(nums: Vec<i32>) -> Vec<i32> {
+    if !nums.contains(&0) {
+        let p: i32 = nums.iter().product();
+        return nums.iter().map(|e| p / e).collect();
+    } else if nums.clone().into_iter().filter(|&e| e == 0).count() > 1 {
+        return vec![0; nums.len()];
+    }
+    let p: i32 = nums.clone().into_iter().filter(|&e| e != 0).product();
+    nums.iter().map(|&e| if e == 0 { p } else { 0 }).collect()
+}

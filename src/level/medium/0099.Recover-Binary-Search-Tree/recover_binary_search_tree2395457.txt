@@ -1,0 +1,38 @@
+// https://leetcode.com/problems/recover-binary-search-tree/solutions/2395457/rust-w-o-cloning-or-creating-nodes/
+use std::rc::Rc;
+use std::cell::RefCell;
+impl Solution {
+    pub fn recover_tree(root: &mut Option<Rc<RefCell<TreeNode>>>) {
+        let mut data: Vec<i32> = vec![];
+        
+        Self::dfs_collect(root, &mut data);
+        // a one swap sorting could be implemented to improve runtime performance to O(N)
+		data.sort(); 
+        data.reverse();
+        
+        Self::dfs_replace(root, &mut data);
+    }
+    
+    fn dfs_collect(root: &mut Option<Rc<RefCell<TreeNode>>>, data: &mut Vec<i32>) {
+        if root.is_none() { return }
+        let mut node = root.as_ref().unwrap().borrow_mut(); 
+        
+        Self::dfs_collect(&mut node.left, data);
+        
+        data.push(node.val);
+        
+        Self::dfs_collect(&mut node.right, data);
+    }
+    
+    fn dfs_replace(root: &mut Option<Rc<RefCell<TreeNode>>>, data: &mut Vec<i32>) {
+        if root.is_none() { return }
+        let mut node = root.as_ref().unwrap().borrow_mut(); 
+        
+        Self::dfs_replace(&mut node.left, data);
+        
+        node.val = data[data.len() - 1];
+        data.pop();
+        
+        Self::dfs_replace(&mut node.right, data);
+    }
+}

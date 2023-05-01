@@ -1,0 +1,43 @@
+// https://leetcode.com/problems/unique-substrings-in-wraparound-string/solutions/3016417/rust-solution-using-dynamic-programing/
+impl Solution {
+  pub fn find_substring_in_wrapround_string(p: String) -> i32 {
+    let s = p.chars().into_iter().map(|v| (v as u8 - 'a' as u8) as usize).collect::<Vec<usize>>();
+    let n = s.len();
+    let mut memo = vec![0;26];
+
+    let mut len = 1;
+    let mut last = s[0];
+    let mut start = 0;
+    for i in 1..n {
+      let c = s[i];
+      if (last + 1) % 26 == c {
+        len += 1;
+      } else {
+        let edge = n.min(start+len).min(start+26);
+        for j in start..edge {
+          let padding = j - start;
+          let ti = (s[start] + padding) % 26;
+          let real_len = len - padding;
+          memo[ti] = memo[ti].max(real_len);
+        }
+        start = i;
+        len = 1;
+      }
+      last = c;
+    }
+
+    let edge = n.min(start+len).min(start+26);
+    for j in start..edge {
+      let padding = j - start;
+      let ti = (s[start] + padding) % 26;
+      let real_len = len - padding;
+      memo[ti] = memo[ti].max(real_len);
+    }
+
+    let mut result = 0usize;
+    for v in memo {
+      result += v;
+    }
+    result as i32
+  }
+}

@@ -1,0 +1,23 @@
+// https://leetcode.com/problems/spiral-matrix-ii/solutions/509979/rust-concise-iterator/
+impl Solution {
+    pub fn generate_matrix(n: i32) -> Vec<Vec<i32>> {
+        fn f(n: usize, bx: usize, by: usize) -> Box<dyn Iterator<Item=(usize, usize)>> {
+            if n == 0 {
+                Box::new(std::iter::empty())
+            } else if n == 1 {
+                Box::new(std::iter::once((bx, by)))
+            } else {
+                Box::new((0..n - 1).map(move |j| (0, j))
+                    .chain((0..n - 1).map(move |i| (i, n - 1)))
+                    .chain((0..n - 1).map(move |j| (n - 1, n - j - 1)))
+                    .chain((0..n - 1).map(move |i| (n - i - 1, 0)))
+                    .map(move |(x, y)| (x + bx, y + by))
+                    .chain(f( n - 2, bx + 1, by + 1)))
+            }
+        }
+        let n = n as usize;
+        let mut ans = vec![vec![0; n]; n];
+        f(n, 0, 0).zip(1..).for_each(|((i, j), k)| {ans[i][j] = k;});
+        ans
+    }
+}

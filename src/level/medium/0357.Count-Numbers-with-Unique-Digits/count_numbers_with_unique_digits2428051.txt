@@ -1,0 +1,9 @@
+// https://leetcode.com/problems/count-numbers-with-unique-digits/solutions/2428051/rust-4-line-solution/
+impl Solution {
+    pub fn count_numbers_with_unique_digits(n: i32) -> i32 {
+        fn p(n: i32, r: i32) -> i32 {
+            (n - r + 1 ..=n).fold(1, |acc, i| acc * i)
+        }
+        (1..=n).fold(1, |acc, r| acc + p(10, r) - p(9, r - 1))
+    }
+}

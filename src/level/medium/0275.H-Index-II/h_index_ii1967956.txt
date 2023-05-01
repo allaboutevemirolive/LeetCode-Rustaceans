@@ -1,0 +1,18 @@
+// https://leetcode.com/problems/h-index-ii/solutions/1967956/binary-search-in-rust/
+impl Solution {
+    pub fn h_index(citations: Vec<i32>) -> i32 {
+        let n = citations.len();
+        let mut l = 0;
+        let mut h = n;
+
+        while l != h {
+            let m = (l + h) / 2;
+            if citations[n - m - 1] > (m as i32) {
+                l = m + 1;
+            } else { 
+                h = m;
+            }
+        }
+        l as i32
+    }
+}
