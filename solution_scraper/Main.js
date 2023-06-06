@@ -170,8 +170,8 @@ async function writeToFile(folder_dash, link, copied_solution, file_txt_undersco
     const page = await browser.newPage();
 
     // Parameters
-    const text_file = 'LeetCode-Hard-Page-1.txt';
-    const target_link = 'https://leetcode.com/problemset/all/?difficulty=HARD&page=1';
+    const text_file = 'LeetCode-Hard-Page-2.txt';
+    const target_link = 'https://leetcode.com/problemset/all/?difficulty=HARD&page=2';
     const search_lang = "rust";
     const unhide_Lang_Button = 'Rust'; // Capitalize the first letter
     const target_language_class = '.language-rust, .language-python, .language-java, .language-cpp';
