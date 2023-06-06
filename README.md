@@ -3,7 +3,7 @@
 <img src="https://github.com/allaboutevemirolive/RustyLeet/blob/main/.github/rustyCrab2.png" width="300" height="300" alt="RustyLeet logo">
 
 
-Welcome to RustyLeet! 🦀👨‍💻
+Welcome to leetcode-rust! 🦀👨‍💻
 
 This is a repository of solutions for LeetCode problems in Rust. If you're a Rustacean looking for some fun coding challenges or someone looking to improve their Rust skills, you're in the right place!
 
