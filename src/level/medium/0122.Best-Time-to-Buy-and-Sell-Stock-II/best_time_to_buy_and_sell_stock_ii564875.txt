@@ -1,8 +1,0 @@
-// https://leetcode.com/problems/best-time-to-buy-and-sell-stock-ii/solutions/564875/rust-simple-0ms-solution/
-impl Solution {
-    pub fn max_profit(prices: Vec<i32>) -> i32 {
-        (1..prices.len())
-            .map(|i| std::cmp::max(0, prices[i] - prices[i - 1]))
-            .sum()
-    }
-}

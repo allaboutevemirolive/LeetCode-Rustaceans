@@ -1,9 +1,0 @@
-// https://leetcode.com/problems/search-a-2d-matrix-ii/solutions/1261662/rust-4ms-faster-than-86-76-2-6mb-less-than-48-28/
-pub fn search_matrix(matrix: Vec<Vec<i32>>, target: i32) -> bool {
-	for i in matrix.iter() {
-		if i.contains(&target) {
-			return true;
-		}
-	}
-	false
-}

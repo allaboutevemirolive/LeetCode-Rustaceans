@@ -1,2 +1,0 @@
-// https://leetcode.com/problems/validate-binary-search-tree/solutions/1546941/rust-iterative-solution/
-DepthFirstTraversal::from_root_node(root).is_sorted()

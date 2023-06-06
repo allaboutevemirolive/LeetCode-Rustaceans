@@ -1,7 +1,0 @@
-// https://leetcode.com/problems/super-pow/solutions/1942373/ruby-one-liner-beats-100-100-a-port-to-rust/
-impl Solution {
-    pub fn super_pow(a: i32, b: Vec<i32>) -> i32 {
-        let a = (a % 1337) as i128;
-        b.iter().fold(1i128, |x, &d| (x.pow(10) % 1337 * a.pow(d as u32)) % 1337) as i32
-    }
-}

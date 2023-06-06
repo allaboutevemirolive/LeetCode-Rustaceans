@@ -1,6 +1,0 @@
-// https://leetcode.com/problems/kth-smallest-element-in-a-sorted-matrix/solutions/2741487/rust-solution-alternative-approach-but-not-optimal/
-pub fn kth_smallest(matrix: Vec<Vec<i32>>, k: i32) -> i32 {
-	let mut matrix = matrix.concat();
-	matrix.sort();
-	matrix[k as usize - 1]
-}

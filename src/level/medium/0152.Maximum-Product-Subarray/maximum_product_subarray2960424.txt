@@ -1,7 +1,0 @@
-// https://leetcode.com/problems/maximum-product-subarray/solutions/2960424/rust-dp-solution-o-n-runtime-o-n-space/
-dfs(nums, prev_val):
-    if not nums: int.MIN
-    return max(
-        dfs(nums[1..], nums[0]),
-        dfs(nums[1..], nums[0] * prev),
-        prev)

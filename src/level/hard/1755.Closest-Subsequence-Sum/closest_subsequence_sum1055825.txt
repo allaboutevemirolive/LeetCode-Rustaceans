@@ -1,9 +1,0 @@
-// https://leetcode.com/problems/closest-subsequence-sum/solutions/1055825/rust-o-n-2-n-2-with-explanation/
-fn sums(nums: &[i32]) -> Vec<i32> {
-    let mut res: HashSet<_> = once(0).collect();
-    for &e in nums {
-        let new: Vec<_> = res.iter().map(|&x| x + e).collect();
-        res.extend(new);
-    }
-    res.into_iter().collect()
-}

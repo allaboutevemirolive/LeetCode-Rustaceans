@@ -1,7 +1,0 @@
-// https://leetcode.com/problems/h-index/solutions/1044603/rust-100-time-memory/
-impl Solution {
-    pub fn h_index(mut citations: Vec<i32>) -> i32 {
-        citations.sort_unstable_by(|a, b| b.cmp(a));
-        citations.iter().enumerate().position(|(index, value)| index >= *value as usize).unwrap_or(citations.len()) as i32
-    }
-}

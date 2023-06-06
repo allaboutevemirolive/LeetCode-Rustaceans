@@ -1,6 +1,0 @@
-// https://leetcode.com/problems/reverse-words-in-a-string/solutions/2778511/rust-one-line-solution/
-impl Solution {
-    pub fn reverse_words(s: String) -> String {
-        s.split(' ').filter(|mem| mem!=&"").rev().collect::<Vec<_>>().join(" ")
-    }
-}

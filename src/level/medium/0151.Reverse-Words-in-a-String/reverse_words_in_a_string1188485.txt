@@ -1,9 +1,0 @@
-// https://leetcode.com/problems/reverse-words-in-a-string/solutions/1188485/rust-solution/
-impl Solution {
-    pub fn reverse_words(s: String) -> String {
-        s.rsplit(" ")
-            .filter(|&word| word != "")
-            .map(|word| word.to_string())
-            .collect::<Vec<String>>().join(" ")
-    }
-}

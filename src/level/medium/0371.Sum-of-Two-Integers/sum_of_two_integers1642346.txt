@@ -1,4 +1,0 @@
-// https://leetcode.com/problems/sum-of-two-integers/solutions/1642346/rust-cheating-iterator-solution/
-pub fn get_sum(a: i32, b: i32) -> i32 {
-    [a, b].iter().sum()
-}

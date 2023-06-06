@@ -1,8 +1,0 @@
-// https://leetcode.com/problems/minimum-moves-to-equal-array-elements-ii/solutions/2217519/rust-o-n-log-n-and-o-n-solutions-with-explanation/
-impl Solution {
-    pub fn min_moves2(mut nums: Vec<i32>) -> i32 {
-        nums.sort_unstable();
-        let median = nums[nums.len()/2];
-        nums.into_iter().map(|num| ((num - median) as i64).abs()).sum::<i64>() as _
-    }
-}
