@@ -6,9 +6,9 @@ const fs = require('fs');
     const page = await browser.newPage();
 
     // Numeral of pages starts from 1
-    for (let i = 1; i <= 15; i++) {
+    for (let i = 1; i <= 13; i++) {
 
-        const targetUrl = `https://leetcode.com/problemset/all/?difficulty=MEDIUM&page=${i}`;
+        const targetUrl = `https://leetcode.com/problemset/all/?difficulty=HARD&page=${i}`;
 
         await page.goto(targetUrl);
 
@@ -26,7 +26,7 @@ const fs = require('fs');
                 .map((link) => link.href)
         );
 
-        const file_name = 'LeetCode-Medium-Page-' + i ;
+        const file_name = 'LeetCode-Hard-Page-' + i ;
 
         fs.writeFile(`${file_name}.txt`, matches.join('\n'), (err) => {
             if (err) {
